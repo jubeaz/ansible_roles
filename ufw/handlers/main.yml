@@ -1,0 +1,11 @@
+---
+# handlers file for ufw
+- name: enable ufw service
+  service:
+    name: ufw
+    state: restarted
+    enabled: true
+- name: enable ufw
+  ufw:
+    state: enabled
+

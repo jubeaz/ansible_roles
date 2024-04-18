@@ -1,0 +1,52 @@
+---
+- include_tasks: variables.yml
+  when: (inventory_hostname in groups[_client_group_name]) or (inventory_hostname == _ca_name)
+
+- include_tasks: asserts.yml
+  when: inventory_hostname in groups[_client_group_name]
+
+- name: Get back cert in tmp dir
+  become: false
+  synchronize:
+    src: "{{ _ca_new_certs_dir }}/{{ ansible_hostname }}-{{ ansible_date_time.epoch }}-{{ vars[_cert_file_var] }}"
+    dest: "/tmp/{{ vars[_cert_file_var] }}"
+    use_ssh_args: true
+    mode: push
+  delegate_to: "{{ _ca_name }}"
+
+- name: copy file on destination dir
+  copy:
+    src: "/tmp/{{ vars[_cert_file_var] }}"
+    dest: "{{ vars[_cert_path_var] }}/{{ vars[_cert_file_var] }}"
+    owner: "{{ vars[_owner_user_var] }}"
+    group: "{{ vars[_owner_group_var] }}"
+    mode: 0644
+    remote_src: true
+
+- name: delete cert from tmp
+  file:
+    path: "/tmp/{{ vars[_cert_file_var] }}"
+    state: absent
+
+- name: Get back cert bundle in tmp dir
+  become: false
+  synchronize:
+    src: "{{ _ca_new_certs_dir }}/bundle-{{ ansible_hostname }}-{{ ansible_date_time.epoch }}-{{ vars[_cert_file_var] }}"
+    dest: "/tmp/bundle-{{ vars[_cert_file_var] }}"
+    use_ssh_args: true
+    mode: push
+  delegate_to: "{{ _ca_name }}"
+
+- name: copy bundle file on destination dir
+  copy:
+    src: "/tmp/bundle-{{ vars[_cert_file_var] }}"
+    dest: "{{ vars[_cert_path_var] }}/bundle-{{ vars[_cert_file_var] }}"
+    owner: "{{ vars[_owner_user_var] }}"
+    group: "{{ vars[_owner_group_var] }}"
+    mode: 0644
+    remote_src: true
+
+- name: delete cert bundle from tmp
+  file:
+    path: "/tmp/bundle-{{ vars[_cert_file_var] }}"
+    state: absent

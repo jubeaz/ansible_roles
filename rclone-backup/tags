@@ -1,0 +1,76 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/rclone-backup/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Create local_dirs	tasks/main.yml	/^- name: Create local_dirs$/;"	p	language:AnsiblePlaybook
+Create service	tasks/main.yml	/^- name: Create service$/;"	p	language:AnsiblePlaybook
+Create timer	tasks/main.yml	/^- name: Create timer$/;"	p	language:AnsiblePlaybook
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+Generate ssh key for rclone keepass	tasks/main.yml	/^- name: Generate ssh key for rclone keepass$/;"	p	language:AnsiblePlaybook
+HEREDOC	files/rclone-backup.sh	/^   cat << HEREDOC$/;"	h	language:Sh
+HEREDOC	files/rclone-restore.sh	/^   cat << HEREDOC$/;"	h	language:Sh
+Include OS-specific variables (Archlinux)	tasks/variables.yml	/^- name: Include OS-specific variables (Archlinux)$/;"	p	language:AnsiblePlaybook
+Include OS-specific variables (Ubuntu)	tasks/variables.yml	/^- name: Include OS-specific variables (Ubuntu)$/;"	p	language:AnsiblePlaybook
+Include common variables	tasks/variables.yml	/^- name: Include common variables$/;"	p	language:AnsiblePlaybook
+Install backup script	tasks/main.yml	/^- name: Install backup script$/;"	p	language:AnsiblePlaybook
+Install cron	tasks/main.yml	/^- name: Install cron$/;"	p	language:AnsiblePlaybook
+Install keepassxc	tasks/arch.yml	/^- name: Install keepassxc$/;"	p	language:AnsiblePlaybook
+Install keepassxc	tasks/ubuntu.yml	/^- name: Install keepassxc$/;"	p	language:AnsiblePlaybook
+Install retore script	tasks/main.yml	/^- name: Install retore script$/;"	p	language:AnsiblePlaybook
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1645972196
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+arch.yml	tasks/arch.yml	1;"	F	language:Yaml	epoch:1647740993
+arch.yml	vars/arch.yml	1;"	F	language:Yaml	epoch:1645972196
+assert proper distribution	tasks/asserts.yml	/^- name: assert proper distribution$/;"	p	language:AnsiblePlaybook
+asserts.yml	tasks/asserts.yml	1;"	F	language:Yaml	epoch:1645972196
+backup_dirs=	files/rclone-backup.sh	/^backup_dirs=()$/;"	f	language:Sh
+check	files/rclone-backup.sh	/^check() {$/;"	f	language:Sh
+check	files/rclone-restore.sh	/^check() {$/;"	f	language:Sh
+clean_up	files/rclone-backup.sh	/^clean_up() {$/;"	f	language:Sh
+cloud_backup	files/rclone-backup.sh	/^cloud_backup() {$/;"	f	language:Sh
+cloud_paths=	files/rclone-backup.sh	/^cloud_paths=()$/;"	f	language:Sh
+cloud_sync	files/rclone-backup.sh	/^cloud_sync() {$/;"	f	language:Sh
+common.yml	vars/common.yml	1;"	F	language:Yaml	epoch:1665651666
+content=	files/rclone-backup.sh	/^  local content=()$/;"	f	language:Sh
+create_keepass_db	files/rclone-backup.sh	/^create_keepass_db() {$/;"	f	language:Sh
+create_keepass_entry	files/rclone-backup.sh	/^create_keepass_entry() {$/;"	f	language:Sh
+create_keepass_group	files/rclone-backup.sh	/^create_keepass_group() {$/;"	f	language:Sh
+delete_empty_dirs	files/rclone-backup.sh	/^delete_empty_dirs() {$/;"	f	language:Sh
+enc_directory	files/rclone-backup.sh	/^enc_directory() {$/;"	f	language:Sh
+enc_file	files/rclone-backup.sh	/^enc_file() {$/;"	f	language:Sh
+fetch_keepass_entry	files/rclone-backup.sh	/^fetch_keepass_entry () {$/;"	f	language:Sh
+fetch_keepass_entry	files/rclone-restore.sh	/^fetch_keepass_entry () {$/;"	f	language:Sh
+find_keepass_entry_from_url	files/rclone-backup.sh	/^find_keepass_entry_from_url() {$/;"	f	language:Sh
+find_keepass_entry_from_url	files/rclone-restore.sh	/^find_keepass_entry_from_url() {$/;"	f	language:Sh
+main	files/rclone-backup.sh	/^main() {$/;"	f	language:Sh
+main	files/rclone-restore.sh	/^main() {$/;"	f	language:Sh
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1646292803
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1665651844
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1645972196
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1665651845
+parse_cmdline	files/rclone-backup.sh	/^parse_cmdline() {$/;"	f	language:Sh
+parse_cmdline	files/rclone-restore.sh	/^parse_cmdline() {$/;"	f	language:Sh
+process_directory	files/rclone-backup.sh	/^process_directory() {$/;"	f	language:Sh
+process_file	files/rclone-backup.sh	/^process_file() {$/;"	f	language:Sh
+rclone-backup.sh	files/rclone-backup.sh	1;"	F	language:Sh	epoch:1667126486
+rclone-restore.sh	files/rclone-restore.sh	1;"	F	language:Sh	epoch:1646326901
+restart timer	handlers/main.yml	/^- name: restart timer$/;"	p	language:AnsiblePlaybook
+restore_list=	files/rclone-restore.sh	/^restore_list=()$/;"	f	language:Sh
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1645972196
+ubuntu.yml	tasks/ubuntu.yml	1;"	F	language:Yaml	epoch:1646020073
+ubuntu.yml	vars/ubuntu.yml	1;"	F	language:Yaml	epoch:1645972196
+usage	files/rclone-backup.sh	/^function usage()$/;"	f	language:Sh
+usage	files/rclone-restore.sh	/^function usage()$/;"	f	language:Sh
+variables.yml	tasks/variables.yml	1;"	F	language:Yaml	epoch:1645972196

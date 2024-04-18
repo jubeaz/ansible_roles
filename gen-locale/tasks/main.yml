@@ -1,0 +1,26 @@
+---
+- include_tasks: asserts.yml  
+- name: Specify locale
+  template:
+    src: templates/locale.gen.j2
+    dest: /etc/locale.gen
+    mode: 0644
+    owner: root
+    group: root
+  notify: Generate locale
+
+- name: Set locale
+  template:
+    src: templates/locale.conf.j2
+    dest: /etc/locale.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Set vconsole
+  copy:
+    content: "{{ vconsole_content }}"
+    dest: /etc/vconsole.conf
+    mode: 0644
+    owner: root
+    group: root

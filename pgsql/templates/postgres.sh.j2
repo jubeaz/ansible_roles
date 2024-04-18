@@ -1,0 +1,5 @@
+{{ ansible_managed | comment }}
+
+export PGROOT={{ _pgsql_data_dir }}
+export PGDATA={{ _pgsql_data_dir }}
+export PATH=$PATH:{{ _pgsql_bin_path }}

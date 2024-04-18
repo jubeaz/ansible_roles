@@ -1,0 +1,27 @@
+{{ ansible_managed | comment }}
+.include {{ _ca_dirs['_ca_cnf'].path }}/openssl-base.cnf
+{% set template = ca_self_info %}
+
+[ req ]
+encrypt_key                 = yes
+default_keyfile             = $b_private_key
+
+default_bits                = {{ template.default_bits }}
+default_md                  = {{ template.default_md }}
+
+prompt                      = no
+distinguished_name          = req_dn
+string_mask                 = utf8only
+x509_extensions             = v3_ext
+
+[ req_dn ]
+{% for key, value in template.dn.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+[ v3_ext ]
+# subjectKeyIdentifier        = hash
+# authorityKeyIdentifier      = keyid:always,issuer
+# basicConstraints            = critical, CA:true
+# keyUsage                    = critical, cRLSign, keyCertSign
+

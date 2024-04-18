@@ -1,0 +1,11 @@
+
+- name: Install Security, Critical and Rollups Updates and reboot as many times as needed
+  ansible.windows.win_updates:
+    category_names: 
+      - SecurityUpdates
+      - CriticalUpdates
+      - UpdateRollups
+    reboot: true
+  become: true
+  become_method: runas
+  become_user: SYSTEM

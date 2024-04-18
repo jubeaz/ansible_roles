@@ -1,0 +1,9 @@
+---
+- name: Assert ca_signing_ca is defined and sety
+  assert:
+    that:
+      - ca_signing_ca is defined
+      - ca_signing_ca is string
+    quiet: true
+
+      # TO DO control is inventory hostname and is CA

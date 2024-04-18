@@ -1,0 +1,9 @@
+[Unit]
+Description=Run rsyncd-clean daily at {{ rsyncd_service_clean_time }}
+
+[Timer]
+OnCalendar=*-*-* {{ rsyncd_service_clean_time }}
+
+[Install]
+WantedBy=timers.target
+

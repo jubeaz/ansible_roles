@@ -1,0 +1,11 @@
+---
+- name: restart updatedb
+  service:
+    name: updatedb
+    state: restarted
+    enabled: true
+- name: restart updatedb timer
+  systemd:
+    name: updatedb.timer
+    state: restarted
+    enabled: true

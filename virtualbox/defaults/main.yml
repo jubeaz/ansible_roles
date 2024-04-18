@@ -1,0 +1,6 @@
+---
+# defaults file for virtualbox
+vbox_sys_user: root
+vbox_users:
+  - root
+vbox_base_data_dir: /var/lib/virtualbox

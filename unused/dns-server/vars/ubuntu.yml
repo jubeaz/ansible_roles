@@ -1,0 +1,5 @@
+---
+_named_conf_dir: /etc/bind
+_named_zone_dir: /var/cache/bind
+_named_user: root
+_named_group: bind

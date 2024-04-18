@@ -1,0 +1,11 @@
+---
+vmware_dependencies:
+  - fuse2
+  - gtkmm
+  - linux-lts-headers
+  - ncurses
+  - libcanberra
+  - pcsclite
+  - dkms
+  - gcr
+  - libxcrypt-compat

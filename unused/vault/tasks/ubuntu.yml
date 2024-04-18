@@ -1,0 +1,32 @@
+---
+- name: Apt install key
+  apt_key:
+    url: "{{ _hvault_apt_key_url }}"
+    state: present
+
+- name: Apt add repository
+  apt_repository:
+    repo: "{{ _hvault_apt_repo }}"
+    state: present
+
+- name: Install hashicorp vault
+  apt:
+    name: vault
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Delete /etc/vault.d/vault.hcl
+  file:
+    path: /etc/vault.d/vault.hcl
+    state: absent
+
+- name: Delete /etc/vault.d/vault.env
+  file:
+    path: /etc/vault.d/vault.env
+    state: absent
+
+- name: Delete /opt/vault/
+  file:
+    path: /opt/vault
+    state: absent

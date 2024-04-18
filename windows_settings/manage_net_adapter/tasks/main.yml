@@ -1,0 +1,13 @@
+
+- name: "Enable interface '{{adapter| default(pub_adapter)}}'"
+  win_shell: netsh interface set interface "{{adapter}}" enable
+  register: enable_adpter_interface
+  until: "enable_adpter_interface is not failed"
+  retries: 3
+  delay: 120
+  when: two_adapters == true and action | default('enable') == 'enable'
+
+
+- name: "Disable interface '{{adapter| default(pub_adapter)}}'"
+  win_shell: netsh interface set interface "{{adapter}}" disable
+  when: two_adapters == true and action | default('enable') == 'disable'

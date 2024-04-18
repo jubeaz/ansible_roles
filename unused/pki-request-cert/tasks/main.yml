@@ -1,0 +1,37 @@
+---
+- include_tasks: variables.yml
+  when: (inventory_hostname in groups[_client_group_name]) or (inventory_hostname == _ca_name)
+
+- include_tasks: asserts.yml
+  when: inventory_hostname in groups[_client_group_name]
+
+- name: Create PK
+  openssl_privatekey:
+    path: "{{ vars[_key_path_var] }}/{{ vars[_key_file_var] }}"
+    size: "{{ _ca_template_params['default_bits'] }}"
+    state: present
+    owner: "{{ vars[_owner_user_var] }}"
+    group: "{{ vars[_owner_group_var] }}"
+
+- name: Include "csrs/{{ _csr_template_name }}_csr.yml" 
+  include_tasks: "csrs/{{ _csr_template_name }}_csr.yml"
+
+- name: Copy csr readable by everyone
+  copy:
+    src: "{{ vars[_cert_path_var] }}/{{ vars[_cert_file_var] }}.csr"
+    dest: "/tmp/{{ vars[_cert_file_var] }}.csr"
+    owner: "{{ vars[_owner_user_var] }}"
+    group: "{{ vars[_owner_group_var] }}"
+    mode: 0444
+    remote_src: true
+  when: _openssl_csr.changed == true
+
+- name: Copy csr on ca
+  become: false
+  ansible.posix.synchronize:
+    src: "/tmp/{{ vars[_cert_file_var] }}.csr"
+    dest: "{{ _ca_csr_dir }}/{{ ansible_hostname}}-{{ ansible_date_time.epoch }}-{{ vars[_cert_file_var] }}.csr"
+    use_ssh_args: true
+    mode: pull
+  delegate_to: "{{ _ca_name }}"
+  when: _openssl_csr.changed == true

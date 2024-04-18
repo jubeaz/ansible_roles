@@ -1,0 +1,75 @@
+- name: set acl on CA
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $for,
+          [String]
+          $to,
+          [String]
+          $right,
+          [String]
+          $inheritance
+      )
+
+      Import-Module -Name PSPKI
+      $CA =  Get-CertificationAuthority -Name $to
+      Write-Output "CA found : $($CA.DistinguishedName)"
+
+      $CA | Get-CertificationAuthorityAcl | Add-CertificationAuthorityAcl -Identity $for -AccessType "Allow" -AccessMask $right | Set-CertificationAuthorityAcl 
+    error_action: stop
+    parameters:
+      for: "{{item.value.for}}"
+      to: "{{item.value.to}}"
+      right: "{{item.value.right}}"
+      inheritance: "{{item.value.inheritance}}"
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+  with_dict: "{{ acls }}"
+  register: adcs_acl_authority_result
+
+- name: restart CA
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $CAName
+      )
+
+      Import-Module -Name PSPKI
+      $CA =  Get-CertificationAuthority -Name $to
+      Write-Output "CA found : $($CA.DistinguishedName)"
+
+      $CA | Restart-CertificationAuthority
+
+    error_action: stop
+    parameters:
+      CAName: "{{CAName}}"
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+
+- debug:
+    var: adcs_acl_authority_result
+
+
+#Add-AdCrl Add-AIA Add-CAAccessControlEntry Add-CAACL Add-CDP Add-OCSPACL Connect-CA Disable-CRLFlag Disable-KRAFlag Enable-CRLFlag Enable-KRAFlag 
+#Get-AIA Get-CA Get-CAACL Get-CASecurityDescriptor Get-CDP Get-CRL Get-CRLFlag Get-Csp Get-CTL Get-KRAFlag Get-OCSPACL Remove-AdCrl Remove-AIA 
+#Remove-CAAccessControlEntry Remove-CAACL Remove-CDP Remove-OCSPACL Remove-Request Restore-CRLFlagDefault Restore-KRAFlagDefault 
+#Set-AIA Set-CAACL Set-CASecurityDescriptor Set-CDP Set-OCSPACL Show-CRL Show-CTL Add-AdCertificate Add-AdCertificateRevocationList 
+#Add-AuthorityInformationAccess Add-CAKRACertificate Add-CATemplate Add-CertificateTemplateAcl Add-CertificationAuthorityAcl Add-CRLDistributionPoint 
+#Add-ExtensionList Add-OnlineResponderAcl Add-OnlineResponderArrayMember Add-OnlineResponderLocalCrlEntry Add-OnlineResponderRevocationConfiguration 
+#Approve-CertificateRequest Connect-CertificationAuthority Connect-OnlineResponder Convert-PemToPfx Convert-PfxToPem Deny-CertificateRequest 
+#Disable-CertificateRevocationListFlag Disable-InterfaceFlag Disable-KeyRecoveryAgentFlag Disable-PolicyModuleFlag Enable-CertificateRevocationListFlag
+# Enable-InterfaceFlag Enable-KeyRecoveryAgentFlag Enable-PolicyModuleFlag Get-AdcsDatabaseRow Get-ADKRACertificate Get-AdPkiContainer 
+# Get-AuthorityInformationAccess Get-CACryptographyConfig Get-CAExchangeCertificate Get-CAKRACertificate Get-CATemplate Get-CertificateContextProperty 
+# Get-CertificateRequest Get-CertificateRevocationList Get-CertificateRevocationListFlag Get-CertificateTemplate Get-CertificateTemplateAcl
+#  Get-CertificateTrustList Get-CertificateValidityPeriod Get-CertificationAuthority Get-CertificationAuthorityAcl Get-CertificationAuthorityDbSchema Get-CRLDistributionPoint Get-CRLValidityPeriod Get-CryptographicServiceProvider Get-EnrollmentPolicyServerClient Get-EnterprisePKIHealthStatus Get-ErrorMessage Get-ExtensionList Get-FailedRequest Get-InterfaceFlag Get-IssuedRequest Get-KeyRecoveryAgentFlag Get-ObjectIdentifier Get-ObjectIdentifierEx Get-OnlineResponderAcl Get-OnlineResponderRevocationConfiguration Get-PendingRequest Get-PolicyModuleFlag Get-RevokedRequest Import-LostCertificate New-SelfSignedCertificateEx Ping-ICertInterface Publish-CRL Receive-Certificate Register-ObjectIdentifier Remove-AdCertificate Remove-AdCertificateRevocationList Remove-AdcsDatabaseRow Remove-AuthorityInformationAccess Remove-CAKRACertificate Remove-CATemplate Remove-CertificateTemplate Remove-CertificateTemplateAcl Remove-CertificationAuthorityAcl Remove-CRLDistributionPoint Remove-ExtensionList Remove-OnlineResponderAcl Remove-OnlineResponderArrayMember Remove-OnlineResponderLocalCrlEntry Remove-OnlineResponderRevocationConfiguration Restart-CertificationAuthority Restart-OnlineResponder Restore-CertificateRevocationListFlagDefault Restore-KeyRecoveryAgentFlagDefault Restore-PolicyModuleFlagDefault Revoke-Certificate Set-AuthorityInformationAccess Set-CACryptographyConfig Set-CAKRACertificate Set-CATemplate Set-CertificateExtension Set-CertificateTemplateAcl Set-CertificateValidityPeriod Set-CertificationAuthorityAcl Set-CRLDistributionPoint Set-CRLValidityPeriod Set-ExtensionList Set-OnlineResponderAcl Set-OnlineResponderProperty Set-OnlineResponderRevocationConfiguration Show-Certificate Show-CertificateRevocationList Show-CertificateTrustList Start-CertificationAuthority Start-OnlineResponder Stop-CertificationAuthority Stop-OnlineResponder Submit-CertificateRequest Test-WebServerSSL Unregister-ObjectIdentifier
+#

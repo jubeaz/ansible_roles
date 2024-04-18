@@ -1,0 +1,9 @@
+---
+_pgsql_root_dir: "/var/lib/postgres"
+_pgsql_data_dir: "/var/lib/postgres/data"
+_pgsql_bin_path: "/usr/bin"
+_pgsql_config_path: "{{ _pgsql_data_dir }}"
+_pgsql_daemon: "postgresql"
+
+_pgsql_unix_socket_directories: 
+  - /run/postgresql

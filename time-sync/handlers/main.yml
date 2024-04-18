@@ -1,0 +1,7 @@
+---
+# handlers file for time-sync
+- name: "Enable systemd-timesyncd"
+  systemd:
+    name: systemd-timesyncd
+    state: restarted
+    enabled: true

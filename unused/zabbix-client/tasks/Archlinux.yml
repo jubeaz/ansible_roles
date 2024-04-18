@@ -1,0 +1,7 @@
+---
+- name: install zabbix agent
+  pacman:
+    name: zabbix-agent
+    state: present
+  register: __pacman
+  changed_when: (__pacman.packages | default([]))| length >0 

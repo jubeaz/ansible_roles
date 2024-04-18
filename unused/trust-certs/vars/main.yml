@@ -1,0 +1,12 @@
+---
+_distribution_specific: {
+  Ubuntu: {
+    _certs_dest_dir: /usr/local/share/ca-certificates
+    },
+  Archlinux: {
+    _certs_dest_dir: /etc/ca-certificates/trust-source/anchors
+    }
+}
+_ca_trust_certs_dest_dir: "{{ _distribution_specific[ansible_distribution]._certs_dest_dir }}"
+
+  #_trust_certs_dir: /tmp/certs

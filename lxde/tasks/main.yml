@@ -1,0 +1,70 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml"
+
+#- name: Config x11 monitors
+#  template:
+#    src: x11_monitors.conf.j2
+#    dest: /etc/X11/xorg.conf.d/x11_monitors.conf
+#    owner: root
+#    group: root
+#    mode: 06344
+#  notify: restart lightdm
+- name: Get localectl
+  command: localectl status
+  register: __locale_status
+  changed_when: false
+
+- name: Parse 'X11 Layout' from current locale
+  set_fact:
+    current_x11_layout: "{{ __locale_status.stdout | regex_search('X11 Layout: ([^\n]+)', '\\1') | first }}"
+
+- name: Set keyboard map
+  command: localectl set-x11-keymap "{{ x11_keymap_layout }}"
+  changed_when: current_x11_layout != x11_keymap_layout
+  notify: restart lightdm
+
+- name: Add users to light
+  user:
+    name: "{{ item }}"
+    groups: "{{ _light_group }}"
+    append: yes
+  with_items: "{{ light_users }}"
+
+- name: Create wallpaper folder
+  ansible.builtin.file:
+    path: /usr/share/wallpaper
+    owner: root
+    group: root
+    state: directory
+    mode: '0755'
+
+- name: Copy greeter bg images
+  copy:
+    dest: "/usr/share/wallpaper/greeter-bg.png"
+    src: "files/greeter-bg.png"
+    owner: root
+    group: root
+    mode: 0655
+
+- name: Copy greeter config
+  copy:
+    dest: "/etc/lightdm/lightdm-gtk-greeter.conf"
+    src: "files/lightdm-gtk-greeter.conf"
+    owner: root
+    group: root
+    mode: 0644
+

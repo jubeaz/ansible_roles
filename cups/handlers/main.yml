@@ -1,0 +1,9 @@
+---
+#- name: cups-genppdupdate
+#  command: 
+
+- name: restart cups
+  service:
+    name: cups
+    state: restarted
+    enabled: true

@@ -1,0 +1,47 @@
+{{ ansible_managed | comment(decoration="// ") }}
+
+{% for key, value in named_acls.items() %}
+acl {{ key }} { 
+    {% for item in value %}
+    {{ item }} ;
+    {% endfor %}
+};
+{% endfor %}
+
+{% for key, value in named_primaries.items() %}
+primaries {{ key }} { 
+    {% for item in value %}
+    {{ item }} ;
+    {% endfor %}
+};
+{% endfor %}
+
+options {
+    directory "{{ _named_zone_dir }}";
+    pid-file "/run/named/named.pid";
+
+{% for key, value in named_atomic_options.items() %}
+    {{ key }} {{ value }};
+{% endfor %}
+
+
+
+{% for key, value in named_list_options.items() %}
+    {{ key }} { 
+    {% for item in value %}
+        {{ item }} ;
+    {% endfor %}
+    };
+{% endfor %}
+
+
+{% for key, value in named_acl_options.items() %}
+    {{ key }} { {{ value | join("; ")}}; };
+{% endfor %}
+
+    dnssec-validation false;
+
+    version none;
+    hostname none;
+    server-id none;
+};

@@ -1,0 +1,11 @@
+- name: Ensure PostgreSQL Python libraries are installed.
+  apt:
+    name: python3-psycopg2
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure PostgreSQL packages are installed.
+  apt:
+    name: postgresql
+    state: present

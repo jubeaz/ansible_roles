@@ -1,0 +1,19 @@
+---
+- include_tasks: variables.yml
+  when: inventory_hostname == _ca_name
+#
+#  
+#- include_tasks: asserts.yml
+#  when: inventory_hostname in groups[_client_group_name]
+
+  #- include_tasks: ubuntu.yml
+  #  when: ansible_distribution == "Ubuntu"
+  #- include_tasks: arch.yml
+
+
+- name: Include ca_sign
+  include_tasks: ca_sign.yml
+  when: inventory_hostname == _ca_name
+  loop: "{{ ca_templates.keys() }}"
+  loop_control:
+    loop_var: template

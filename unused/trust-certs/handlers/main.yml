@@ -1,0 +1,11 @@
+---
+- name: Trust root ca Archlinux
+  command:
+    argv:
+      - update-ca-trust
+
+- name: Trust root ca Ubuntu
+  command:
+    argv:
+      - update-ca-certificates
+      - --fresh

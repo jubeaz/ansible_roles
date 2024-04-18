@@ -1,0 +1,26 @@
+---
+# vars file for virtualbox
+_vbox_group: vboxusers
+_vbox_data_dirs:
+  vm_dir:
+    path: "{{ vbox_base_data_dir }}/vms"
+    owner: root
+    group: "{{ _vbox_group }}"
+    mode: "0775"
+  iso_dir:
+    path: "{{ vbox_base_data_dir }}/isos"
+    owner: root
+    group: root
+    mode: "0755"
+  ovf_dir:
+    path: "{{ vbox_base_data_dir }}/ovfs"
+    owner: root
+    group: root
+    mode: "0755"
+  share_dir:
+    path: "{{ vbox_base_data_dir }}/share"
+    owner: root
+    group: root
+    mode: "0755"
+
+

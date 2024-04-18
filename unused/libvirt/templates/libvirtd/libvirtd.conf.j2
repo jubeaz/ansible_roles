@@ -1,0 +1,163 @@
+{{ ansible_managed | comment }}
+# Master libvirt daemon configuration file
+#
+
+#################################################################
+#
+# Authentication.
+#
+# There are the following choices available:
+#
+#  - none: do not perform auth checks. If you can connect to the
+#          socket you are allowed. This is suitable if there are
+#          restrictions on connecting to the socket (eg, UNIX
+#          socket permissions), or if there is a lower layer in
+#          the network providing auth (eg, TLS/x509 certificates)
+#
+#  - sasl: use SASL infrastructure. The actual auth scheme is then
+#          controlled from /etc/sasl2/libvirt.conf. For the TCP
+#          socket only GSSAPI & DIGEST-MD5 mechanisms will be used.
+#          For non-TCP or TLS sockets, any scheme is allowed.
+#
+#  - polkit: use PolicyKit to authenticate. This is only suitable
+#            for use on the UNIX sockets. The default policy will
+#            require a user to supply their own password to gain
+#            full read/write access (aka sudo like), while anyone
+#            is allowed read/only access.
+#
+
+#auth_unix_ro = "polkit"
+#auth_unix_rw = "polkit"
+#auth_tcp = "sasl"
+#auth_tls = "none"
+#tcp_min_ssf = 112
+#access_drivers = [ "polkit" ]
+
+{% if libvirtd_cfg.auth is defined %}
+{% for key,value in libvirtd_cfg.auth.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+#################################################################
+#
+# TLS x509 certificate configuration
+#
+#key_file = "/etc/pki/libvirt/private/serverkey.pem"
+#cert_file = "/etc/pki/libvirt/servercert.pem"
+#ca_file = "/etc/pki/CA/cacert.pem"
+#crl_file = "/etc/pki/CA/crl.pem"
+
+
+{% if libvirtd_cfg.x509 is defined %}
+{% for key,value in libvirtd_cfg.x509.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+#################################################################
+#
+# Authorization controls
+#
+
+#tls_no_sanity_certificate = 1
+#tls_no_verify_certificate = 1
+#tls_allowed_dn_list = ["DN1", "DN2"]
+#tls_priority="NORMAL"
+#sasl_allowed_username_list = ["joe@EXAMPLE.COM", "fred@EXAMPLE.COM" ]
+
+{% if libvirtd_cfg.auth_controls is defined %}
+{% for key,value in libvirtd_cfg.auth_controls.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+#################################################################
+#
+# Processing controls
+#
+
+#max_clients = 5000
+#max_queued_clients = 1000
+#max_anonymous_clients = 20
+#min_workers = 5
+#max_workers = 20
+#prio_workers = 5
+#max_client_requests = 5
+#admin_min_workers = 1
+#admin_max_workers = 5
+#admin_max_clients = 5
+#admin_max_queued_clients = 5
+#admin_max_client_requests = 5
+
+{% if libvirtd_cfg.process_controls is defined %}
+{% for key,value in libvirtd_cfg.process_controls.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+#################################################################
+#
+# Logging controls
+#
+#log_level = 3
+#log_filters="1:qemu 1:libvirt 4:object 4:json 4:event 1:util"
+#log_outputs="3:syslog:virtproxyd"
+
+{% if libvirtd_cfg.log_controls is defined %}
+{% for key,value in libvirtd_cfg.log_controls.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+##################################################################
+#
+# Auditing
+#
+#audit_level = 2
+#audit_logging = 1
+
+{% if libvirtd_cfg.auditing is defined %}
+{% for key,value in libvirtd_cfg.auditing.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+###################################################################
+# UUID of the host:
+# Host UUID is read from one of the sources specified in host_uuid_source.
+#host_uuid = "00000000-0000-0000-0000-000000000000"
+#host_uuid_source = "smbios"
+
+{% if libvirtd_cfg.uuid is defined %}
+{% for key,value in libvirtd_cfg.uuid.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+###################################################################
+# Keepalive protocol:
+#
+#keepalive_interval = 5
+#keepalive_count = 5
+#keepalive_required = 1
+#admin_keepalive_required = 1
+#admin_keepalive_interval = 5
+#admin_keepalive_count = 5
+
+{% if libvirtd_cfg.keepalive is defined %}
+{% for key,value in libvirtd_cfg.keepalive.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}
+
+###################################################################
+# Open vSwitch:
+#
+#ovs_timeout = 5
+
+{% if libvirtd_cfg.ovs is defined %}
+{% for key,value in libvirtd_cfg.ovs.items() %}
+{{ key }}={{ value }}
+{% endfor %}
+{% endif %}

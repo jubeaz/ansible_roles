@@ -1,0 +1,68 @@
+{{ ansible_managed | comment }}
+
+title-text: ""
+title-color: "white"
+terminal-font: "{{ grub_theme_terminal_font }}"
+message-color: "white"
+message-bg-color: "black"
+desktop-image: "background.png"
+desktop-color: "#3c3b37"
+
+## Logo
+#+ image { 
+#    left = 25%
+#    top = 84%
+#    width = 198
+#    height = 64
+#    file = "logo.png"
+#}
+#
+
+
++ boot_menu {
+    left = 5%
+    width = 55%
+    top = 45%
+    height = 50%	
+    item_font = "{{ grub_theme_font }}"
+    item_color = "{{ grub_theme_color }}"
+    selected_item_font = "{{ grub_theme_selected_font }}"
+    selected_item_color = "{{ grub_theme_selected_color }}"
+    icon_width = 16
+    icon_height = 16
+    item_height = 33
+    item_padding = 20
+    item_icon_space = 0
+    item_spacing = 1
+}
+
++ hbox {
+    top = 100%-56
+    left = 20%
++ label { text = "Return" font = "{{ grub_theme_font }}" color = "{{ grub_theme_selected_color }}" }
++ label { text = ": Start       " font = "{{ grub_theme_font }}" color = "{{ grub_theme_color }}" }
++ label { text = "e " font = "{{ grub_theme_font }}" color = "{{ grub_theme_selected_color }}"}
++ label { text = ": Edit       " font = "{{ grub_theme_font }}" color = "{{ grub_theme_color }}" }
++ label { text = "c " font = "{{ grub_theme_font }}" color = "{{ grub_theme_selected_color }}" }
++ label { text = ": Terminal       " font = "{{ grub_theme_font }}" color = "{{ grub_theme_color }}" }
++ label { text = "esc " font = "{{ grub_theme_font }}" color = "{{ grub_theme_selected_color }}" }
++ label { text = ": Back" font = "{{ grub_theme_font }}" color = "{{ grub_theme_color }}" }
+}
+
+# Show logo and circular progress
+#+ circular_progress
+#{
+#   id = "__timeout__"
+#   left = 100
+#   top = 100
+#   width = 168
+#   height = 168
+#   num_ticks = 50
+#   ticks_disappear = false
+#   start_angle = -67
+#   end_angle = -67
+#   center_bitmap = "Ubulogo2.png"
+#   tick_bitmap = "tick.png"
+#}
+
+

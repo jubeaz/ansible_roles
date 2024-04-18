@@ -1,0 +1,9 @@
+- name: Disable the user 'vagrant'
+  ansible.windows.win_user:
+    name: vagrant
+    state: absent
+  become: yes
+  become_method: runas
+  become_user: "{{domain_name}}\\Administrator"
+  vars:
+    ansible_become_pass: "{{domain_password}}"

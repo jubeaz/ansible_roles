@@ -1,0 +1,44 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- include_tasks: ufw_frontend.yml
+  when: "'ufw' in ansible_facts.packages"
+  loop: "{{ haproxy_frontends }}"
+  loop_control: 
+    loop_var: front
+    
+- name: Manage certificates
+  include_tasks: tls.yml
+  loop: "{{ haproxy_certs }}"
+  loop_control:
+    loop_var: cert
+
+- name: Create chroot directory
+  file:
+    path: "{{ haproxy_chroot }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  when: haproxy_chroot != ''
+
+- name: Copy HAProxy configuration in place.
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: 0644
+    validate: haproxy -f %s -c -q
+  notify: restart haproxy
+
+- name: Ensure HAProxy is started and enabled on boot.
+  service: name=haproxy state=started enabled=yes

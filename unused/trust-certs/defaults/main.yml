@@ -1,0 +1,5 @@
+---
+ca_base_dir: /etc/ssl/ca
+ca_certs_dir: certs
+ca_file_basename: "myca"
+

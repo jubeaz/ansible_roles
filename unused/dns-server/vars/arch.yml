@@ -1,0 +1,5 @@
+---
+_named_conf_dir: /etc
+_named_zone_dir: /var/named
+_named_user: root
+_named_group: named

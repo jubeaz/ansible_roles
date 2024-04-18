@@ -1,0 +1,50 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+    #  vboxmanage list systemproperties | grep folder
+
+- name: Create base dir
+  file:
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+    path: "{{ vbox_base_data_dir }}"
+
+- name: Create directories
+  file:
+    state: directory
+    owner: "{{ item.value.owner }}"
+    group: "{{ item.value.group }}"
+    mode: "{{ item.value.mode }}"
+    path: "{{ item.value.path }}"
+  with_dict: "{{ _vbox_data_dirs }}"
+
+- name: Add users
+  user:
+    name: "{{ item }}"
+    groups: "{{ _vbox_group }}"
+    append: yes
+  with_items: "{{ vbox_users }}"
+
+- name: Install vm service
+  template:
+    src: vbox_vm_@.service.j2
+    dest: /etc/systemd/system
+    owner: root
+    group: root
+    mode: "0644"
+

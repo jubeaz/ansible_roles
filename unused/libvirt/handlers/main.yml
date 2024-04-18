@@ -1,0 +1,66 @@
+---
+- name: restart libvirtd
+  service:
+    name: libvirtd
+    state: restarted
+    enabled: true
+
+- name: restart virtproxyd
+  service:
+    name: virtproxyd
+    state: restarted
+    enabled: true
+
+- name: restart virtlogd
+  service:
+    name: virtlogd
+    state: restarted
+    enabled: true
+
+- name: restart virtlockd
+  service:
+    name: virtlockd
+    state: restarted
+    enabled: true
+
+- name: restart virtqemud
+  service:
+    name: virtqemud
+    state: restarted
+    enabled: true
+
+- name: restart virtinterfaced
+  service:
+    name: virtinterfaced
+    state: restarted
+    enabled: true
+
+- name: restart virtnodedevd
+  service:
+    name: virtnodedevd
+    state: restarted
+    enabled: true
+
+- name: restart virtstoraged
+  service:
+    name: virtstoraged
+    state: restarted
+    enabled: true
+
+- name: restart virtnetworkd
+  service:
+    name: virtnetworkd
+    state: restarted
+    enabled: true
+
+- name: restart virtnwfilterd
+  service:
+    name: virtnwfilterd
+    state: restarted
+    enabled: true
+
+- name: restart virtsecretd
+  service:
+    name: virtsecretd
+    state: restarted
+    enabled: true

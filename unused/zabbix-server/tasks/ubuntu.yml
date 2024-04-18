@@ -1,0 +1,6 @@
+- name: Install to do
+  apt:
+    name: bind9
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

@@ -1,0 +1,37 @@
+[Unit]
+Description=Vault server
+Requires=basic.target network.target
+After=basic.target network.target
+ConditionFileNotEmpty=/etc/vault.hcl
+
+[Service]
+EnvironmentFile=/etc/vault.env
+User=vault
+Group=vault
+PrivateTmp=yes
+StartLimitInterval=60s
+StartLimitBurst=3
+ProtectSystem=full
+ProtectHome=read-only
+ExecStart=/bin/vault server -config=/etc/vault.hcl
+KillSignal=SIGINT
+Restart=on-failure
+TimeoutStopSec=30s
+{% if ansible_distribution == 'Archlinux' %}
+CapabilityBoundingSet=CAP_IPC_LOCK
+Environment=GOMAXPROCS=2
+{% endif %}
+{% if ansible_distribution == 'Ubuntu' %}
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+NoNewPrivileges=yes
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
+RestartSec=5
+{% endif %}
+
+[Install]
+WantedBy=multi-user.target
+

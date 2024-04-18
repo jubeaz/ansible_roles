@@ -1,0 +1,54 @@
+#- name: Reboot
+#  win_reboot:
+#    reboot_timeout: 1200
+#
+- name: Ensure Administrator is part of Domain Admins
+  microsoft.ad.group:
+    domain_username: "{{domain_name}}\\Administrator"
+    domain_password: "{{domain_password}}"
+    name: "Domain Admins"
+    members:
+      add: 
+        - Administrator
+    state: present
+
+
+- name: Sync the contents of one directory to another - hack to get Requires -Module Ansible.ModuleUtils.Legacy loaded
+  community.windows.win_robocopy:
+    src: C:\windows\temp
+    dest: C:\windows\temp
+
+- name: "Create users"
+  microsoft.ad.user:
+    sam_account_name: "{{ item.key }}"
+    upn:  "{{ item.key + '@' + domain_name  }}"
+    name: "{{ item.key }}"
+    firstname: "{{item.value.firstname}}"
+    surname: "{{ item.value.surname | default(item.value.firstname) }}"
+    password: "{{ item.value.password }}"
+    password_never_expires: yes
+    path: "{{item.value.path}}"
+    description: "{{item.value.description | default('-')}}"
+    city: "{{item.value.city | default('-')}}"
+    groups: 
+      add: "{{item.value.groups | default([])}}"
+    spn: 
+      set: "{{item.value.spns | default([])}}"
+    protect_from_deletion: "{{item.value.sensitive | default(false)}}"
+    domain_username: "{{domain_name}}\\Administrator"
+    domain_password: "{{domain_password}}"
+  with_dict: "{{ objects | default({})}}"
+  when: action |default('create') == "create"
+  register:  user_creation
+
+- name: "Add Ressource Based Constained Delegation"
+  microsoft.ad.user:
+    name: "{{ item.key }}"
+    path: "{{item.value.path}}"
+    delegates:
+      add: "{{item.value.delegates | default([])}}"
+    domain_username: "{{domain_name}}\\Administrator"
+    domain_password: "{{domain_password}}"
+  with_dict: "{{ objects | default({})}}"
+  when: action |default('create') == "add_delegates" and item.value.delegates | default([]) | length > 0
+  register: user_delegation_result

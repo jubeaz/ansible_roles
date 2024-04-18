@@ -1,0 +1,66 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+
+- include_tasks: asserts.yml
+
+- name: check blackarch repo absent
+  lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^[blackarch]'
+    line: '[blackarch]'
+    state: present
+  check_mode: yes
+  register: __blackarch_repo
+  changed_when: false
+
+- name: Install BlackArch
+  block:
+    #    - name: Check multilib status
+    #      lineinfile:
+    #        path: /etc/pacman.conf
+    #        regexp: '^[multilib]'
+    #        line: '[multilib]'
+    #      check_mode: true
+    #      register: __multilib_enabled
+    #      changed_when: false
+    #    - name: Enable multilib 
+    #      blockinfile:
+    #        dest: /etc/pacman.conf
+    #        marker_begin: ""
+    #        marker_end: ""
+    #        marker: ""
+    #        block: | 
+    #          [multilib]
+    #          Include = /etc/pacman.d/mirrorlist
+    #        state: present
+    #      when: __multilib_enabled.msg == 'line added'
+
+    - name: Get strap
+      get_url:
+        url: "{{ _blackarch_strap_url }}"
+        checksum: "{{ _blackarch_strap_checksum }}"
+        dest: /tmp/strap.sh
+        mode: 0700
+        owner: root
+        group: root
+
+    - name: check blackarch repo absent
+      lineinfile:
+        path: /tmp/strap.sh
+        regexp: 'verify_keyring$'
+        state: absent
+    - name: run_strap
+      command: /tmp/strap.sh
+      register: __strap
+      notify: update packages
+  when: __blackarch_repo.msg == 'line added'
+
+
+
+
+
+

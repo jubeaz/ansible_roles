@@ -1,0 +1,37 @@
+- name: Install to do
+  apt:
+    name: bind9
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: create zone dir "{{ _named_zone_dir }}"
+  file:
+    path: "{{ _named_zone_dir }}"
+    owner: "{{ _named_user }}"
+    group: "{{ _named_group }}"
+    mode: "0774"
+    state: directory
+
+- name: List files to delete
+  find:
+    paths: "{{ _named_conf_dir }}"
+    patterns: "db.*"
+  register: _files_to_delete
+
+    # - name: Remove file
+    #   file:
+    #     path: "{{ item.path }}"
+    #     state: absent
+    #   with_items: "{{ _files_to_delete.files }}"
+
+- name: Copy std zone files
+  copy:
+    src: "files/{{ item }}"
+    dest: "{{ _named_zone_dir }}/{{ item }}"
+    mode: "0640"
+    owner: "{{ _named_user }}"
+    group: "{{ _named_group }}"
+  with_items:
+    - localhost.zone
+    - 127.0.0.zone

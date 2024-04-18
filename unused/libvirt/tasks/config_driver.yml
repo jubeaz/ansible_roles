@@ -1,0 +1,32 @@
+---
+- name: Configure "{{ __libvirt_driver.key }}"
+  block:
+    - name: setfact _libvirt_drivers_name
+      set_fact:
+        _libvirt_driver_name: "{{ __libvirt_driver.key }}"
+    - name: setfact _libvirt_drivers_i
+      set_fact:
+        _libvirt_drivers_i: "{{ __libvirt_driver.key }}_cfg"
+    - name: setfact _driver_params
+      set_fact:
+        _driver_params: "{{ libvirt_drivers[_libvirt_drivers_i] }}"
+
+    - name: Create "{{ __libvirt_driver.key}}" config file
+      template:
+        dest: "/etc/libvirt/{{ __libvirt_driver.key }}.conf"
+        src: "templates/drivers/driver.conf.j2"
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Create "{{ __libvirt_driver.key }}" systemd files
+      template:
+        src: "templates/drivers/driver-service{{ item }}.j2"
+        dest: "/etc/systemd/system/{{ __libvirt_driver.key }}{{ item }}"
+        owner: root
+        group: root
+        mode: 0644
+      loop:  "{{ __libvirt_driver.value }}"
+  notify: restart {{ __libvirt_driver.key }}
+
+

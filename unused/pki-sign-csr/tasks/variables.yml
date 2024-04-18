@@ -1,0 +1,8 @@
+---
+- name: Set ca csr_dir
+  set_fact:
+    _ca_csr_dir: "{{ hostvars[_ca_name].ca_base_dir }}/{{ hostvars[_ca_name].ca_csr_dir }}"
+
+- name: Set ca new_certs_dir
+  set_fact:
+    _ca_new_certs_dir: "{{ hostvars[_ca_name].ca_base_dir }}/{{ hostvars[_ca_name].ca_new_certs_dir }}"

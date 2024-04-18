@@ -1,0 +1,107 @@
+---
+- name: Create TLS key dir
+  file:
+    path: "{{ libvirt_key_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create TLS cert dir
+  file:
+    path: "{{ libvirt_cert_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create TLS ca dir
+  file:
+    path: "{{ libvirt_ca_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Stat CA cert
+  stat:
+    path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}"
+  register: __cacert
+
+- name: Generate CA
+  block:
+    - name: create CA key
+      openssl_privatekey:
+        path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.key"
+        size: 4096
+        state: present
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: create CSR
+      openssl_csr:
+        path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.csr"
+        privatekey_path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.key"
+        key_usage_critical: true
+        key_usage:
+          - digitalSignature
+          - keyEncipherment
+        extended_key_usage:
+          - serverAuth
+        common_name: "Self Signed libvirt {{ inventory_hostname }}"
+        subject_alt_name: "DNS:{{ inventory_hostname }}"
+        owner: root
+        group: root
+        mode: 0640
+
+    - name: sign CSR
+      openssl_certificate:
+        path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}"
+        csr_path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.csr"
+        privatekey_path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.key"
+        provider: selfsigned
+        owner: root
+        group: root
+        mode: 0640
+  when: not __cacert.stat.exists
+
+- name: Stat cert
+  stat:
+    path: "{{ libvirt_cert_path }}/{{ libvirt_cert_file }}"
+  register: __cert
+
+- name: Generate cert
+  block:
+    - name: create key
+      openssl_privatekey:
+        path: "{{ libvirt_key_path }}/{{ libvirt_key_file }}"
+        size: 2048
+        state: present
+        owner: root
+        group: root
+
+    - name: create CSR
+      openssl_csr:
+        path: "{{ libvirt_cert_path }}/{{ libvirt_cert_file }}.csr"
+        privatekey_path: "{{ libvirt_key_path }}/{{ libvirt_key_file }}"
+        key_usage:
+          - digitalSignature
+          - keyEncipherment
+        extended_key_usage:
+          - clientAuth
+          - serverAuth
+        common_name: "TLS libvirt {{ inventory_hostname }}"
+        subject_alt_name: "DNS:{{ inventory_hostname }}"
+
+    - name: sign CSR
+      community.crypto.x509_certificate:
+        path: "{{ libvirt_cert_path }}/{{ libvirt_cert_file }}"
+        csr_path: "{{ libvirt_cert_path }}/{{ libvirt_cert_file }}.csr"
+        provider: ownca
+        ownca_path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}"
+        ownca_privatekey_path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.key"
+        ownca_not_after: +365d  # valid for one year
+        ownca_not_before: "-1d"  # valid since yesterday
+  when: not __cert.stat.exists
+

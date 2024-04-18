@@ -1,0 +1,9 @@
+<network>
+    <name>{{ network.name }}</name>
+    <forward mode='{{ network.mode }}'/>
+    <ip address='{{ network.ip }}' netmask='{{ network.netmask }}'>
+        <dhcp>
+            <range start='{{ network.dhcp_start }}' end='{{ network.dhcp_end }}'/>
+        </dhcp>
+    </ip>
+</network>

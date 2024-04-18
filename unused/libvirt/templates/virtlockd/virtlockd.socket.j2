@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Virtual machine lock manager socket
+Before=libvirtd.service
+
+[Socket]
+ListenStream={{ _libvirt_socket_dir }}/virtlockd-sock
+{% if virtlockd_cfg.usocket.rw_perms is defined %}
+SocketMode={{ virtlockd_cfg.usocket.rw_perms }}
+{% else %}
+SocketMode=0600
+{% endif %}
+{% if virtlockd_cfg.usocket.group is defined %}
+SocketGroup={{ virtlockd_cfg.usocket.group }}
+{% else %}
+SocketGroup=root
+{% endif %}
+
+[Install]
+WantedBy=sockets.target

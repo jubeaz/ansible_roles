@@ -1,0 +1,28 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Create Exchange directory
+  file:
+    path: "{{ ans_exchange_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+#- name: create directory for users
+
+- name: Create .ansible.cfg
+  template:
+    src: ansible.cfg.j2
+    dest: "{{ item.home_dir }}/.ansible.cfg"
+    owner: "{{ item.login }}"
+    group: "{{ item.group }}"
+    mode: 0640
+  loop: "{{ ans_users }}"
+

@@ -1,0 +1,15 @@
+{{ ansible_managed | comment }}
+
+{% for key,value in openssh_sshd_config.items() %}
+{{ key }} {{ value }}
+{% endfor %}
+
+
+{% if openssh_sshd_user_override is defined %}
+    {% for key,value in openssh_sshd_user_override.items() %}
+Match User {{ key }}
+        {% for key2,value2 in value.items() %}
+    {{ key2 }} {{ value2 }}
+        {% endfor %}
+    {% endfor %}
+{% endif %}

@@ -1,0 +1,14 @@
+{% include "./templates/rndc.key.j2" %}
+
+options {
+	default-key "local-key";
+	default-server 127.0.0.1;
+	default-port {{ _rndc_port }};
+};
+
+server localhost {
+    key "local-key";
+};
+
+
+

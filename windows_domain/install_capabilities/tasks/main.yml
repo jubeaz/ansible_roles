@@ -1,0 +1,20 @@
+- name: Install capabilities
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $C
+      )
+      Add-WindowsCapability -Online -Name $C
+    error_action: stop
+    parameters:
+      C: "{{item}}"
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+  with_items: "{{ capabilities }}"
+  register:  install_capabilities
+  

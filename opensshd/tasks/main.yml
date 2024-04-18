@@ -1,0 +1,39 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+    quiet: true
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Copy issue file
+  copy:
+    dest: "/etc/{{ _sshd_issue_filename }}"
+    src: files/issue
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create sshd_config file
+  template:
+    dest: "/etc/ssh/sshd_config"
+    src: "templates/sshd_config.j2"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart sshd
+  when: "'openssl' in ansible_facts.packages"
+

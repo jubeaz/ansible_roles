@@ -1,0 +1,35 @@
+
+- name: Configure global settings.
+  lineinfile:
+    dest: "{{ _pgsql_config_path }}/postgresql.conf"
+    regexp: "^#?{{ item.option }}.+$"
+    line: "{{ item.option }} = '{{ item.value }}'"
+    state: "{{ item.state | default('present') }}"
+    mode: 0644
+  with_items: "{{ pgsql_global_config_options }}"
+  notify: restart pgsql
+
+- name: Configure host based authentication (if entries are configured).
+  template:
+    src: "pg_hba.conf.j2"
+    dest: "{{ _pgsql_config_path }}/pg_hba.conf"
+    owner: "{{ _pgsql_user }}"
+    group: "{{ _pgsql_group }}"
+    mode: 0600
+  notify: restart pgsql
+  when: pgsql_hba_entries | length > 0
+
+- name: Ensure PostgreSQL unix socket dirs exist.
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ _pgsql_user }}"
+    group: "{{ _pgsql_group }}"
+    mode: "{{ _pgsql_unix_socket_directories_mode }}"
+  with_items: "{{ _pgsql_unix_socket_directories }}"
+
+- name: Ensure PostgreSQL is started and enabled on boot.
+  service:
+    name: "{{ _pgsql_daemon }}"
+    state: restarted
+    enabled: true

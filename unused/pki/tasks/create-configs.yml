@@ -1,0 +1,52 @@
+---
+- name: Create openssl-base.cnf
+  template:
+    src: templates/openssl-base.cnf.j2
+    dest: "{{ _ca_dirs._ca_cnf.path }}/openssl-base.cnf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create ca-root-ca.cnf
+  template:
+    src: templates/ca/ca-root-ca.cnf.j2
+    dest: "{{ _ca_dirs._ca_private.path }}/ca-root-ca.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: ca_type == "root-ca"
+
+- name: Create req-intermediate-ca.cnf
+  template:
+    src: templates/req/req-self-intermediate_ca.cnf.j2
+    dest: "{{ _ca_dirs._ca_private.path }}/req-intermediate-ca.cnf"
+    owner: root
+    group: root
+    mode: 0600
+  when: ca_type == "intermediate-ca"
+
+- name: Create crl.cnf
+  template:
+    src: templates/crl.cnf.j2
+    dest: "{{ _ca_dirs._ca_cnf.path }}/crl.cnf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Create req templates
+  template:
+    src: "templates/req/req-{{ item.key }}.cnf.j2"
+    dest: "{{ _ca_dirs._ca_cnf_req.path }}/req-{{ item.key }}.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ ca_templates | dict2items }}"
+
+- name: Create ca templates
+  template:
+    src: "templates/ca/ca-{{ item.key }}.cnf.j2"
+    dest: "{{ _ca_dirs._ca_cnf_ca.path }}/ca-{{ item.key }}.cnf"
+    owner: root
+    group: root
+    mode: 0644
+  loop: "{{ ca_templates | dict2items }}"

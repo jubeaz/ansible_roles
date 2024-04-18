@@ -1,0 +1,11 @@
+---
+- name: restart timer_full
+  service:
+    name: "sslbackup-full.timer"
+    state: restarted
+    enabled: true
+- name: restart timer_diff
+  service:
+    name: "sslbackup-diff.timer"
+    state: restarted
+    enabled: true

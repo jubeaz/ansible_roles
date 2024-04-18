@@ -1,0 +1,13 @@
+---
+_pgsql_user: postgres
+_pgsql_group: postgres
+
+_pgsql_unix_socket_directories_mode: "02775"
+
+# `md5` or `scram-sha-256` (https://www.postgresql.org/docs/10/auth-methods.html)
+_pgsql_auth_method: "{{ ansible_fips  | ternary('scram-sha-256', 'md5') }}"
+
+# Global configuration options that will be set in postgresql.conf.
+pgsql_global_config_options:
+  - option: unix_socket_directories
+    value: '{{ _pgsql_unix_socket_directories | join(",") }}'

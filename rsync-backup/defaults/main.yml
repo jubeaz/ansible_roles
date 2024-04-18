@@ -1,0 +1,9 @@
+---
+sslbackup_cacert: test.pem
+sslbackup_server: toto
+sslbackup_port: 874
+sslbackup_module: test
+
+sslbackup_includes:
+  - /home/
+  - /home/**

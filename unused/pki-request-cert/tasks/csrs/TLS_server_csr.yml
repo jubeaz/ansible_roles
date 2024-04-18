@@ -1,0 +1,10 @@
+---
+- name: Create TLS_server CSR
+  openssl_csr:
+    path: "{{ vars[_cert_path_var] }}/{{ vars[_cert_file_var] }}.csr"
+    privatekey_path: "{{ vars[_key_path_var] }}/{{ vars[_key_file_var] }}"
+    common_name: "{{ vars[_cn_var] }}"
+    subject_alt_name: "{{ vars[_san_var] | map('regex_replace', '^', 'DNS:') | list }}"
+    digest: "{{ _ca_template_params.default_md }}"
+    mode: 0744
+  register: _openssl_csr

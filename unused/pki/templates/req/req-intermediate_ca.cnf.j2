@@ -1,0 +1,22 @@
+{{ ansible_managed | comment }}
+.include {{ _ca_dirs._ca_cnf.path }}/openssl-base.cnf
+{% set template = ca_templates_params[ca_templates.intermediate_ca] %}
+
+
+[ req ]
+default_keyfile         =
+encrypt_key             = yes
+
+default_bits            = {{ template.default_bits }}
+default_md              = {{ template.default_md }}
+utf8                    = yes
+string_mask             = utf8only
+prompt                  = yes
+distinguished_name      = req_dn
+req_extensions          = req_reqext
+
+[ client_dn ]
+commonName              = "6. Common Name              (eg, full name)"
+commonName_max          = 64
+
+[ req_reqext ]

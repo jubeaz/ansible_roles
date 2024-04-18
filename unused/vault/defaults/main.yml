@@ -1,0 +1,8 @@
+---
+# defaults file for vault
+hvault_data_dir: /var/lib/vault/data
+hvault_tls_dir: /var/lib/vault/tls
+hvault_tls_key: self.key
+hvault_tls_cert: self.pem
+hvault_port: 8200
+hvault_ufw_from: 192.168.1.0/24

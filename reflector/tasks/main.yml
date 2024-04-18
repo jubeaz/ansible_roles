@@ -1,0 +1,20 @@
+---
+- include_tasks: asserts.yml
+- name: Install reflector
+  pacman:
+    name: reflector
+    state: present
+    update_cache: true
+  register: __pacman
+  changed_when: __pacman.packages is defined
+
+- name: config
+  template:
+    dest: /etc/xdg/reflector/reflector.conf
+    src: reflector.conf.j2
+    owner: root
+    group: root
+    mode: 0640
+  notify:
+    - restart reflector
+    - restart reflector timer

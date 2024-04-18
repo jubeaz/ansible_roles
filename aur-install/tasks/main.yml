@@ -1,0 +1,54 @@
+---
+- include_tasks: asserts.yml
+- name: AUR | get metadata from AurJson api for {{ aur_pkg_name }}
+  uri: >
+    url=https://aur.archlinux.org/rpc.php?v=5&type=info&arg={{ aur_pkg_name | mandatory }}
+    return_content=yes
+    timeout=6
+  register: __api_info
+
+- name: AUR | assert proper answer
+  assert:
+    that:
+      - __api_info.status == 200
+      - __api_info.json is defined
+      - __api_info.json.type == 'multiinfo'
+      - __api_info.json.resultcount == 1
+      - __api_info.json.results is defined
+
+- name: AUR | {{ aur_pkg_name }} | download tarball
+  get_url: >
+    url='https://aur.archlinux.org{{ __api_info.json.results[0].URLPath }}'
+    dest='{{ aur_directory }}'
+  register: __aur_tarball
+
+- name: AUR | {{ aur_pkg_name }} | unarchive tarball
+  when: __aur_tarball.changed == true
+  become: false
+  unarchive: >
+    src={{ __aur_tarball.dest }}
+    dest={{ aur_directory }}
+    remote_src=yes
+  register: __extracted_pkg
+
+# This will break if run as root. Set user to use with makepkg with 'makepkg_user' var
+- name: AUR | {{ aur_pkg_name }} | build package, including missing dependencies
+  when: __extracted_pkg.changed == true
+  become: false
+  command: >
+    makepkg --noconfirm --noprogressbar -mfs
+    chdir={{ aur_directory }}/{{ aur_pkg_name }}
+  register: __aur_makepkg_result
+
+# Shameless variable declaration hack
+- shell: ls -1 {{ aur_directory }}/{{ aur_pkg_name | quote }} | grep pkg.tar
+  register: __compiled_package_name
+  changed_when: false
+
+- name: AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman
+  #when: __aur_makepkg_result.changed == true
+  shell: >
+    pacman --noconfirm --noprogressbar --needed -U {{ __compiled_package_name.stdout | quote }}
+    chdir={{ aur_directory }}/{{ aur_pkg_name }}
+  register: __pacman_install_result
+  changed_when: __pacman_install_result.stdout is defined and __pacman_install_result.stdout.find('there is nothing to do') == -1

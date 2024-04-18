@@ -1,0 +1,56 @@
+---
+- include_tasks: asserts.yml
+
+- name: Install packages
+  pacman:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  register: __pacman
+  changed_when: __pacman.packages is defined
+  loop: "{{ _pacman_packages }}"
+
+- name: Create hooks directory
+  file:
+    path: /etc/pacman.d/hooks
+    state: directory
+    mode: 0640
+    owner: root
+    group: root
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Install mlocate hook
+  copy:
+    dest: /etc/pacman.d/hooks
+    src: locate.hook
+    mode: 0640
+    owner: root
+    group: root
+  when: "'mlocate' in ansible_facts.packages"
+
+- name: Install reboot-required script
+  copy:
+    dest: /usr/bin/reboot-required.sh
+    src: reboot-required.sh
+    mode: 0750
+    owner: root
+    group: root
+
+- name: Install reboot-required hook
+  copy:
+    dest: /etc/pacman.d/hooks
+    src: reboot-required.hook
+    mode: 0640
+    owner: root
+    group: root
+
+- name: Create AUR directory
+  file: 
+    path: "{{ aur_directory }}"
+    owner: "{{ aur_owner }}"
+    group: "{{ aur_group }}"
+    mode: 0750
+    state: directory

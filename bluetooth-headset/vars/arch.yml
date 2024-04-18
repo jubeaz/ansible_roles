@@ -1,0 +1,9 @@
+---
+bluetoot_headset_pkgs:
+  - pulseaudio-bluetooth
+  - pulseaudio-alsa
+  - pavucontrol
+  - bluez
+  - bluez-utils
+  - blueman
+  #   cp /etc/pulse ~/.config/pulse

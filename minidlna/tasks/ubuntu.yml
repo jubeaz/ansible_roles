@@ -1,0 +1,6 @@
+- name: Install to do
+  apt:
+    name: todo
+    state: present
+    update_cache: true
+    cache_valid_time: 3600

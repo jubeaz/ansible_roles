@@ -1,0 +1,69 @@
+# DNSCHANGE
+# - name: "disable interface {{pub_adapter}} before join domain"
+#   win_shell: netsh interface set interface "{{pub_adapter}}" disable
+
+- name: "disable the registration of the {{pub_adapter}} interface (NAT address) in DNS"
+  ansible.windows.win_shell:
+    Get-NetAdapter {{pub_adapter | ansible.windows.quote(shell='powershell')}} | Set-DNSClient -RegisterThisConnectionsAddress $False
+  when: two_adapters == true
+
+- name: Ensure that domain exists
+  microsoft.ad.domain:
+    domain_netbios_name: "{{domain_netbios_name}}"
+    dns_domain_name: "{{domain_name}}"
+    safe_mode_password: "{{domain_password}}"
+    reboot: true
+  register: check_domain
+
+- name: Ensure the server is a domain controller
+  microsoft.ad.domain_controller:
+    dns_domain_name: "{{domain_name}}"
+    domain_admin_user: "Administrator@{{domain_name}}"
+    domain_admin_password: "{{domain_password}}"
+    safe_mode_password: "{{domain_password}}"
+    install_dns: true
+    reboot: true
+    state: domain_controller
+  register: check_domain_controller
+
+
+- name: Check for xDnsServer Powershell module
+  win_psmodule:
+    name: xDnsServer
+    state: present
+
+- name: enable only the {{domain_adapter}} interface (local) for DNS client requests
+  ansible.windows.win_shell: dnscmd . /resetlistenaddresses {{ ansible_host }}
+  when: two_adapters == true
+
+
+- name: Configure DNS Forwarders
+  win_dsc:
+    resource_name: xDnsServerForwarder
+    IsSingleInstance: "yes"
+    UseRootHint: false
+    IPAddresses:
+      - "1.1.1.1"
+      - "9.9.9.9"
+
+
+- name: "Install XactiveDirectory"
+  win_psmodule:
+    name: ActiveDirectoryDSC
+    state: present
+
+- name: Ensure Administrator is part of Enterprise Admins
+  microsoft.ad.group:
+    name: "Enterprise Admins"
+    members:
+      add:
+        - Administrator
+    state: present
+
+- name: Ensure Administrator is part of Domain Admins
+  microsoft.ad.group:
+    name: "Domain Admins"
+    members:
+      add: 
+        - Administrator
+    state: present

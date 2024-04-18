@@ -1,0 +1,9 @@
+- name: Install packages
+  include_role:
+    name: aur-install
+  vars:
+    aur_pkg_name: "{{ item }}"
+  loop:
+    - xrdp
+    - xorgxrdp
+

@@ -1,0 +1,77 @@
+---
+
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+    quiet: true
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: Enable ipv4 forward
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/sysctl.conf
+    regexp: '^#net/ipv4/ip_forward=1'
+    line:  'net/ipv4/ip_forward=1'
+  when: ufw_forward
+
+- name: Enable ipv6 default forward
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/sysctl.conf
+    regexp: '^#net/ipv6/conf/default/forwarding=1'
+    line:  'net/ipv6/conf/default/forwarding=1'
+  when: ufw_forward
+
+- name: Enable ipv6 all forward
+  ansible.builtin.lineinfile:
+    path: /etc/ufw/sysctl.conf
+    regexp: '^#net/ipv6/conf/all/forwarding=1'
+    line:  'net/ipv6/conf/all/forwarding=1'
+  when: ufw_forward
+
+- name: define default forward policy
+  ansible.builtin.lineinfile:
+    path: /etc/default/ufw
+    regexp: '^DEFAULT_FORWARD_POLICY="DROP"'
+    line:  'DEFAULT_FORWARD_POLICY="ACCEPT"'
+  when: ufw_forward
+
+
+- name: reboot
+  ansible.builtin.reboot:
+
+- name: ufw add ssh in rule
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item }}"
+    to_port: 22
+  loop: "{{ ufw_in_ssh_ip }}"
+  notify: 
+    - enable ufw service
+    - enable ufw
+
+
+- name: "check NAT is enabled"
+  ansible.builtin.lineinfile:
+    name: /etc/ufw/before.rules
+    regexp: '^\*nat'
+    state: absent
+  check_mode: yes
+  register: is_nat_enabled
+  when: ufw_nat
+  changed_when: false
+
+
+- name: Ensure nat is defined
+  ansible.builtin.blockinfile:
+    path: /etc/ufw/before.rules
+    insertbefore: '^\*filter'
+    backup: yes
+    block: |
+      *nat
+      :POSTROUTING ACCEPT [0:0]
+      # BEGIN NAT RULES
+      # END NAT RULES
+      COMMIT
+  when: ufw_nat and is_nat_enabled.found | default(1) == 0

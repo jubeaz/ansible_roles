@@ -1,0 +1,31 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+    quiet: true
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: Install timesyncd config
+  template:
+    src: templates/timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf
+    mode: 0644
+    owner: root
+    group: root
+  notify: Enable systemd-timesyncd
+
+- name: Get timezone
+  command: timedatectl status
+  changed_when: false
+  check_mode: false
+  register: __timedatectl
+
+- name: Set timezone
+  command: /usr/bin/timedatectl set-timezone {{ tz_timezone }}
+  when: 'tz_timezone |string not in __timedatectl.stdout'
+
+- name: Set ntp on
+  command: /usr/bin/timedatectl set-ntp on
+  when: '"NTP service: active" not in __timedatectl.stdout'

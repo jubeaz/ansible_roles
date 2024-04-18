@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Libvirt proxy non-TLS IP socket
+Before=virtproxyd.service
+BindsTo=virtproxyd.socket
+After=virtproxyd.socket
+Conflicts=libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
+
+[Socket]
+# This must match the /etc/libvirt/virtproxyd.conf tcp_port setting
+# when using systemd version < 227
+{% if virtproxyd_cfg.network.tcp_listen_stream is defined %}
+ListenStream={{ virtproxyd_cfg.network.tcp_listen_stream }}
+{% else %}
+ListenStream=16509
+{% endif %}
+Service=virtproxyd.service
+
+[Install]
+WantedBy=sockets.target

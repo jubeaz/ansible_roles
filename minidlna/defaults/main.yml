@@ -1,0 +1,14 @@
+---
+# defaults file for minidlna
+minidlna_cache_dir: /var/lib/minidlna/cache
+minidlna_log_dir: /var/lib/minidlna/log
+minidlna_user: minidlna
+minidlna_group: minidlna
+minidlna_group_members:
+  - root
+minidlna_port: 8200
+minidlna_display_name: "{{ ansible_hostname }}"
+minidlna_media_dirs:
+  - ["V,", /var/lib/minidlna/videos]
+minidlna_ufw:
+  - 192.168.1.0/24

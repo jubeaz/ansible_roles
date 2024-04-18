@@ -1,0 +1,24 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Libvirt proxy local socket
+Before=virtproxyd.service
+Conflicts=libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
+
+[Socket]
+# The directory must match the /etc/libvirt/virtproxyd.conf unix_sock_dir setting
+# when using systemd version < 227
+ListenStream={{ _libvirt_socket_dir }}/libvirt-sock
+{% if virtproxyd_cfg.usocket.rw_perms is defined %}
+SocketMode={{ virtproxyd_cfg.usocket.rw_perms }}
+{% else %}
+SocketMode=0666
+{% endif %}
+{% if virtproxyd_cfg.usocket.group is defined %}
+SocketGroup={{ virtproxyd_cfg.usocket.group }}
+{% else %}
+SocketGroup=root
+{% endif %}
+Service=virtproxyd.service
+
+[Install]
+WantedBy=sockets.target

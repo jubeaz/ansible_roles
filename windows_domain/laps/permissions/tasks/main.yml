@@ -1,0 +1,5 @@
+- name: process permssion
+  include_tasks: permission.yml
+  with_items: "{{laps_readers}}"
+  loop_control:
+     loop_var: principal

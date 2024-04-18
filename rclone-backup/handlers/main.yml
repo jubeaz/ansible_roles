@@ -1,0 +1,6 @@
+---
+- name: restart timer
+  service:
+    name: rclone-backup.timer
+    state: restarted
+    enabled: true

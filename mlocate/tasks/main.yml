@@ -1,0 +1,30 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+    quiet: true
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: restart updatedb
+  service:
+    name: updatedb
+    state: restarted
+    enabled: true
+  when: ansible_distribution == "Archlinux" and __pacman.changed
+
+- name: restart updatedb timer
+  systemd:
+    name: updatedb.timer
+    state: restarted
+    enabled: true 
+  when: ansible_distribution == "Archlinux" and __pacman.changed

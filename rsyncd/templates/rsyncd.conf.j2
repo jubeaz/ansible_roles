@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}
+
+{% for key,value in rsyncd_params.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+&include /etc/rsyncd.d
+
+

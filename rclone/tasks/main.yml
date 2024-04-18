@@ -1,0 +1,27 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Create config directory
+  file:
+    path: "{{ item.path | dirname}}"
+    state: directory
+    mode: 0700
+    owner: "{{ item.login }}"
+    group: "{{ item.group }}"
+  loop: "{{ rclone_users }}"
+
+- name: Set up rclone config
+  template:
+    src: rclone.conf.j2
+    dest: '{{ item.path }}'
+    mode: 0600
+    owner: "{{ item.login }}"
+    group: "{{ item.group }}"
+  loop: "{{ rclone_users }}"
+  no_log: true

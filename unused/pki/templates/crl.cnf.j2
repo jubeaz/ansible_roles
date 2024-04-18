@@ -1,0 +1,31 @@
+{{ ansible_managed | comment }}
+# config used to sign intermediate ca certificates
+
+.include {{ _ca_dirs._ca_cnf.path }}/openssl-base.cnf
+
+[ ca ]
+default_ca              = CA_default
+
+[ CA_default ]
+dir                     = $b_dir
+certs                   = $b_certs
+crl_dir                 = $b_crl_dir
+new_certs_dir           = $b_new_certs_dir
+private_dir             = $b_private_dir
+
+database                = $b_database
+serial                  = $b_serial
+RANDFILE                = $b_RANDFILE
+
+private_key             = $b_private_key
+certificate             = $b_certificate
+default_md              = sha256
+crlnumber               = $b_crlnumber
+crl                     = $b_crl
+crl_extensions          = crl_ext
+default_crl_days        = 30
+
+[ crl_ext ]
+
+authorityKeyIdentifier  = keyid:always,issuer
+

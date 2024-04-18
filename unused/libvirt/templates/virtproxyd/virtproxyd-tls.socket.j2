@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Libvirt proxy TLS IP socket
+Before=virtproxyd.service
+BindsTo=virtproxyd.socket
+After=virtproxyd.socket
+Conflicts=libvirtd.socket libvirtd-ro.socket libvirtd-admin.socket libvirtd-tcp.socket libvirtd-tls.socket
+
+[Socket]
+# This must match the /etc/libvirt/virtproxyd.conf tls_port setting
+# when using systemd version < 227
+{% if virtproxyd_cfg.network.tls_listen_stream is defined %}
+ListenStream={{ virtproxyd_cfg.network.tls_listen_stream }}
+{% else %}
+ListenStream=16514
+{% endif %}
+Service=virtproxyd.service
+
+[Install]
+WantedBy=sockets.target

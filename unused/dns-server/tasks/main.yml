@@ -1,0 +1,97 @@
+---
+# tasks file for dns-server
+- name: Include OS-specific variables (Ubuntu)
+  include_vars: "ubuntu.yml"
+  when: ansible_distribution == "Ubuntu"
+
+- name: Include OS-specific variables (Archlinux)
+  include_vars: "arch.yml"
+  when: ansible_distribution == "Archlinux"
+
+- name: Include common variables 
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Add ufw allow rules 
+  ufw:
+    rule: allow
+    direction: in
+    src: '{{ item }}'
+    to_port: 53
+    state: enabled
+  when: "'ufw' in ansible_facts.packages"
+  with_items: "{{ named_ufw_from }}"
+
+- name: Add ufw allow rndc rules
+  ufw:
+    rule: allow
+    direction: in
+    src: '{{ item }}'
+    to_port: "{{ _rndc_port }}"
+    state: enabled
+  when: "'ufw' in ansible_facts.packages"
+  with_items: "{{ rndc_ufw_from }}"
+
+- name: Create cluster rndc key
+  register: __rndc_confgen
+  run_once: true
+  command:
+    cmd: rndc-confgen -A "{{ _rndc_confgen_algo }}"
+- debug: var=__rndc_confgen.stdout
+
+- set_fact:
+    __rndc_cluster_key: "{{ __rndc_confgen.stdout | regex_search(_rndc_confgen_regexp,'\\1') }}"
+
+- name: Create local rndc key
+  register: __rndc_confgen
+  command:
+    cmd: rndc-confgen
+
+- set_fact:
+    __rndc_local_key: "{{ __rndc_confgen.stdout | regex_search(_rndc_confgen_regexp,'\\1') }}"
+
+- name: Create rndc.conf
+  template:
+    src: rndc.conf.j2
+    dest: /etc/rndc.conf
+    group: "{{ _named_group }}"
+    owner: "{{ _named_user }}"
+    mode: 0640
+
+- name: Create rndc.key
+  template:
+    src: rndc.key.j2
+    dest: "{{ _named_conf_dir }}/rndc.key"
+    group: "{{ _named_group }}"
+    owner: "{{ _named_user }}"
+    mode: 0640
+
+- name: Create config
+  template:
+    src: "{{ item.key }}.j2"
+    dest: "{{ item.value['dest'] }}/{{ item.key }}"
+    group: "{{ _named_group }}"
+    owner: "{{ _named_user }}"
+    mode: "{{ item.value['mode'] }}"
+  with_dict: "{{ _templates }}"
+  notify: Restart bind
+
+- name: Create local zone files
+  template:
+    src: templates/local.zone.j2
+    dest: "{{ _named_zone_dir }}/{{ item.value['name'] }}.zone"
+    group: "{{ _named_group }}"
+    owner: "{{ _named_user }}"
+    mode: 0640
+  with_dict: "{{ named_master_zones }}"
+  notify: Restart bind

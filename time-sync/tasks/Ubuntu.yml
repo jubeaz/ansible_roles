@@ -1,0 +1,12 @@
+---
+- name: Uninstall ntp
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+    name: ntp
+    state: absent
+
+- name: Insure systemd-timesyncd install
+  apt:
+    name: systemd-timesyncd
+    state: present

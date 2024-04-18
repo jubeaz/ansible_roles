@@ -1,0 +1,22 @@
+---
+- name: Check if root certificate file exist
+  stat:
+    path: "{{ _ca_dirs._ca_certs.path }}/{{ _ca_cert_name }}"
+  register: __ca_cert_file
+
+- name: Create root certificate
+  command:
+    argv:
+      - openssl
+      - req
+      - -passout
+      - "pass:{{ ca_key_password }}"
+      - -config
+      - "{{ _ca_dirs._ca_private.path }}/ca-root-ca.cnf"
+      - -new
+      - -x509
+      - -days
+      - "{{ ca_self_info.duration }}"
+      - -out
+      - "{{ _ca_dirs._ca_certs.path }}/{{ _ca_cert_name }}"
+  when: not __ca_cert_file.stat.exists

@@ -1,0 +1,4 @@
+vbox_extra_repos:
+  - https://al1.seblu.net/$repo/$arch
+  - https://al2.seblu.net/$repo/$arch
+

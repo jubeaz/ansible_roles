@@ -1,0 +1,158 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
+#export RSYNC_SSL_CA_CERT="{{ sslbackup_cacert }}"
+export RSYNC_SSL_TYPE="openssl"
+export RSYNC_SSL_PORT="{{ sslbackup_port }}"
+export RSYNC_SSL_OPENSSL=""
+
+server="{{ sslbackup_server }}"
+target="rsync://${server}/$HOSTNAME"
+
+
+progname=$(basename $0)
+dryrun=""
+verbose=""
+params=""
+recursive=""
+
+sync_base_params="-aF --delete"
+log_format="%t %o %n"
+log="/var/log/sslbackup-$(date +%Y-%m).log"
+date=$(date +%Y-%m-%d)
+
+# usage function
+function usage()
+{
+   cat << HEREDOC
+
+   Usage: $progname command [ command opts] [ command args ]
+
+   standard commandes:
+     full            full backup
+     diff            differential backup
+     list            list backup
+
+   full standard options:
+     -h, --help
+     -d, --dry-run
+     -v, --verbose
+
+   diff standard options:
+     -h, --help
+     -d, --dry-run
+     -v, --verbose
+
+   list standard options:
+     -h, --help
+     -v, --verbose
+     -r, --recursive
+
+HEREDOC
+}
+
+reconfig-filters() {
+    cat {{ _sslbackup_conf_dir }}/*.conf > /.rsync-filter
+    echo '- *' >> /.rsync-filter
+}
+
+full () {
+    while [[ $# -gt 0 ]] ; do
+        case "$1" in
+            -v | --verbose)
+                verbose="--info=ALL"
+                shift
+                ;;
+            -d | --dry-run)
+                dryrun="--dry-run"
+                shift
+                ;;
+            -h | --help | *)
+                usage ; exit ; ;;
+        esac
+    done
+
+    params="$sync_base_params $dryrun $verbose"
+    /usr/bin/rsync-ssl $params --log-format="FULL $log_format" / $target/full >> $log
+    echo "/usr/bin/rsync-ssl $params --log-format=\"$log_format\" / $target/full"
+}
+
+differential () {
+    compare_params="--compare-dest=/full/"
+    diff_dir="diff-${date}"
+    del_file="deletion-${date}"
+
+    while [[ $# -gt 0 ]] ; do
+        case "$1" in
+            -v | --verbose)
+                verbose="--info=ALL"
+                shift
+                ;;
+            -d | --dry-run)
+                dryrun="--dry-run"
+                shift
+                ;;
+            -h | --help | *)
+                usage ; exit ; ;;
+        esac
+    done
+
+    params="$sync_base_params $dryrun $verbose $compare_params"
+    /usr/bin/rsync-ssl $params --log-format="DIFF $log_format"  /  $target/$diff_dir >> $log
+    echo "/usr/bin/rsync-ssl $params --log-format=\"$log_format\" /  $target/$diff_dir"
+
+    # Generate list of deletion
+    params="$sync_base_params --dry-run --info=ALL0,DEL"
+    /usr/bin/rsync-ssl $params /  $target/full > /tmp/$del_file
+    /usr/bin/rsync-ssl -a /tmp/$del_file $target/
+}
+
+list () {
+    while [[ $# -gt 0 ]] ; do
+        case "$1" in
+            -r | --recusrsive)
+                recursive="--recursive"
+                shift
+                ;;
+            -v | --verbose)
+                verbose="--info=ALL"
+                shift
+                ;;
+            -h | --help | *)
+                usage ; exit ; ;;
+        esac
+    done
+
+    params="--list-only --human-readable --stats $verbose $recursive"
+    echo "/usr/bin/rsync-ssl  $params $target"
+    /usr/bin/rsync-ssl  $params $target
+}
+
+main() {
+    [[ $# -eq 0 ]] && usage && exit
+    case "$1" in
+        full)
+            shift
+            reconfig-filters
+            full "${@}"
+            exit
+            ;;
+        diff)
+            shift
+            reconfig-filters
+            differential "${@}"
+            ;;
+        list)
+            shift
+            list "${@}"
+            exit
+            ;;
+        *)
+            usage ; exit ; ;;
+    esac
+}
+
+main "${@}"

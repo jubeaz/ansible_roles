@@ -1,0 +1,7 @@
+---
+# handlers file for zabbix-client
+- name: Insure zabbix agent is started
+  service:
+    name: zabbix-agent
+    state: restarted
+    enabled: true

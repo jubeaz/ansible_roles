@@ -1,0 +1,5 @@
+---
+_hvault_token_dir: "/etc/vault/token"
+_hvault_keys_dir: "/etc/vault/keys"
+_hvault_user: vault
+_hvault_group: vault

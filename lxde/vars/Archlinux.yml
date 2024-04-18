@@ -1,0 +1,14 @@
+---
+lxde_pkgs:
+  - lxde
+  - xorg-xauth
+  - xorg-xhost
+  - light-locker
+  - lightdm
+  - lightdm-gtk-greeter
+  - i3-wm
+  - rofi
+  #- light
+  - ttf-font-awesome
+  - arandr
+    #  - openbox

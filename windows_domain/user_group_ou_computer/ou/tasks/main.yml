@@ -1,0 +1,12 @@
+
+- name: Ensure OU is present
+  microsoft.ad.ou:
+    name: "{{ item.value.name }}"
+    path: "{{ item.value.path }}"
+    protect_from_deletion: false
+    state: present
+    domain_username: "{{domain_name}}\\Administrator"
+    domain_password: "{{domain_password}}"
+  with_dict: "{{objects | default({})}}"
+  register: oucreate
+

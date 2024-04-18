@@ -1,0 +1,7 @@
+- name: Install pgsql lastest
+  pacman:
+    name: postgresql
+    state: present
+    update_cache: true
+  register: __pacman
+  changed_when: (__pacman.packages | default([]))| length >0 

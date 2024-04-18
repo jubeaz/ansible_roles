@@ -1,0 +1,24 @@
+[Unit]
+
+Description=VirtualBox VM %I
+After=network.target vboxdrv.service virtualbox.service
+Before=runlevel2.target shutdown.target
+
+
+
+[Service]
+
+Type=idle
+User={{ vbox_sys_user }}
+Group={{_vbox_group }}
+Type=forking
+Restart=no
+TimeoutSec=5min
+IgnoreSIGPIPE=no
+KillMode=process
+GuessMainPID=no
+RemainAfterExit=yes
+
+
+ExecStart=/usr/bin/VBoxManage startvm %i --type headless
+

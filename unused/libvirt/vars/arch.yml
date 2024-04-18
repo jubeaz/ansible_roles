@@ -1,0 +1,16 @@
+---
+_libvirt_packages:
+  - qemu
+  - qemu-arch-extra #usermode
+    #- qemu-headless-arch-extra
+    #- qemu-headless
+  - libvirt
+  - bridge-utils
+    #  - iptables-nft
+  - dnsmasq
+  - openbsd-netcat
+  - dmidecode
+  - python-lxml
+  - libvirt-python
+    #- virt-manager
+

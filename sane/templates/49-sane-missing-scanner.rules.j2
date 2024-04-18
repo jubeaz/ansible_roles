@@ -1,0 +1,5 @@
+{%for item in sane_missing_scanners %}
+
+ATTRS{idVendor}=="{{ item.vendor }}", ATTRS{idProduct}=="{{ item.product }}", MODE="0664", GROUP="lp", ENV{libsane_matched}="yes"
+{% endfor %}
+

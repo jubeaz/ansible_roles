@@ -1,0 +1,39 @@
+---
+- name: Check if intermediate certificate file exist
+  stat:
+    path: "{{ _ca_dirs._ca_certs.path }}/{{ _ca_cert_name }}"
+  register: __ca_cert_file
+
+- name: Create csr
+  block:
+    - name: Create csr
+      command:
+        argv:
+          - openssl
+          - req
+          - -passout
+          - "pass:{{ ca_key_password }}"
+          - -config
+          - "{{ _ca_dirs._ca_private.path }}/req-intermediate-ca.cnf"
+          - -new
+          - -out
+          - "{{ _ca_dirs._ca_csr.path }}/{{ ansible_date_time.epoch }}-{{ _ca_csr_name }}"
+
+    - name: Set Root CA  csr_dir for intermediate CA
+      set_fact:
+        __ca_root_base_dir: "{{ hostvars[ca_signing_ca].ca_base_dir }}"
+
+    - name: Copy csr on root CA
+      become: false
+      ansible.posix.synchronize:
+        src: "{{ _ca_dirs._ca_csr.path }}/{{ ansible_date_time.epoch }}-{{ _ca_csr_name }}"
+        dest: "{{ __ca_root_base_dir }}/{{ ca_csr_dir }}"
+        use_ssh_args: true
+        mode: pull
+      delegate_to: "{{ ca_signing_ca }}"
+
+    - name: Delete csr
+      file:
+        path: "{{ _ca_dirs._ca_csr.path }}/{{ ansible_date_time.epoch }}-{{ _ca_csr_name }}"
+        state: absent
+  when: not __ca_cert_file.stat.exists

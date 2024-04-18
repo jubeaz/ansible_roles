@@ -1,0 +1,99 @@
+---
+- name: Create CA directories
+  file:
+    path: "{{ item.value.path }}"
+    owner: root
+    group: root
+    mode: "{{ item.value.mode }}"
+    state: directory
+  with_dict: "{{ _ca_dirs }}"
+
+- name: Create csr_template directories
+  file:
+    path: "{{ ca_base_dir }}/{{ ca_csr_dir }}/{{ item }}"
+    owner: root
+    group: root
+    mode: 0777
+    state: directory
+  loop: "{{ ca_templates.keys() }}"
+
+- name: Check ca_database
+  stat:
+    path: "{{ _ca_dirs._ca_base.path }}/{{ ca_database }}"
+  register: __ca_database
+
+- name: Createi CA database
+  block:
+    - name: Create ca_database
+      file:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_database }}"
+        owner: root
+        group: root
+        mode: 0644
+        state: touch
+    - name: Create ca_database_attr
+      file:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_database }}.attr"
+        owner: root
+        group: root
+        mode: 0644
+        state: touch
+    - name: Set ca_database attribute
+      lineinfile:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_database }}.attr"
+        owner: root
+        group: root
+        mode: 0644
+        regexp: '^unique_subject'
+        line: "unique_subject = {{ ca_unique_subject }}"
+  when: not __ca_database.stat.exists
+
+- name: Check ca_serial
+  stat:
+    path: "{{ _ca_dirs._ca_base.path }}/{{ ca_serial }}"
+  register: __ca_serial
+
+- name: Create CA serial
+  block:
+    - name: Create ca_serial
+      file:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_serial }}"
+        owner: root
+        group: root
+        mode: 0644
+        state: touch
+
+    - name: Set initial ca_serial
+      lineinfile:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_serial }}"
+        owner: root
+        group: root
+        mode: 0644
+        regexp: '^1000'
+        line: '1000'
+  when: not __ca_serial.stat.exists
+
+- name: Check ca_crlnumber
+  stat:
+    path: "{{ _ca_dirs._ca_base.path }}/{{ ca_crlnumber }}"
+  register: __ca_crlnumber
+
+- name: Create CA crlnumber
+  block:
+    - name: Create ca_crlnumber
+      file:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_crlnumber }}"
+        owner: root
+        group: root
+        mode: 0644
+        state: touch
+
+    - name: Set initial ca_crlnumber
+      lineinfile:
+        path: "{{ _ca_dirs._ca_base.path }}/{{ ca_crlnumber }}"
+        owner: root
+        group: root
+        mode: 0644
+        regexp: '^1000'
+        line: '1000'
+  when: not __ca_crlnumber.stat.exists

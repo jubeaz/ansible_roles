@@ -1,0 +1,11 @@
+---
+- name: Create TLS_libvirt CSR
+  openssl_csr:
+    path: "{{ vars[_key_path_var] }}/{{ vars[_cert_file_var] }}.csr"
+    privatekey_path: "{{ vars[_key_path_var] }}/{{ vars[_key_file_var] }}"
+    common_name: "{{ inventory_hostname }}"
+    subject_alt_name:
+      - "DNS:{{ inventory_hostname }}" 
+      - "DNS:{{ ansible_hostname }}" 
+      - "IP:127.0.0.1"
+    digest: "{{ _ca_template_params.default_md }}"

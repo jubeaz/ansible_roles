@@ -1,0 +1,77 @@
+
+- name: Create cert directory form "{{ cert.name }}"
+  file:
+    path: "{{ cert.key_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+- name: Create key directory form "{{ cert.name }}"
+  file:
+    path: "{{ cert.cert_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+- name: Create key+file directory form "{{ cert.name }}"
+  file:
+    path: "{{ cert.path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Generate private key for "{{ cert.name }}"
+  openssl_privatekey:
+    path: "{{ cert.key_path }}/{{ cert.key_name }}"
+    size: "4096"
+    type: RSA
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Generate csr for "{{ cert.name }}"
+  openssl_csr:
+    path: "haproxy.csr"
+    path: "{{ cert.cert_path }}/csr_{{ cert.cert_name }}"
+    privatekey_path: "{{ cert.key_path }}/{{ cert.key_name }}"
+    common_name: "{{ cert.cn }}"
+    subject_alt_name: "{{ cert.san | map('regex_replace', '^', 'DNS:') | list }}"
+    key_usage:
+      - digitalSignature
+      - keyEncipherment
+    extended_key_usage:
+      - serverAuth
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Sign csr for "{{ cert.name }}"
+  openssl_certificate:
+    path: "{{ cert.cert_path }}/{{ cert.cert_name }}"
+    privatekey_path: "{{ cert.key_path }}/{{ cert.key_name }}"
+    csr_path: "{{ cert.cert_path }}/csr_{{ cert.cert_name }}"
+    provider: selfsigned
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Check if intermediate certificate file exist
+  stat:
+    path: "{{ cert.path }}/{{ cert.name }}"
+  register: __cert
+
+- name: read key and certificate for "{{ cert.name }}"
+  command: awk 1 "{{ cert.key_path }}/{{ cert.key_name }}" "{{ cert.cert_path }}/{{ cert.cert_name }}"
+  register: __bundle
+  when: not __cert.stat.exists
+
+- name: create key and cert bundle file for "{{ cert.name }}"
+  copy:
+    dest: "{{ cert.path }}/{{ cert.name }}"
+    content: "{{ __bundle.stdout }}"
+    remote_src: true
+    owner: root
+    group: root
+    mode: 0600
+  when: not __cert.stat.exists

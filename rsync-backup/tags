@@ -1,0 +1,44 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/rsync-backup/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Create diff backup service	tasks/main.yml	/^- name: Create diff backup service$/;"	p	language:AnsiblePlaybook
+Create diff backup timer	tasks/main.yml	/^- name: Create diff backup timer$/;"	p	language:AnsiblePlaybook
+Create filter conf dir	tasks/main.yml	/^- name: Create filter conf dir$/;"	p	language:AnsiblePlaybook
+Create full backup service	tasks/main.yml	/^- name: Create full backup service$/;"	p	language:AnsiblePlaybook
+Create full backup timer	tasks/main.yml	/^- name: Create full backup timer$/;"	p	language:AnsiblePlaybook
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+Include OS-specific variables (Archlinux)	tasks/variables.yml	/^- name: Include OS-specific variables (Archlinux)$/;"	p	language:AnsiblePlaybook
+Include OS-specific variables (Ubuntu)	tasks/variables.yml	/^- name: Include OS-specific variables (Ubuntu)$/;"	p	language:AnsiblePlaybook
+Include common variables	tasks/variables.yml	/^- name: Include common variables$/;"	p	language:AnsiblePlaybook
+Install cron	tasks/ubuntu.yml	/^- name: Install cron$/;"	p	language:AnsiblePlaybook
+Install script	tasks/main.yml	/^- name: Install script$/;"	p	language:AnsiblePlaybook
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1643803399
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+arch.yml	tasks/arch.yml	1;"	F	language:Yaml	epoch:1665651155
+arch.yml	vars/arch.yml	1;"	F	language:Yaml	epoch:1644035285
+assert proper distribution	tasks/asserts.yml	/^- name: assert proper distribution$/;"	p	language:AnsiblePlaybook
+asserts.yml	tasks/asserts.yml	1;"	F	language:Yaml	epoch:1643803399
+common.yml	vars/common.yml	1;"	F	language:Yaml	epoch:1665649543
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1645086431
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1665649948
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1643803399
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1665649949
+restart timer_diff	handlers/main.yml	/^- name: restart timer_diff$/;"	p	language:AnsiblePlaybook
+restart timer_full	handlers/main.yml	/^- name: restart timer_full$/;"	p	language:AnsiblePlaybook
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1643803399
+ubuntu.yml	tasks/ubuntu.yml	1;"	F	language:Yaml	epoch:1644035722
+ubuntu.yml	vars/ubuntu.yml	1;"	F	language:Yaml	epoch:1644034521
+variables.yml	tasks/variables.yml	1;"	F	language:Yaml	epoch:1643803399

@@ -1,0 +1,24 @@
+---
+- name: Get back cert in csr dir
+  become: false
+  synchronize:
+    src: "{{ __ca_root_base_dir }}/{{ ca_new_certs_dir }}/{{ ansible_date_time.epoch }}-{{ _ca_cert_name }}"
+    dest: "{{ _ca_dirs._ca_csr.path }}"
+    use_ssh_args: true
+    mode: push
+  delegate_to: "{{ ca_signing_ca }}"
+
+- name: Move cert in certs dir
+  command: mv "{{ _ca_dirs._ca_csr.path }}/{{ ansible_date_time.epoch }}-{{ _ca_cert_name }}" "{{ _ca_dirs._ca_certs.path }}/{{ _ca_cert_name }}"
+
+- name: Get back cert bundle in csr dir
+  become: false
+  synchronize:
+    src: "{{ __ca_root_base_dir }}/{{ ca_new_certs_dir }}/bundle-{{ ansible_date_time.epoch }}-{{ _ca_cert_name }}"
+    dest: "{{ _ca_dirs._ca_csr.path }}"
+    use_ssh_args: true
+    mode: push
+  delegate_to: "{{ ca_signing_ca }}"
+
+- name: Move cert bundle in certs dir
+  command: mv "{{ _ca_dirs._ca_csr.path }}/bundle-{{ ansible_date_time.epoch }}-{{ _ca_cert_name }}" "{{ _ca_dirs._ca_certs.path }}/bundle-{{ _ca_cert_name }}"

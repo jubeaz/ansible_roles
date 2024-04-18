@@ -1,0 +1,21 @@
+{{ ansible_managed | comment(decoration="; ") }}
+
+$TTL   {{ item.value['TTL'] }} 
+@       IN      SOA     {{ ansible_facts['hostname'] }}.{{ item.value['name'] }}. {{ item.value['email'] }}. (
+                     {{ ansible_date_time.epoch }}       ; Serial
+                     {{ item.value['refresh'] }}         ; Refresh
+                     {{ item.value['retry'] }}         ; retry
+                     {{ item.value['expire'] }}         ; expire
+                     {{ item.value['negative'] }} )      ; regative
+;
+@              IN      NS       {{ ansible_facts['hostname'] }}.{{ item.value['name'] }}.
+
+
+{% for item in item.value['content'] %}
+{% if item[0] == "COMMENT" %}
+; {{ item[1] }}
+{% else %}
+{{ item[1] }}   IN {{ item[0] }} {{ item[2] }} ; {{ item[3] }}
+{% endif %}
+{% endfor %}
+

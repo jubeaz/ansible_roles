@@ -1,0 +1,22 @@
+- name: Create {{ network.name }} network
+  virt_net:
+    command: define
+    name: "{{ network.name }}"
+    xml: '{{ lookup("template", "templates/network.xml.j2") }}'
+
+- name: Get {{ network.name }} network status
+  virt_network:
+    command: status
+    name: "{{ network.name }}"
+  register: __network_status
+
+- name: Start {{ network.name }} network
+  virt_network:
+    command: create
+    name: "{{ network.name }}"
+  when:  __network_status.status != "active"
+ 
+- name: AutoStart {{ network.name }} network
+  virt_network:
+    autostart: yes
+    name: "{{ network.name }}"

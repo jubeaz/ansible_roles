@@ -1,0 +1,13 @@
+---
+- name: restart rsyncd
+  service:
+    name: "{{ rsyncd_service_name }}"
+    state: restarted
+    enabled: true
+
+- name: restart timer
+  service:
+    name: "rsyncd-clean.timer"
+    state: restarted
+    enabled: true
+

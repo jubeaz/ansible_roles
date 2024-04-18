@@ -1,0 +1,14 @@
+---
+#  BLUEtooth
+  #   cp /etc/pulse ~/.config/pulse
+  #   load-module module-switch-on-connect >> ~/.config/pulse/default.pa
+  #
+- name: Install packages
+  pacman:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  register: __pacman
+  changed_when: (__pacman.packages | default([]))| length >0
+  loop: "{{ bluetoot_headset_pkgs }}"
+

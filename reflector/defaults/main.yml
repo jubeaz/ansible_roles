@@ -1,0 +1,8 @@
+---
+reflector_protocols: 
+  - https
+reflector_countries:
+  - France
+  - Germany
+reflector_numberof: 5
+reflector_sort_method: rate

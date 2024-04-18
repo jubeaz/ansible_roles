@@ -1,0 +1,6 @@
+[Match]
+Name={{ libvirt_interface }}
+
+[Network]
+Bridge={{ libvirt_bridge_name }}
+

@@ -1,0 +1,6 @@
+{{ ansible_managed | comment }}
+[{{ item }}]
+
+{% for key,value in rsyncd_modules[item].items() %}
+{{ key }} = {{ value }}
+{% endfor %}

@@ -1,0 +1,37 @@
+# https://answers.microsoft.com/en-us/protect/forum/protect_defender-protect_start-windows_10/how-do-i-stop-sending-antivirus-samples-to/a2e7b280-a8ba-43f5-b391-0a12c109f990
+- name: Manage windows defender on server
+  block:
+    - name: Install windows defender
+      win_feature:
+        name: Windows-Defender
+        state: "{{'present' if windows_defender == true else 'absent'}}"
+      register: win_defender_install
+      when: windows_defender is defined
+    - name: Reboot if needed
+      win_reboot:
+        reboot_timeout: 600
+        post_reboot_delay: 30
+      when: windows_defender is defined and win_defender_install.reboot_required
+    - name: Get info for a single feature
+      community.windows.win_feature_info:
+        name: Windows-Defender
+      register: win_defender_install  
+  when: is_server_os
+
+- name: disable real-time protection
+  win_shell: |
+    Set-MpPreference -DisableRealtimeMonitoring {{0 if windows_defender | default(true) else 1}}
+  when: is_server_os == false
+  become: yes
+  become_user: SYSTEM
+  become_method: runas
+#- debug: 
+#    var: win_defender_install
+
+- name: Disable windows defender sending sample (MAPSReporting)
+  win_shell: Set-MpPreference -MAPSReporting 0
+  when: is_server_os == false or win_defender_install.features[0].installed == true
+
+- name: Disable windows defender sending sample (SubmitSamplesConsent)
+  win_shell: Set-MpPreference -SubmitSamplesConsent 2
+  when: is_server_os == false or win_defender_install.features[0].installed == true

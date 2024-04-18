@@ -1,0 +1,9 @@
+{{ ansible_managed | comment }}  
+# See timesyncd.conf(5) for details.
+
+[Time]
+NTP={{ tz_ntp_servers }}
+#FallbackNTP=ntp.ubuntu.com
+#RootDistanceMaxSec=5
+#PollIntervalMinSec=32
+#PollIntervalMaxSec=2048

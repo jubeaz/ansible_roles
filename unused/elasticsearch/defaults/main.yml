@@ -1,0 +1,26 @@
+---
+aur_directory: /tmp
+# defaults file for elasticsearch
+es_http_port: 9200
+es_ufw_http_from: 
+  - 127.0.0.1
+es_cluster_port: 9300
+es_ufw_cluster_from: 
+  - 127.0.0.1 
+    
+es_data: /var/lib/elasticsearch/data
+es_logs: /var/log/elasticsearch/log
+  
+es_heap_space: 2g
+
+es_cluster_name: "{{ ansible_nodename }}"
+es_node_name: "{{ ansible_nodename }}"
+es_host: "{{ ansible_ssh_host }}"
+
+
+
+es_deployment_type: "development"
+es_init_master_method: "inventory"  # ["inventory", "var"]
+es_seed_hosts: [] 
+es_master_nodes: []
+es_api_basic_auth_password: password

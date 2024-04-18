@@ -1,0 +1,6 @@
+---
+# defaults file for xrdp
+#xrdp_port: 3389
+#xrdp_ufw:
+#  - 192.168.1.0/24
+

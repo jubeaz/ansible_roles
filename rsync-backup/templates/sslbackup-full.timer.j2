@@ -1,0 +1,9 @@
+[Unit]
+Description=Run rsyncd-clean daily at {{ sslbackup_time }}
+
+[Timer]
+OnCalendar=Sun *-*-* {{ sslbackup_time }}
+
+[Install]
+WantedBy=timers.target
+

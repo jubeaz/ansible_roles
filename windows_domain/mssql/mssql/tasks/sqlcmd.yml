@@ -1,0 +1,53 @@
+--- 
+- name: Add MSSQL admin
+  win_shell: |
+    SqlCmd -E -Q "CREATE LOGIN [{{item}}] FROM WINDOWS"
+    SqlCmd -E -Q "SP_ADDSRVROLEMEMBER '{{item}}','SYSADMIN'"
+  become: yes
+  become_method: runas
+  become_user: "{{SQLSVCACCOUNT}}"
+  vars:
+    ansible_become_pass: "{{SQLSVCPASSWORD}}"
+  loop: "{{sql_sysadmins}}"
+
+- name: Add IMPERSONATE on login
+  win_shell: |
+    SqlCmd -E -Q "CREATE LOGIN [{{item.key}}] FROM WINDOWS"
+    SqlCmd -E -Q "GRANT IMPERSONATE ON LOGIN::[{{item.value}}] TO [{{item.key}}]"
+  become: yes
+  become_method: runas
+  become_user: "{{SQLSVCACCOUNT}}"
+  vars:
+    ansible_become_pass: "{{SQLSVCPASSWORD}}"
+  with_dict: "{{executeaslogin}}"
+
+- name: Add IMPERSONATE on user
+  win_shell: |
+    SqlCmd -E -Q "CREATE LOGIN [{{item.key}}] FROM WINDOWS"
+    SqlCmd -E -Q "USE {{item.value.db}};CREATE USER [{{item.value.user}}] FOR LOGIN [{{item.value.user}}]"
+    SqlCmd -E -Q "USE {{item.value.db}};GRANT IMPERSONATE ON USER::[{{item.value.impersonate}}] TO [{{item.value.user}}]"
+  become: yes
+  become_method: runas
+  become_user: "{{SQLSVCACCOUNT}}"
+  vars:
+    ansible_become_pass: "{{SQLSVCPASSWORD}}"
+  with_dict: "{{executeasuser}}"
+
+- name: Enable sa account
+  win_shell: |
+    SqlCmd -E -Q "ALTER LOGIN sa ENABLE"
+    SqlCmd -E -Q "ALTER LOGIN sa WITH PASSWORD = '{{sa_password}}' , CHECK_POLICY=OFF"
+  become: yes
+  become_method: runas
+  become_user: "{{SQLSVCACCOUNT}}"
+  vars:
+    ansible_become_pass: "{{SQLSVCPASSWORD}}"
+
+- name: enable MSSQL authentication and windows authent
+  win_shell: |
+    SqlCmd -E -Q "EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2"
+  become: yes
+  become_method: runas
+  become_user: "{{SQLSVCACCOUNT}}"
+  vars:
+    ansible_become_pass: "{{SQLSVCPASSWORD}}"

@@ -1,0 +1,19 @@
+{{ ansible_managed | comment(decoration="// ") }}
+
+include "{{ _named_conf_dir }}/named.conf.options";
+include "{{ _named_conf_dir }}/named.conf.local";
+include "{{ _named_conf_dir }}/named.conf.default-zones";
+include "{{ _named_conf_dir }}/named.conf.views";
+include "{{ _named_conf_dir }}/named.conf.controls";
+
+//logging {
+//    channel xfer-log {
+//        file "/var/log/named.log";
+//            print-category yes;
+//            print-severity yes;
+//            severity info;
+//        };
+//        category xfer-in { xfer-log; };
+//        category xfer-out { xfer-log; };
+//        category notify { xfer-log; };
+//};

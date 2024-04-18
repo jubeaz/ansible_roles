@@ -1,0 +1,50 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/rsyncd/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+Add ufw allow rules	tasks/main.yml	/^- name: Add ufw allow rules$/;"	p	language:AnsiblePlaybook
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Create Create modules config	tasks/main.yml	/^- name: Create Create modules config$/;"	p	language:AnsiblePlaybook
+Create cleaner service	tasks/main.yml	/^- name: Create cleaner service$/;"	p	language:AnsiblePlaybook
+Create cleaner timer	tasks/main.yml	/^- name: Create cleaner timer$/;"	p	language:AnsiblePlaybook
+Create dropIn directory	tasks/main.yml	/^- name: Create dropIn directory$/;"	p	language:AnsiblePlaybook
+Create modules directories	tasks/main.yml	/^- name: Create modules directories$/;"	p	language:AnsiblePlaybook
+Create rsyncd.conf	tasks/main.yml	/^- name: Create rsyncd.conf$/;"	p	language:AnsiblePlaybook
+Delete obsolete modules	tasks/main.yml	/^- name: Delete obsolete modules$/;"	p	language:AnsiblePlaybook
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+Get installed packages	tasks/main.yml	/^- name: Get installed packages$/;"	p	language:AnsiblePlaybook
+Include OS-specific variables (Archlinux)	tasks/variables.yml	/^- name: Include OS-specific variables (Archlinux)$/;"	p	language:AnsiblePlaybook
+Include OS-specific variables (Ubuntu)	tasks/variables.yml	/^- name: Include OS-specific variables (Ubuntu)$/;"	p	language:AnsiblePlaybook
+Include common variables	tasks/variables.yml	/^- name: Include common variables$/;"	p	language:AnsiblePlaybook
+Install Rsync	tasks/arch.yml	/^- name: Install Rsync$/;"	p	language:AnsiblePlaybook
+Install rsync	tasks/ubuntu.yml	/^- name: Install rsync$/;"	p	language:AnsiblePlaybook
+Install script	tasks/main.yml	/^- name: Install script$/;"	p	language:AnsiblePlaybook
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1643296084
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+arch.yml	tasks/arch.yml	1;"	F	language:Yaml	epoch:1647741043
+arch.yml	vars/arch.yml	1;"	F	language:Yaml	epoch:1665644398
+assert proper distribution	tasks/asserts.yml	/^- name: assert proper distribution$/;"	p	language:AnsiblePlaybook
+asserts.yml	tasks/asserts.yml	1;"	F	language:Yaml	epoch:1642721778
+common.yml	vars/common.yml	1;"	F	language:Yaml	epoch:1643296431
+list files to delete	tasks/main.yml	/^- name: list files to delete$/;"	p	language:AnsiblePlaybook
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1644235677
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1665649951
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1643296228
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1665649952
+restart rsyncd	handlers/main.yml	/^- name: restart rsyncd$/;"	p	language:AnsiblePlaybook
+restart timer	handlers/main.yml	/^- name: restart timer$/;"	p	language:AnsiblePlaybook
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1642721778
+ubuntu.yml	tasks/ubuntu.yml	1;"	F	language:Yaml	epoch:1643023831
+ubuntu.yml	vars/ubuntu.yml	1;"	F	language:Yaml	epoch:1645920795
+variables.yml	tasks/variables.yml	1;"	F	language:Yaml	epoch:1642721778

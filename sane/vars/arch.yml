@@ -1,0 +1,9 @@
+---
+sane_pkgs:
+  - sane
+  - ipp-usb
+    #sane_additional_pkgs:
+  - gscan2pdf
+  - pdftk
+  - djvulibre
+  - unpaper

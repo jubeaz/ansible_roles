@@ -1,0 +1,8 @@
+---
+#https://www.cyberciti.biz/faq/how-to-install-kvm-on-ubuntu-20-04-lts-headless-server/
+_libvirt_packages:
+  - dmidecode
+  - dnsmasq-base
+  - qemu-kvm
+  - libvirt-daemon-system
+    # - virt-manager

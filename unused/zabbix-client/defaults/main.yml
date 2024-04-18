@@ -1,0 +1,12 @@
+---
+# defaults file for zabbix-client
+zbbx_c_passive_srv_from_inv: true
+zbbx_c_passive_inv_grp_name: "zabbix_server"
+zbbx_c_passive_srv_list: ""
+
+zbbx_c_active_srv_from_inv: false
+zbbx_c_active_inv_grp_name: "zabbix_server"
+zbbx_c_active_srv_list: ""
+
+zbbx_c_listen_port: 10050
+zbbx_c_ufw_from: 192.168.2.0/24

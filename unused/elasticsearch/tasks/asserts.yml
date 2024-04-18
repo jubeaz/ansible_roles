@@ -1,0 +1,31 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Ubuntu', 'Archlinux']
+    quiet: yes
+- name: assert es_deployment_type is well set
+  assert:
+    that:
+      - es_deployment_type is defined
+      - es_deployment_type in ["development"]
+- name: assert es_init_master_method is well set
+  assert:
+    that:
+      - es_init_master_method is defined
+      - es_init_master_method in ["inventory", "var", "none"]
+    quiet: yes
+- name: assert es_master_list is well set
+  assert:
+    that:
+      - es_master_list is defined
+      - es_master_list is sequence
+    quiet: yes
+  when:  es_init_master_method  == 'var'
+    #- name: assert es_master_grp_name is well set
+    #  assert:
+    #    that:
+    #      - es_master_grp_name is defined
+    #      - es_master_grp_name is string
+    #    quiet: yes
+    #  when:  es_init_master_method  == 'inventory'

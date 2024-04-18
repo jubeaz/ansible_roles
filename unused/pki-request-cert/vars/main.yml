@@ -1,0 +1,16 @@
+---
+# must be defined  at call time
+#_ca_name: the inventory name of the signing CA
+#_ca_template_name: template name on the CA used to sign
+#
+#_client_group_name:
+#_key_path_var:
+#_key_file_var:
+#_cert_path_var:
+#_cert_file_var:
+#_owner_user_var:
+#_owner_group_var:
+#_csr_template_name:
+#_cn_var: variable containing the CN
+#_san_var: variable containing the list of san
+

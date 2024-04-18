@@ -1,0 +1,32 @@
+---
+- name: Upgrade all packages on servers
+  register: __pacman_upgrade
+  pacman:
+    update_cache: true
+    upgrade: true
+  changed_when: __pacman.upgrade.packages is defined
+
+
+- name: Reboot Required
+  register: __reboot_required_file
+  stat:
+    path: /var/run/reboot-required
+  changed_when: __reboot_required_file.stat.exists == true
+
+- name: Create log directory
+  when: (__pacman_upgrade.changed == true) or (__reboot_required_file.stat.exists == true)
+  delegate_to:  localhost
+  file:
+    state: directory
+    path: "{{ ansible_exchange_dir }}/{{ role_name }}"
+    owner: root
+    group: root
+    mode: 0750
+
+- name: Dump upgraded list into file
+  when: __pacman_upgrade.changed == true
+  local_action: copy content="{{ __pacman_upgrade. packages }}" dest="{{ ansible_exchange_dir }}/{{ role_name }}/{{ ansible_hostname }}-{{ ansible_date_time.epoch }}.updated"
+
+- name:  create reboot requiered file
+  when: __reboot_required_file.stat.exists == true
+  local_action: copy content="reboot" dest="{{ ansible_exchange_dir }}/{{ role_name }}/{{ ansible_hostname }}-{{ ansible_date_time.epoch }}.reboot_required"

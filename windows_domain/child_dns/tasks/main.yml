@@ -1,0 +1,10 @@
+
+- name: Create A record for child domain in parent domain
+  community.windows.win_dns_record:
+    name: "{{item[1]}}.{{item[2]}}"
+    type: "A"
+    values:
+      - "{{hostvars[item[0]].domain_dc_ip}}"
+    zone: "{{domain_name}}"
+  loop: "{{ child_domains }}"
+  when: child_domains is defined

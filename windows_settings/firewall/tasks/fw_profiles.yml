@@ -1,0 +1,20 @@
+---
+- name: Update Firewall profiles
+  win_dsc:
+    resource_name           : xFirewallProfile
+    Name                    : "{{profile.key}}"
+    Enabled                 : "{{profile.value.Enabled}}"
+    DefaultInboundAction    : "{{profile.value.DefaultInboundAction}}"
+    DefaultOutboundAction   : "{{profile.value.DefaultOutboundAction}}"
+#    AllowInboundRules       : 'True'
+#    AllowLocalFirewallRules : 'False'
+#    AllowLocalIPsecRules    : 'False'
+#    NotifyOnListen          : 'True'
+#    LogFileName             : '%systemroot%\system32\LogFiles\Firewall\pfirewall.log'
+#    LogMaxSizeKilobytes     : 16384
+#    LogAllowed              : 'False'
+#    LogBlocked              : 'True'
+#    LogIgnored              : 'NotConfigured'
+  with_dict: "{{firewall_profiles | default({})}}"
+  loop_control:
+    loop_var: profile

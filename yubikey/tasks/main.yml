@@ -1,0 +1,38 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+# auth            sufficient      pam_u2f.so cue pinverification=1
+# auth		include		system-auth
+- name: Add passwordless lightdm auth (/etc/pam.d/lightdm)
+  package_facts:
+    manager: "auto"
+      
+# auth       requisite    pam_nologin.so
+# auth 	   sufficient   pam_u2f.so cue pinverification=1
+- name: Add passwordless tty auth (/etc/pam.d/login)
+  package_facts:
+    manager: "auto"
+
+# auth            sufficient      pam_u2f.so cue origin=pam://akamatsu appid=pam://akamatsu 
+# auth		include		system-auth
+- name: Add passwordless sudo (/etc/pam.d/login)
+  package_facts:
+    manager: "auto"

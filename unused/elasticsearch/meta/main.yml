@@ -1,0 +1,15 @@
+galaxy_info:
+  role_name: elasticsearch
+  author: jubeaz
+  description: install elasticsearch
+  license: GPL-2.0-or-later
+  min_ansible_version: 2.1
+  platforms:
+    - name: ubuntu
+      versions:
+        - focal
+    - name: Archlinux
+      versions:
+        - all
+  galaxy_tags: []
+dependencies: []

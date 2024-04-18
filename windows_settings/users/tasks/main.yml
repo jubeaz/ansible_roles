@@ -1,0 +1,7 @@
+---
+- name: Add local users
+  ansible.windows.win_user:
+    name: "{{item.key}}"
+    password: "{{item.value.password}}"
+    state: present
+  with_dict: "{{ local_users }}"

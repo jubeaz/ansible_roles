@@ -1,0 +1,34 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+- include_tasks: asserts.yml
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+- name: Get installed packages
+  ansible.builtin.package_facts:
+    manager: "auto"
+
+- name: Open firewall ports
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item }}"
+    to_port: "{{ xrdp_port }}"
+  loop: "{{ xrdp_ufw }}"
+  when: "'ufw' in ansible_facts.packages"
+
+- name: set sesman.ini right xorg pointer
+  ansible.builtin.lineinfile:
+    path: /etc/xrdp/sesman.ini
+    regexp: '^param=Xorg$'
+    line: param=/usr/lib/Xorg
+  notify: Restart xrdp

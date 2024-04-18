@@ -1,0 +1,6 @@
+[Unit]
+Description=rsyncd full backup.
+
+[Service]
+Type=oneshot
+ExecStart= /usr/bin/sslbackup.sh full

@@ -1,0 +1,59 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/nordvpn/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+Add login/password file ref	tasks/main.yml	/^- name: Add login\/password file ref$/;"	p	language:AnsiblePlaybook
+Archlinux.yml	tasks/Archlinux.yml	1;"	F	language:Yaml	epoch:1647740850
+Archlinux.yml	vars/Archlinux.yml	1;"	F	language:Yaml	epoch:1646904654
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Copy base config as model	tasks/main.yml	/^- name: Copy base config as model$/;"	p	language:AnsiblePlaybook
+Copy nord.sh	tasks/main.yml	/^- name: Copy nord.sh$/;"	p	language:AnsiblePlaybook
+Copy nordvpn resolv.conf	tasks/main.yml	/^- name: Copy nordvpn resolv.conf$/;"	p	language:AnsiblePlaybook
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+Extract ovpn configs	tasks/main.yml	/^- name: Extract ovpn configs$/;"	p	language:AnsiblePlaybook
+Get ovpn.zip	tasks/main.yml	/^- name: Get ovpn.zip$/;"	p	language:AnsiblePlaybook
+HEREDOC	files/nordvpn.sh	/^   cat << HEREDOC$/;"	h	language:Sh
+Include OS-specific variables	tasks/main.yml	/^- name: Include OS-specific variables$/;"	p	language:AnsiblePlaybook
+Include common variables	tasks/main.yml	/^- name: Include common variables$/;"	p	language:AnsiblePlaybook
+Install login/password file	tasks/main.yml	/^- name: Install login\/password file$/;"	p	language:AnsiblePlaybook
+Install packages	tasks/Archlinux.yml	/^- name: Install packages$/;"	p	language:AnsiblePlaybook
+Kali.yml	tasks/Kali.yml	1;"	F	language:Yaml	epoch:1646901874
+Kali.yml	vars/Kali.yml	1;"	F	language:Yaml	epoch:1646901874
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1646901874
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+Ubuntu.yml	tasks/Ubuntu.yml	1;"	F	language:Yaml	epoch:1646901874
+Ubuntu.yml	vars/Ubuntu.yml	1;"	F	language:Yaml	epoch:1646901874
+add_vpn_rule	files/nordvpn.sh	/^add_vpn_rule () {$/;"	f	language:Sh
+assert proper distribution	tasks/main.yml	/^- name: assert proper distribution$/;"	p	language:AnsiblePlaybook
+asserts.yml	tasks/asserts.yml	1;"	F	language:Yaml	epoch:1646901874
+close_tunnel	files/nordvpn.sh	/^close_tunnel() {$/;"	f	language:Sh
+common.yml	vars/common.yml	1;"	F	language:Yaml	epoch:1646928610
+construct_db	files/nordvpn.sh	/^construct_db() {$/;"	f	language:Sh
+del_vpn_rule	files/nordvpn.sh	/^del_vpn_rule () {$/;"	f	language:Sh
+get_db_server	files/nordvpn.sh	/^get_db_server() {$/;"	f	language:Sh
+get_openvpn_server	files/nordvpn.sh	/^get_openvpn_server() {$/;"	f	language:Sh
+main	files/nordvpn.sh	/^main() {$/;"	f	language:Sh
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1646930274
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1646901874
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1646901874
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1667230934
+nordvpn.sh	files/nordvpn.sh	1;"	F	language:Sh	epoch:1667230570
+restrict_to_tunnel	files/nordvpn.sh	/^restrict_to_tunnel() {$/;"	f	language:Sh
+set_nord_dns	files/nordvpn.sh	/^set_nord_dns() {$/;"	f	language:Sh
+set_openvpn_server	files/nordvpn.sh	/^set_openvpn_server() {$/;"	f	language:Sh
+start_openvpn	files/nordvpn.sh	/^start_openvpn() {$/;"	f	language:Sh
+stop_openvpn	files/nordvpn.sh	/^stop_openvpn() {$/;"	f	language:Sh
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1646901874
+unset_nord_dns	files/nordvpn.sh	/^unset_nord_dns() {$/;"	f	language:Sh
+usage	files/nordvpn.sh	/^function usage()$/;"	f	language:Sh

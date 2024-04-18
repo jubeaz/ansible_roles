@@ -1,0 +1,4 @@
+---
+aur_directory: /usr/src/aur
+aur_owner: nobody
+aur_group: root

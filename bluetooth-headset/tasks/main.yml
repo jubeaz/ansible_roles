@@ -1,0 +1,21 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: config bluetooth autoEnable
+  lineinfile:
+    path: /etc/bluetooth/main.conf
+    regexp: '^AutoEnable'
+    insertafter: '^#AutoEnable'
+    line: 'AutoEnable=true'
+  notify: restart bluetooth
+- name: add pulseaudio switch on connect
+  lineinfile:
+    path: /etc/pulse/default.pa
+    regexp: '^load-module module-switch-on-connect'
+    insertafter: '^#load-module module-switch-on-connect'
+    line: 'load-module module-switch-on-connect'
+  notify: restart bluetooth

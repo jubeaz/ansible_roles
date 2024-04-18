@@ -1,0 +1,16 @@
+---
+rclone_users:
+  - login: root
+    group: root
+    path: /root/.config/rclone/rclone.conf
+    rclone_configs:
+      - name: gdrive
+        token:
+          access_token:
+          token_type:
+          refresh_token:
+          expiry:
+        properties:
+          type: drive
+          scope: drive
+          team_drive: ""

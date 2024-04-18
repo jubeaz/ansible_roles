@@ -1,0 +1,50 @@
+{{ ansible_managed | comment }}
+
+.include {{ _ca_dirs._ca_cnf.path }}/openssl-base.cnf
+{% set template = ca_self_info %}
+
+[ ca ]
+
+default_ca                  = CA_default
+
+[ CA_default ]
+
+dir                         = $b_dir
+certs                       = $b_certs
+new_certs_dir               = $b_new_certs_dir
+private_dir                 = $b_private_dir
+RANDFILE                    = $b_RANDFILE
+
+private_key                 = $b_private_key
+certificate                 = $b_certificate
+
+
+name_opt                    = multiline, -esc_msb, utf8
+cert_opt                    = ca_default
+preserve                    = no
+
+[ req ]
+
+encrypt_key                 = yes
+default_bits                = {{ template.default_bits }}
+default_md                  = {{ template.default_md }}
+default_keyfile             = $b_private_key
+prompt                      = no
+string_mask                 = utf8only
+
+distinguished_name          = root_ca_dn
+x509_extensions             = root_ca_ext
+
+
+[ root_ca_dn ]
+{% for key, value in template.dn.items() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+[ root_ca_ext ]
+
+subjectKeyIdentifier        = hash
+authorityKeyIdentifier      = keyid:always,issuer
+basicConstraints            = critical, CA:true
+keyUsage                    = critical, cRLSign, keyCertSign
+

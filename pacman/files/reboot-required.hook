@@ -1,0 +1,11 @@
+[Trigger]
+Type = Package
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = *
+
+[Action]
+Description = run reboot-required.sh
+When = PostTransaction
+Exec = /usr/bin/reboot-required.sh

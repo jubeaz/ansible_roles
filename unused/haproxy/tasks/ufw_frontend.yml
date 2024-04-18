@@ -1,0 +1,8 @@
+- name: Add "{{ front.name }}" front ufw allow rules
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item }}"
+    to_port: "{{ front.bind_port }}"
+    state: enabled
+  loop: "{{ front.firewall_allow }}"

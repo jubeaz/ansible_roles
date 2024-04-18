@@ -1,0 +1,33 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/aur-install/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20210905.0/
+AUR | assert proper answer	tasks/main.yml	/^- name: AUR | assert proper answer$/;"	p	language:AnsiblePlaybook
+AUR | get metadata from AurJson api for {{ aur_pkg_name }}	tasks/main.yml	/^- name: AUR | get metadata from AurJson api for {{ aur_pkg_name }}$/;"	p	language:AnsiblePlaybook
+AUR | {{ aur_pkg_name }} | build package, including missing dependencies	tasks/main.yml	/^- name: AUR | {{ aur_pkg_name }} | build package, including missing dependencies$/;"	p	language:AnsiblePlaybook
+AUR | {{ aur_pkg_name }} | download tarball	tasks/main.yml	/^- name: AUR | {{ aur_pkg_name }} | download tarball$/;"	p	language:AnsiblePlaybook
+AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman	tasks/main.yml	/^- name: AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman$/;"	p	language:AnsiblePlaybook
+AUR | {{ aur_pkg_name }} | unarchive tarball	tasks/main.yml	/^- name: AUR | {{ aur_pkg_name }} | unarchive tarball$/;"	p	language:AnsiblePlaybook
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1647688143
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+assert aur_pkg is well defined	tasks/asserts.yml	/^- name: assert aur_pkg is well defined$/;"	p	language:AnsiblePlaybook
+asserts.yml	tasks/asserts.yml	1;"	F	language:Yaml	epoch:1647690441
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1647690304
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1647688143
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1647689440
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1648359674
+main.yml	vars/main.yml	1;"	F	language:Yaml	epoch:1647688936
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1647688143

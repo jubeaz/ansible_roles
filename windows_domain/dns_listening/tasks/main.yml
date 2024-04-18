@@ -1,0 +1,68 @@
+
+
+# https://petri.com/configure-dns-on-domain-controller-two-ip-addresses/
+- name: "Set DS DNS to listen on {{domain_dc_ip}} (domain)" 
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $IP
+      )
+      Import-Module ActiveDirectory
+      Set-Location AD:
+
+      try {
+        $s= Get-DnsServerSetting -ALL
+        $s.ListeningIpAddress = @($IP)
+        Set-DNSServerSetting $s
+        $Ansible.Failed = $false
+      } catch {
+        $Ansible.Failed = $true
+        $message = $_
+        Write-Warning "Something happened! $message"
+      }
+    error_action: stop
+    parameters:
+      IP: "{{domain_dc_ip}}"
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+  register: set_dns_server_ip
+  when: two_adapters
+
+- debug:
+    var: set_dns_server_ip
+  when: two_adapters
+
+- name: Retrieve DNS Server config
+  win_shell: |
+    $obj = Get-DnsServerSetting
+    Write-Output  $obj
+  register: get_dns_server_listeningip
+  when: two_adapters
+
+- name: Show DNS Server config
+  debug: 
+    var: get_dns_server_listeningip
+  when: two_adapters
+
+- name: Reboot
+  win_reboot:
+    reboot_timeout: 900
+    post_reboot_delay: 100
+  when: two_adapters
+
+- name: Retrieve DNS Server config
+  win_shell: |
+    $obj = Get-DnsServerSetting
+    Write-Output  $obj
+  register: get_dns_server_listeningip
+  when: two_adapters
+
+- name: Show DNS Server config
+  debug: 
+    var: get_dns_server_listeningip
+  when: two_adapters

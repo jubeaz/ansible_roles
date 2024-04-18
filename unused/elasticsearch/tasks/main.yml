@@ -1,0 +1,128 @@
+---
+# tasks file for elasticsearch
+#- include_tasks: asserts.yml
+#- include_tasks: ubuntu.yml
+#  when: ansible_distribution == "Ubuntu"
+#- include_tasks: arch.yml
+#  when: ansible_distribution == "Archlinux"
+#
+#- name: Get installed packages
+#  package_facts:
+#    manager: "auto"
+#
+#- name: UFW
+#  block:
+#    - name: UFW | open firwall port for http
+#      ufw:
+#        rule: allow
+#        direction: in
+#        src: "{{ item }}"
+#        to_port: "{{ es_http_port }}"
+#      loop: "{{ es_ufw_http_from }}"
+#
+#    - name: UFW | open firwall port for cluster
+#      when: es_deployment_type == "development"
+#      ufw:
+#        rule: allow
+#        direction: in
+#        src: "{{ item }}"
+#        to_port: "{{ es_cluster_port }}"
+#      loop: "{{ es_ufw_cluster_from }}"
+#  when: "'ufw' in ansible_facts.packages"
+#
+#- name: Assert data directory exist
+#  file:
+#    path: "{{ es_data }}"
+#    group: elasticsearch
+#    owner: elasticsearch
+#    mode: 0755
+#    state: directory
+#
+#- name: Assert log directory exist
+#  file:
+#    path: "{{ es_logs }}"
+#    owner: elasticsearch
+#    group: elasticsearch
+#    mode: 0755
+#    state: directory
+#
+#- name: Set ES_PATH_CONF
+#  lineinfile:
+#    path: /etc/default/elasticsearch
+#    regexp: '^ES_PATH_CONF='
+#    line: 'ES_PATH_CONF=/etc/elasticsearch'
+#
+#- name: Set elasticsearch.yml
+#  template:
+#    src: templates/elasticsearch.yml.j2
+#    dest: /etc/elasticsearch/elasticsearch.yml
+#    mode: 0640
+#    owner: root
+#    group: elasticsearch
+#      #    backup: yes
+#  notify: Restart elasticsearch
+#
+#- name: Set Xms
+#  lineinfile:
+#    path: /etc/elasticsearch/jvm.options
+#    regexp: '^-Xms'
+#    line: "-Xms{{ es_heap_space }}"
+#
+#- name: Set Xmx
+#  lineinfile:
+#    path: /etc/elasticsearch/jvm.options
+#    regexp: '^-Xmx'
+#    line: "-Xmx{{ es_heap_space }}"
+#
+#- name: Test keystore
+#  stat:
+#    path: /etc/elasticsearch/elasticsearch.keystore
+#  register: __keystore
+#
+#- name: Init keystore
+#  when: not __keystore.stat.exists
+#  command: "{{ _es_bin_path }}/elasticsearch-keystore create"
+#
+#- meta: flush_handlers
+
+
+
+#-----------------------------Create Bootstrap User-----------------------------------
+#- name: Check if bootstrap password is set
+#  command: >
+#   /usr/bin/elasticsearch-keystore list
+#  register: list_keystore
+#  changed_when: False
+#
+#- name: Create Bootstrap password for elastic user
+#  shell: echo "{{es_api_basic_auth_password}}" | /usr/bin/elasticsearch-keystore add -x 'bootstrap.password'
+    #  when:
+    #    - (es_enable_xpack and "security" in es_xpack_features) and (es_version | version_compare('6.0.0', '>')) and es_api_basic_auth_username is defined and list_keystore is defined and es_api_basic_auth_username == 'elastic' and 'bootstrap.password' not in list_keystore.stdout_lines
+    #no_log: true
+  
+#- name: Update API User Password
+#  uri:
+#    url: http://{{es_host}}:{{es_http_port}}/_xpack/security/user/elastic/_password
+#    method: POST
+#    body_format: json
+#    body: "{ \"password\":\"toto\" }"
+#    status_code: 200
+#    user: elastic
+#    password: "{{es_api_basic_auth_password}}"
+#    force_basic_auth: yes
+#      #  when: change_api_password
+- name: List Native Users
+  uri:
+    url: "http://{{ es_host }}:{{es_http_port}}/_xpack/security/user"
+    method: GET
+    user: elastic
+    password: "changeme"
+    force_basic_auth: yes
+    status_code: 200
+      #    validate_certs: "{{ es_validate_certs }}"
+  register: user_list_response
+    #  when: manage_native_users
+    #  check_mode: no
+    #
+- debug: var=user_list_response
+

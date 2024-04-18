@@ -1,0 +1,6 @@
+---
+- name: Restart minidlna
+  service:
+    name: minidlna
+    state: restarted
+    enabled: true

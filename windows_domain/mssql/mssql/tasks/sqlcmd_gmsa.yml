@@ -1,0 +1,58 @@
+--- 
+- name: Add MSSQL admin 
+  win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd.exe -E -Q "CREATE LOGIN [{{item}}] FROM WINDOWS"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd.exe -E -Q "SP_ADDSRVROLEMEMBER '{{item}}','SYSADMIN'"
+  loop: "{{sql_sysadmins}}"
+  when: ISGMSA
+
+- name: Add IMPERSONATE on login
+  win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "CREATE LOGIN [{{item.key}}] FROM WINDOWS"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "GRANT IMPERSONATE ON LOGIN::[{{item.value}}] TO [{{item.key}}]"
+  with_dict: "{{executeaslogin}}"
+  when: ISGMSA
+
+- name: Add IMPERSONATE on user
+  win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "CREATE LOGIN [{{item.key}}] FROM WINDOWS"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "USE {{item.value.db}};CREATE USER [{{item.value.user}}] FOR LOGIN [{{item.value.user}}]"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "USE {{item.value.db}};GRANT IMPERSONATE ON USER::[{{item.value.impersonate}}] TO [{{item.value.user}}]"
+  with_dict: "{{executeasuser}}"
+  when: ISGMSA
+
+- name: Enable sa account
+  win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "ALTER LOGIN sa ENABLE"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "ALTER LOGIN sa WITH PASSWORD = '{{sa_password}}' , CHECK_POLICY=OFF"
+  when: ISGMSA
+
+- name: enable MSSQL authentication and windows authent
+  win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd -E -Q "EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2"
+  when: ISGMSA
+
+
+#- name: Firewall | Allow MSSQL through Firewall
+#  win_dsc:
+#    resource_name: xFirewall
+#    Name: "Access for MSSQL (TCP-In)"
+#    Ensure: present
+#    Enabled: True
+#    Profile: "Domain"
+#    Direction: "Inbound"
+#    Localport: "1433"
+#    Protocol: "TCP"
+#    Description: "Opens the listener port for MSSQL"
+#
+#- name: Firewall | Allow MSSQL discover through Firewall
+#  win_dsc:
+#    resource_name: xFirewall
+#    Name: "Access for MSSQL (UDP-In)"
+#    Ensure: present
+#    Enabled: True
+#    Profile: "Domain"
+#    Direction: "Inbound"
+#    Localport: "1434"
+#    Protocol: "UDP"
+#    Description: "Opens the discover port for MSSQL"

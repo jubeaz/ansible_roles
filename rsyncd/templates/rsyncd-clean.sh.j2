@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+#set -o errexit
+set -o nounset
+set -o pipefail
+current_date=$(date +%Y-%m-%d)
+expiration_date=$(date -d "-7 days" +%Y-%m-%d)
+
+#echo ${current_date}
+#echo ${expiration_date}
+
+modules=$(grep "var" /etc/rsyncd.d/* | cut -d ' ' -f 3)
+
+# echo "processing modules"
+for module in ${modules}; do
+  diffs=$(ls $module | grep -E "diff-[0-9]{4}-[0-9]{2}-[0-9]{2}")
+  if [[ $? -eq 0 ]] ; then
+    echo "${current_date} begin processing module $module" >> /var/log/rsyncd-clean.log
+    for diff in ${diffs} ; do
+      if [[ $diff < "diff-$expiration_date" ]]; then
+        echo "${current_date}         delete $diff and deletion-${diff: -10}" >> /var/log/rsyncd-clean.lo
+g
+        rm -rf "$module/$diff"
+        rm -rf "$module/deletion-${diff: -10}"
+      fi
+    done
+    echo "${current_date} end processing module $module" >> /var/log/rsyncd-clean.log
+  else
+    echo "${current_date} empty module $module" >> /var/log/rsyncd-clean.log
+  fi
+done

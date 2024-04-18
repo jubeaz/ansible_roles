@@ -1,0 +1,6 @@
+---
+- name: restart pgsql
+  service:
+    name: "{{ _pgsql_daemon }}"
+    state: restarted
+    enabled: true

@@ -1,0 +1,10 @@
+---
+- name: Install packages
+  pacman:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  loop: "{{ ansible_pkgs }}"
+  register: __pacman
+  changed_when: (__pacman.packages | default([]))| length >0
+

@@ -1,0 +1,3 @@
+---
+# defaults file for update-pkgs
+ansible_exchange_dir: /tmp

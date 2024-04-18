@@ -1,0 +1,7 @@
+---
+- name: Create TLS_terraform CSR
+  openssl_csr:
+    path: "{{ vars[_key_path_var] }}/{{ vars[_cert_file_var] }}.csr"
+    privatekey_path: "{{ vars[_key_path_var] }}/{{ vars[_key_file_var] }}"
+    common_name: "terraform-{{ ansible_hostname }}"
+    digest: "{{ _ca_template_params.default_md }}"

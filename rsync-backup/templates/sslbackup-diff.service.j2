@@ -1,0 +1,6 @@
+[Unit]
+Description=rsyncd diff backup
+
+[Service]
+Type=oneshot
+ExecStart= /usr/bin/sslbackup.sh diff

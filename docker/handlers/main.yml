@@ -1,0 +1,15 @@
+---
+# handlers file for docker
+- name: Reload systemd
+  systemd:
+    daemon_reload: true
+- name: Start and enable docker
+  service:
+    name: docker
+    enabled: true
+    state: restarted
+- name: Start and enable containerd
+  service:
+    name: containerd
+    enabled: true
+    state: restarted

@@ -1,0 +1,14 @@
+---
+rsyncd_port: 873
+rsyncd_firewall_allow:
+  #  - 10.10.0.0/16
+rsyncd_params:
+  "pid file": /var/run/rsyncd.pid
+  "log file": /var/log/rsyncd.log
+  "lock file": /var/run/rsync.lock
+
+rsyncd_modules:
+  #  name: {
+  #      comment: "my_comment",
+  #      path: my_path
+  #    }

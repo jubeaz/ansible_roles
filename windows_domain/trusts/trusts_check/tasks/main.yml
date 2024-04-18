@@ -1,0 +1,21 @@
+
+- name: Get-ADTrust
+  win_shell: |
+    $obj = Get-ADTrust -Filter *
+    Write-Output -InputObject $obj
+  register: powershell_get_adtrust
+  vars:
+    nsible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+
+- name: Show powershell_get_adtrust result
+  debug: 
+    var: powershell_get_adtrust.stdout_lines
+  when: powershell_get_adtrust.stdout_lines is defined
+#  with_items: "{{powershell_get_adtrust.stdout_lines}}"
+
+#- name: Show powershell_get_adtrust result
+#  debug: 
+#    var: powershell_get_adtrust

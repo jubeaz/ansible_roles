@@ -1,0 +1,67 @@
+---
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+ name: Create pgsql users
+  postgresql_user:
+    name: "{{ zs_db_user.name }}"
+    password: "{{ zs_db_user.password | default(omit) }}"
+    login_host: "{{ zs_db_user.login_host | default('localhost') }}"
+    login_password: "{{ zs_db_user.login_password | default(omit) }}"
+    login_user: "{{ zs_db_user.login_user | default(_zs_pgsql_user) }}"
+    login_unix_socket: "{{ zs_db_user.login_unix_socket | default(_pgsql_unix_socket_directories[0]) }}"
+    port: "{{ zs_db_user.port | default(omit) }}"
+    state: present
+  no_log: "{{ zs_user_no_log }}"
+  become: true
+  become_user: "{{ _zs_pgsql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+  environment:
+    PGOPTIONS: "{{ (_pgsql_auth_method == 'scram-sha-256') | ternary('-c password_encryption=scram-sha-256', '') }}"
+
+- name: Create database
+  postgresql_db:
+    name: "{{ zs_db_.name }}"
+    lc_collate: "{{ zs_db.lc_collate | default('en_US.UTF-8') }}"
+    lc_ctype: "{{ zs_db.lc_ctype | default('en_US.UTF-8') }}"
+    encoding: "{{ zs_db.encoding | default('UTF-8') }}"
+    template: "{{ zs_db.template | default('template0') }}"
+    login_host: "{{ zs_db.login_host | default('localhost') }}"
+    login_password: "{{ zs_db.login_password | default(omit) }}"
+    login_user: "{{ zs_db.login_user | default(_zs_pgsql_user) }}"
+    login_unix_socket: "{{ zs_db.login_unix_socket | default(_pgsql_unix_socket_directories[0]) }}"
+    port: "{{ zs_db.port | default(omit) }}"
+    owner: "{{ zs_db.owner | default(_zs_pgsql_user) }}"
+    state: present
+  become: true
+  become_user: "{{ _zs_pgsql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+
+- name: Finish user config 
+  postgresql_user:
+    name: "{{ zs_db_user.name }}"
+    password: "{{ zs_db_user.password | default(omit) }}"
+    encrypted: "{{ zs_db_user.encrypted | default(omit) }}"
+    priv: "{{ zs_db_user.priv | default(omit) }}"
+    role_attr_flags: "{{ zs_db_user.role_attr_flags | default(omit) }}"
+    db: "{{ zs_db_user.db | default(omit) }}"
+    login_host: "{{ zs_db_user.login_host | default('localhost') }}"
+    login_password: "{{ zs_db_user.login_password | default(omit) }}"
+    login_user: "{{ zs_db_user.login_user | default(_zs_pgsql_user) }}"
+    login_unix_socket: "{{ zs_db_user.login_unix_socket | default(_pgsql_unix_socket_directories[0]) }}"
+    port: "{{ zs_db_user.port | default(omit) }}"
+    state: present
+  no_log: "{{ zs_user_no_log }}"
+  become: true
+  become_user: "{{ _zs_pgsql_user }}"
+  vars:
+    ansible_ssh_pipelining: true
+  environment:
+    PGOPTIONS: "{{ (_pgsql_auth_method == 'scram-sha-256') | ternary('-c password_encryption=scram-sha-256', '') }}"
+

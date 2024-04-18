@@ -1,0 +1,20 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Virtual machine log manager socket
+Before=libvirtd.service
+
+[Socket]
+ListenStream={{ _libvirt_socket_dir }}/virtlogd-sock
+{% if virtlogd_cfg.usocket.rw_perms is defined %}
+SocketMode={{ virtlogd_cfg.usocket.rw_perms }}
+{% else %}
+SocketMode=0600
+{% endif %}
+{% if virtlogd_cfg.usocket.group is defined %}
+SocketGroup={{ virtlogd_cfg.usocket.group }}
+{% else %}
+SocketGroup=root
+{% endif %}
+
+[Install]
+WantedBy=sockets.target

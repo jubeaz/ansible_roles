@@ -1,0 +1,30 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Ubuntu', 'Archlinux']
+    quiet: yes
+- name: assert locales_gen is well defined
+  assert:
+    that:
+      - locales_gen is defined
+      - locales_gen is sequence
+    quiet: yes
+- name: assert every locales_gen is well defined
+  assert:
+    that:
+      - item is string
+    quiet: yes
+  with_items: "{{ locales_gen }}"
+- name: assert local_lang is well defined
+  assert:
+    that:
+      - locale_lang is defined
+      - locale_lang is string
+    quiet: yes
+- name: assert vconsole_content is well defined
+  assert: 
+    that:
+      - vconsole_content is defined
+      - vconsole_content is string
+    quiet: yes

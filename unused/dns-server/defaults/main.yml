@@ -1,0 +1,58 @@
+---
+# defaults file for dns-server
+#named_ufw_from: ["192.168.1.0/24"]
+#rndc_ufw_from: ["192.168.1.0/24"]
+#rndc_cluster: ["192.168.1.1", "192.168.1.2"]
+#
+#named_acls: {
+#  local: ["192.168.0.0/16"],
+#  trusted: ["192.168.1.0/24"],
+#  slaves: ["192.168.1.1", "192.168.1.2"]
+#}
+#
+#named_primaries: {}
+#
+#named_acl_options: {
+#  listen-on-v6: ["none"],
+#  listen-on: ["trusted"],
+#  allow-query: ["local"],
+#  allow-query-cache: ["trusted"],
+#  allow-recursion: ["trusted"],
+#  allow-transfer: ["slaves"],
+#  allow-update: ["none"]
+#}
+#
+#named_list_options: {
+#  forwarders: ["8.8.8.8", "4.4.4.4"]
+#}
+#
+#named_atomic_options: {
+#  notify: "false",
+#  transfer-format: "many-answers",
+#  max-transfer-time-in: "60"
+#}
+#
+#named_master_zones: {
+#  test: {
+#    name: "zone.lan",
+#    email: "root.zone.lan",
+#    TTL: "1w",
+#    refresh: "3h",
+#    retry: "1h",
+#    expire: "1w",
+#    negative: "1h",
+#    dest: ["slaves"],
+#    content: [
+#      ["A", "name", "IP", "comment"],
+#      ["CNAME", "alias", "name", "comment"]
+#    ]
+#  }
+#}
+#
+#named_slaves_zones: {
+#  test: {
+#    name: "zone.lan",
+#    type: "primary",
+#    src: ["slaves"],
+#  }
+#}

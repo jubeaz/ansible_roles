@@ -1,0 +1,9 @@
+---
+# vars file for elasticsearch
+_pkg_name: elasticsearch
+  
+_es_arch_bin_path: /usr/bin
+_es_ubuntu_bin_path: /usr/share/elasticsearch/bin
+_elasticsearch_version: '7.x'
+
+_es_bin_path: "{{ _es_arch_bin_path if ansible_distribution == 'Archlinux' else _es_ubuntu_bin_path }}"

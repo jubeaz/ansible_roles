@@ -1,0 +1,47 @@
+{{ ansible_managed |comment('c') }}
+
+#ui = true
+#mlock = true
+#disable_mlock = true
+
+storage "file" {
+  path = "{{ hvault_data_dir }}"
+}
+
+#storage "consul" {
+#  address = "127.0.0.1:8500"
+#  path    = "vault"
+#}
+
+# default env VAULT_ADDR=http://127.0.0.1:8200
+listener "tcp" {
+  tls_disable = 1
+  address = "127.0.0.1:8200"
+}
+
+# HTTPS listener
+listener "tcp" {
+  address       = "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}:{{ hvault_port }}"
+  tls_cert_file = "{{ hvault_tls_dir }}/{{ hvault_tls_cert }}"  
+  tls_key_file  = "{{ hvault_tls_dir }}/{{ hvault_tls_key }}"
+}
+
+# Enterprise license_path
+# This will be required for enterprise as of v1.8
+#license_path = "/etc/vault.d/vault.hclic"
+
+# Example AWS KMS auto unseal
+#seal "awskms" {
+#  region = "us-east-1"
+#  kms_key_id = "REPLACE-ME"
+#}
+
+# Example HSM auto unseal
+#seal "pkcs11" {
+#  lib            = "/usr/vault/lib/libCryptoki2_64.so"
+#  slot           = "0"
+#  pin            = "AAAA-BBBB-CCCC-DDDD"
+#  key_label      = "vault-hsm-key"
+#  hmac_key_label = "vault-hsm-hmac-key"
+#}
+

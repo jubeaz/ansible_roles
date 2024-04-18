@@ -1,0 +1,92 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Open firewall ports
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item }}"
+    to_port: "{{ minidlna_port }}"
+  loop: "{{ minidlna_ufw }}"
+  when: "'ufw' in ansible_facts.packages"
+
+- name: Install minidlna config
+  template:
+    src: minidlna.conf.j2
+    dest: /etc/minidlna.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart minidlna
+
+- name: Create .d config dir
+  file:
+    path: /etc/systemd/system/minidlna.service.d
+    state: directory
+    mode: "0755"
+    owner: root
+    group: root
+  loop: "{{ minidlna_media_dirs }}"
+
+- name: Install minidlna run as config
+  template:
+    src: run-as-user.conf.j2
+    dest: /etc/systemd/system/minidlna.service.d/run-as-user.conf
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Create group
+  group:
+    name: "{{ minidlna_group }}"
+    state: present
+
+- name: add users to group
+  user:
+    name: "{{ item }}"
+    state: present
+    groups: "{{ minidlna_group }}"
+    append: yes
+  loop: "{{ minidlna_group_members }}" 
+
+- name: Create user
+  user:
+    name: "{{ minidlna_user }}"
+    state: present
+    groups: "{{ minidlna_group }}"
+    append: yes
+
+- name: Create data dir
+  file:
+    path: "{{ item[1] }}"
+    state: directory
+    mode: "0775"
+    owner: "{{ minidlna_user }}"
+    group: "{{ minidlna_group }}"
+  loop: "{{ minidlna_media_dirs }}"
+
+- name: Create log dir
+  file:
+    path: "{{ minidlna_log_dir }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ minidlna_user }}"
+    group: "{{ minidlna_group }}"
+
+- name: Create cache dir
+  file:
+    path: "{{ minidlna_cache_dir }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ minidlna_user }}"
+    group: "{{ minidlna_group }}"

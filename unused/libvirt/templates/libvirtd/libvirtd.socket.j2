@@ -1,0 +1,27 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=Libvirt local socket
+Before=libvirtd.service
+
+
+[Socket]
+# The directory must match the /etc/libvirt/libvirtd.conf unix_sock_dir setting
+# when using systemd version < 227
+
+ListenStream={{ _libvirt_socket_dir }}/libvirt-sock
+
+{% if libvirtd_cfg.usocket.rw_perms is defined %}
+SocketMode={{ libvirtd_cfg.usocket.rw_perms }}
+{% else %}
+SocketMode=0666
+{% endif %}
+Service=libvirtd.service
+
+{% if libvirtd_cfg.usocket.group is defined %}
+SocketGroup={{ libvirtd_cfg.usocket.group }}
+{% else %}
+SocketGroup=root
+{% endif %}
+
+[Install]
+WantedBy=sockets.target

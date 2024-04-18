@@ -1,0 +1,67 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Install script
+  template:
+    src: sslbackup.sh.j2
+    dest: /usr/bin/sslbackup.sh
+    mode: 0740
+    owner: root
+    group: root
+
+- name: Create filter conf dir
+  file:
+    path: "{{ _sslbackup_conf_dir }}"
+    state: directory
+    mode: 0740
+    owner: root
+    group: root
+
+- name: Install script
+  template:
+    src: baseconf.conf.j2
+    dest: "{{ _sslbackup_conf_dir }}/baseconf.conf"
+    mode: 0740
+    owner: root
+    group: root
+  when: sslbackup_includes is sequence
+
+- name: Create full backup timer
+  template:
+    src: templates/sslbackup-full.timer.j2
+    dest: /etc/systemd/system/sslbackup-full.timer
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer_full
+- name: Create full backup service
+  template:
+    src: templates/sslbackup-full.service.j2
+    dest: /etc/systemd/system/sslbackup-full.service
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer_full
+
+- name: Create diff backup timer
+  template:
+    src: templates/sslbackup-diff.timer.j2
+    dest: /etc/systemd/system/sslbackup-diff.timer
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer_diff
+- name: Create diff backup service
+  template:
+    src: templates/sslbackup-diff.service.j2
+    dest: /etc/systemd/system/sslbackup-diff.service
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer_diff

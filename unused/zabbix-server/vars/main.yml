@@ -1,0 +1,3 @@
+---
+_zs_pgsql_user: "postgres"
+_pgsql_auth_method: "{{ ansible_fips  | ternary('scram-sha-256', 'md5') }}"

@@ -1,0 +1,50 @@
+---
+# vars file for pki
+
+_ca_cert_name: "{{ ca_file_basename }}.{{ _ca_cert_ext }}"
+_ca_key_name: "{{ ca_file_basename }}.{{ _ca_key_ext }}"
+_ca_crl_name: "{{ ca_file_basename }}.crl.{{ _ca_cert_ext }}"
+_ca_csr_name: "{{ ca_file_basename }}.{{ _ca_csr_ext }}"
+
+_pki_templates: ["TLS_server", "TLS_client", "TLS_client_server", "identity", "encryption", "intermediate_ca"]
+
+_ca_key_ext: "key"
+_ca_cert_ext: "pem"
+_ca_csr_ext: "csr"  # to move as internal variables
+
+csr_list: []
+
+_ca_dirs:
+  _ca_base:
+    path: "{{ ca_base_dir }}"
+    mode: "0755"
+  _ca_cnf:
+    path: "{{ ca_base_dir }}/{{ ca_cnf_dir }}"
+    mode: "0755"
+  _ca_cnf_req:
+    path: "{{ ca_base_dir }}/{{ ca_cnf_dir }}/{{ ca_cnf_req_dir }}"
+    mode: "0755"
+  _ca_cnf_ca:
+    path: "{{ ca_base_dir }}/{{ ca_cnf_dir }}/{{ ca_cnf_ca_dir }}"
+    mode: "0755"
+  _ca_certs:
+    path: "{{ ca_base_dir }}/{{ ca_certs_dir }}"
+    mode: "0755"
+  _ca_new_certs:
+    path: "{{ ca_base_dir }}/{{ ca_new_certs_dir }}"
+    mode: "0755"
+  _ca_crl:
+    path: "{{ ca_base_dir }}/{{ ca_crl_dir }}"
+    mode: "0755"
+  _ca_private:
+    path: "{{ ca_base_dir }}/{{ ca_private_dir }}"
+    mode: "0700"
+  _ca_csr:
+    path: "{{ ca_base_dir }}/{{ ca_csr_dir }}"
+    mode: "0777"
+  _ca_signed_csr:
+    path: "{{ ca_base_dir }}/{{ ca_signed_csr_dir }}"
+    mode: "0755"
+  _ca_rejected_csr:
+    path: "{{ ca_base_dir }}/{{ ca_rejected_csr_dir }}"
+    mode: "0755"

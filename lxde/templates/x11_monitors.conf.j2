@@ -1,0 +1,8 @@
+{% for id, options in x11_monitors.items() %}
+Section "Monitor"
+    Identifier "{{ id }}"
+    {% for key, value in options.items() %}
+    Option "{{ key }}" "{{ value }}"
+    {% endfor %}
+EndSection
+{% endfor %}

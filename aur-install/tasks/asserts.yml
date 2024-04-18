@@ -1,0 +1,8 @@
+---
+- name: assert aur_pkg is well defined
+  assert:
+    that:
+      - aur_pkg_name is defined
+      - aur_pkg_name is sequence
+    quiet: yes
+-

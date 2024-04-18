@@ -1,0 +1,8 @@
+{% for config in item.rclone_configs %}
+[{{ config.name }}]
+{% for key, value in config.properties.items() %}
+{{ key }} = {{ value }}
+
+{% endfor %}
+token = {"access_token":"{{  config.token.access_token }}","token_type":"{{ config.token.token_type }}","refresh_token":"{{ config.token.refresh_token }}","expiry":"{{ config.token.expiry }}"}
+{% endfor %}

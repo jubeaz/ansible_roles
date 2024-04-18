@@ -1,0 +1,14 @@
+---
+- name: Assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Ubuntu', 'Archlinux']
+    quiet: true
+- name:
+  debug: var=ca_templates
+- name: Assert supported templates
+  assert:
+    that:
+      - item.key in  _pki_templates
+    quiet: true
+  loop: "{{ ca_templates | dict2items }}"

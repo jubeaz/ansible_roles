@@ -1,0 +1,44 @@
+- name: Enable Auto Update
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: NoAutoUpdate
+    data: 0
+    type: dword
+- name: Enable  AutoInstallMinorUpdates
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: AutoInstallMinorUpdates
+    data: 1
+    type: dword
+- name: set AutoUpdate DetectionFrequency
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: DetectionFrequency
+    data: 22
+    type: dword
+- name: set AutoUpdate DetectionFrequencyEnabled
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: DetectionFrequencyEnabled
+    data: 1
+    type: dword
+- name: set AutoUpdate ScheduledInstallDay
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: ScheduledInstallDay
+    data: 0
+    type: dword
+- name: set AutoUpdate ScheduledInstallTime
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: ScheduledInstallTime
+    data: 22
+    type: dword
+- name: set AutoUpdate RescheduleWaitTime
+  ansible.windows.win_regedit:
+    path: HKLM:\Software\Policies\Microsoft\Windows\WindowsUpdate\AU
+    name: RescheduleWaitTime
+    data: 20
+    type: dword
+
+

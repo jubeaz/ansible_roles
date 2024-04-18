@@ -1,0 +1,63 @@
+---
+- name: List all the csr to sign with {{ template }}
+  find:
+    path: "{{ _ca_csr_dir }}/{{ template }}"
+    pattern: "*.csr"
+  register: __csr_list
+
+- name: Set empty csr_list to sign with {{ template }}
+  set_fact:
+    csr_list: []
+
+- name: Set csr_list to sign with {{ template }}
+  set_fact:
+    csr_list: "{{ csr_list | default([])}} + [ '{{ item.path | basename }}']"
+  with_items: "{{ __csr_list.files }}"
+
+- name: Sign csrs with {{ template }}
+  command:
+    argv:
+      - openssl
+      - ca
+      - -notext
+      - -batch
+      - -passin
+      - "pass:{{ ca_key_password }}"
+      - -config
+      - "{{ ca_base_dir }}/{{ ca_cnf_dir }}/{{ ca_cnf_ca_dir }}/ca-{{ template }}.cnf"
+      - -in
+      - "{{ _ca_csr_dir }}/{{ template }}/{{ item }}"
+      - -out
+      - "{{ _ca_new_certs_dir }}/{{ item |splitext | first }}"
+  with_items: "{{ csr_list }}"
+  when: ((csr_list | length) > 0)
+
+
+- name: Read certificates for bundle files creation
+  command: awk 1 "{{ _ca_new_certs_dir }}/{{ item |splitext | first }}" "{{ ca_base_dir }}/{{ ca_certs_dir }}/bundle-{{ ca_file_basename }}.pem"
+  register: ca_bundle
+  with_items: "{{ csr_list }}"
+
+- name: Create bundle files
+  copy:
+    dest: "{{ _ca_new_certs_dir }}/bundle-{{ item.cmd[2] |basename }}"
+    content: "{{ item.stdout }}"
+    remote_src: true
+  with_items: "{{ ca_bundle.results }}"
+
+- name: Copy csrs to signed_csr
+  copy:
+    src: "{{ _ca_csr_dir }}/{{ template }}/{{ item }}"
+    dest: "{{ ca_base_dir }}/{{ ca_signed_csr_dir }}"
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: true
+  with_items: "{{ csr_list }}"
+
+- name: Delete csr
+  file:
+    path: "{{ _ca_csr_dir }}/{{ template }}/{{ item }}"
+    state: absent
+  with_items: "{{ csr_list }}"
+

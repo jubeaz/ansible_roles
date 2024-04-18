@@ -1,0 +1,63 @@
+---
+haproxy_certs:
+  #  - name: rsyncd.pem
+  #    path: ""
+  #    cert_name:
+  #    cert_path: ""
+  #    key_name:
+  #    key_path:
+  #    cn: 
+  #    san:
+  #      - ""
+  #      - ""
+
+haproxy_socket: /var/lib/haproxy/stats
+haproxy_chroot: /var/lib/haproxy
+haproxy_user: haproxy
+haproxy_group: haproxy
+haproxy_global_params: []
+# Default haproxy timeouts
+haproxy_connect_timeout: 5000
+haproxy_client_timeout: 50000
+haproxy_server_timeout: 50000
+
+#########################################
+
+
+# Frontend settings.
+haproxy_frontends:
+  - name: hafrontend
+    bind_addr: '*:xx'
+    bind_port: '*:xx'
+    bind_extra: '*:xx'
+    firewall_allow: 
+      - 127.0.0.1 
+    mode: tcp
+    option: {
+      option_1: "value",
+      option_2: "value"
+    }
+    acl: {
+      name: "params"
+    }
+    extra_params: {
+      name: "params"
+    }
+    use_backends:
+      - "be 1"
+      - "be 2"
+# Backend settings.
+haproxy_backends:
+  - name: habackend
+    mode: tcp
+    option: {
+      option_1: "value",
+      option_2: "value"
+    }
+    servers: {
+      name: "params"
+    }
+    extra_params: {
+      u: "value",
+      v: "value"
+    }

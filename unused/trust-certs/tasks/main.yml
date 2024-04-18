@@ -1,0 +1,6 @@
+---
+- include_tasks: process_ca.yml
+  loop: "{{ groups[pki_group] }}"
+  loop_control:
+    loop_var: _ca_name
+  when: inventory_hostname not in groups[pki_group]

@@ -1,0 +1,46 @@
+---
+# tasks file for docker
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: create directory for docker service drop-in
+  file:
+    dest: /etc/systemd/system/docker.service.d
+    state: directory
+    mode: 0744
+    owner: root
+    group: root
+- name: Install socket service
+  template:
+    src: templates/execstart.conf.j2
+    dest: /etc/systemd/system/docker.service.d/execstart.conf
+    owner: root
+    group: root
+    mode: 0644
+- name: Create /etc/docker
+  file:
+    path: /etc/docker
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+- name: Install daemon template
+  template:
+    src: templates/daemon.json.j2
+    dest: /etc/docker/daemon.json
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - Reload systemd
+    - Start and enable docker
+    - Start and enable containerd
+- name: Add users to docker group
+  user:
+    name: "{{ item }}"
+    append: true
+    groups: docker
+  with_items: "{{ docker_user_list }}"

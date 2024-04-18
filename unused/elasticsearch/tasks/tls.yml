@@ -1,0 +1,29 @@
+---
+# generation d'un pkcs12 pour l'AC
+# ./bin/elasticsearch-certutil ca
+
+
+# generation d'un cert pour les nodes que l'on copie dans le ES_PATH_CONF
+#./bin/elasticsearch-certutil cert --ca elastic-stack-ca.p12
+#
+
+$ES_PATH_CONF/elasticsearch.yml
+
+xpack.security.transport.ssl.enabled: true
+xpack.security.transport.ssl.verification_mode: certificate 
+xpack.security.transport.ssl.client_authentication: required
+xpack.security.transport.ssl.keystore.path: elastic-certificates.p12
+xpack.security.transport.ssl.truststore.path: elastic-certificates.p12
+
+if you want to use hostname verification, set the verification mode to full. You should generate a different certificate for each host that matches the DNS or IP address. See the xpack.security.transport.ssl.verification_mode parameter in TLS settings.
+
+if you entered a password when creating the node certificate, run the following commands to store the password in the Elasticsearch keystore:
+
+./bin/elasticsearch-keystore add xpack.security.transport.ssl.keystore.secure_password
+
+./bin/elasticsearch-keystore add xpack.security.transport.ssl.truststore.secure_password
+
+Complete the previous steps for each node in your cluster.
+
+On every node in your cluster, restart Elasticsearch. The method for starting and stopping Elasticsearch varies depending on how you installed it.
+

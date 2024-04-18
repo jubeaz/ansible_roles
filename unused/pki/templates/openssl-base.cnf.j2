@@ -1,0 +1,27 @@
+{{ ansible_managed | comment}}
+
+b_dir               = {{ ca_base_dir }}
+b_certs             = $b_dir/{{ ca_certs_dir }}
+b_crl_dir           = $b_dir/{{ ca_crl_dir }}
+b_new_certs_dir     = $b_dir/{{ ca_new_certs_dir }}
+b_private_dir       = $b_dir/{{ ca_private_dir }}
+
+b_database          = $b_dir/{{ ca_database }}
+b_serial            = $b_dir/{{ ca_serial }}
+b_RANDFILE          = $b_private_dir/.rand
+
+b_private_key       = $b_private_dir/{{ _ca_key_name }}
+b_certificate       = $b_certs/{{ _ca_cert_name }}
+b_crl               = $b_dir/crl/{{ _ca_crl_name }}
+
+b_crlnumber         = $b_dir/{{ ca_crlnumber }}
+
+b_cps               = "{{ ca_cps }}"
+b_cps_explicit      = "{{ ca_cps_explicit }}"
+b_cps_organization  = "{{ ca_cps_organization }}"
+
+b_crldp_uri         = URI:{{ ca_crldp_uri }}
+
+b_aia_uri           = "{{ ca_aia_uri }}"
+b_ocsp_uri          = "{{ ca_ocsp_uri }}"
+

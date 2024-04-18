@@ -1,0 +1,72 @@
+---
+- name: assert proper distribution
+  assert:
+    that:
+      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+    quiet: true
+
+- name: Include OS-specific variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  include_vars: "common.yml"
+
+
+- include_tasks: "{{ ansible_distribution }}.yml" 
+
+- name: Create grub config file
+  template:
+    dest: "/etc/default/grub"
+    src: "templates/grub.j2"
+    owner: root
+    group: root
+    mode: 0644
+  notify: update grub config
+
+- name: Copy theme images
+  copy:
+    dest: "/boot/grub/theme/"
+    src: "files/{{ grub_theme }}/{{ grub_resolution }}/"
+    owner: root
+    group: root
+    mode: 0644
+  notify: update grub config
+    #  when: "'grub' in ansible_facts.packages"
+
+#grub-mkfont -v --output=./SourceCodePro-Semibold_34.pf2 --size=34 ./SourceCodePro-Semibold.ttf
+
+- name: Copy fonts
+  copy:
+    dest: "/boot/grub/theme/"
+    src: "files/fonts/"
+    owner: root
+    group: root
+    mode: 0644
+  notify: update grub config
+#
+- name: Copy theme.txt 
+  template:
+    dest: "/boot/grub/theme/theme.txt"
+    src: "templates/theme.txt.j2"
+    owner: root
+    group: root
+    mode: 0644
+  notify: update grub config
+
+- name: Copy custom
+  template:
+    dest: "/etc/grub.d/40_custom"
+    src: "templates/40_custom.j2"
+    owner: root
+    group: root
+    mode: 0655
+  notify: update grub config
+
+- name: Ensure entry
+  lineinfile:
+    path: /etc/grub.d/10_linux
+    regexp: 'CLASS="--class gnu-linux --class gnu --class os"'
+    line: 'CLASS="--class gnu-linux --class gnu --class os --unrestricted"'
+  notify: update grub config
+
+

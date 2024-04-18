@@ -1,0 +1,11 @@
+---
+- name: restart reflector
+  service:
+    name: reflector
+    state: restarted
+    enabled: true
+- name: restart reflector timer
+  systemd:
+    name: reflector.timer
+    state: restarted
+    enabled: true

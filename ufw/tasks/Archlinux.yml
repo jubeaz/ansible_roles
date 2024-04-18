@@ -1,0 +1,10 @@
+---
+- name: "Install ufw"
+  pacman:
+    name: 
+      - linux-lts
+      - iptables
+      - ufw
+    state: present
+  register: __pacman
+  changed_when: (__pacman.packages | default([]))| length >0 

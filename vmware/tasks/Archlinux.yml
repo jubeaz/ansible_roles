@@ -1,0 +1,19 @@
+---
+- name: Install dependencies
+  pacman:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  register: __pacman
+  changed_when: (__pacman.packages | default([])) | length > 0
+  loop: "{{ vmware_dependencies }}"
+# need to uncomment _remove_vmware_keymaps_dependency=y in PKGBUILD
+- name: Install AUR
+  include_role:
+    name: aur-install
+  vars:
+    aur_pkg_name: "vmware-workstation"
+# sudo systemctl start vmware-networks-configuration.service
+# sudo systemctl enable vmware-networks
+#                       vmware-usbarbitrator
+# modprobe -a vmw_vmci vmmon

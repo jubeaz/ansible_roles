@@ -1,0 +1,12 @@
+---
+- name: Update Net Connection Profile
+  win_dsc:
+    resource_name    : xNetConnectionProfile
+    InterfaceAlias   : "{{profile.interface}}"
+    NetworkCategory  : "{{profile.NetworkCategory}}"
+#    IPv4Connectivity : 'Internet'
+#    IPv6Connectivity : 'Internet'
+  with_dict: "{{connection_profiles | default({})}}"
+  loop_control:
+    loop_var: profile
+

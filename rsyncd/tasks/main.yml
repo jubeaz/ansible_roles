@@ -1,0 +1,101 @@
+---
+- include_tasks: variables.yml
+- include_tasks: asserts.yml
+
+- include_tasks: ubuntu.yml
+  when: ansible_distribution == "Ubuntu"
+- include_tasks: arch.yml
+  when: ansible_distribution == "Archlinux"
+
+- name: Get installed packages
+  package_facts:
+    manager: "auto"
+
+- name: Add ufw allow rules
+  ufw:
+    rule: allow
+    direction: in
+    src: "{{ item }}"
+    to_port: "{{ rsyncd_port }}"
+    state: enabled
+  when: "'ufw' in ansible_facts.packages"
+  loop: "{{ rsyncd_firewall_allow }}"
+
+- name: Install script
+  template:
+    src: rsyncd-clean.sh.j2
+    dest: /usr/bin/rsyncd-clean.sh
+    mode: 0740
+    owner: root
+    group: root
+
+- name: Create cleaner timer
+  template:
+    src: templates/rsyncd-clean.timer.j2
+    dest: /etc/systemd/system/rsyncd-clean.timer
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer
+- name: Create cleaner service
+  template:
+    src: templates/rsyncd-clean.service.j2
+    dest: /etc/systemd/system/rsyncd-clean.service
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart timer
+
+- name: Create dropIn directory
+  file:
+    path: /etc/rsyncd.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0740
+
+- name: Create rsyncd.conf
+  template:
+    src: templates/rsyncd.conf.j2
+    dest: /etc/rsyncd.conf
+    owner: root
+    group: root
+    mode: 0640
+  notify: restart rsyncd
+
+- name: list files to delete
+  find:
+    paths: /etc/rsyncd.d
+    file_type: file
+    patterns: '*.conf'
+    excludes: "{{ rsyncd_modules.keys() | product(['.conf']) | map('join') | list }}"
+  register: __modules_to_delete
+
+- name: Create Create modules config
+  template:
+    src: templates/module.conf.j2
+    dest: "/etc/rsyncd.d/{{ item }}.conf"
+    owner: root
+    group: root
+    mode: 0640
+  loop: "{{ rsyncd_modules.keys() }}"
+  notify: restart rsyncd
+
+- name: Delete obsolete modules
+  file:
+    path: "{{ item.path }}"
+    state: absent
+    owner: root
+    group: root
+    mode: 0700
+  loop: "{{ __modules_to_delete.files }}"
+
+- name: Create modules directories
+  file:
+    path: "{{ rsyncd_modules[item].path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  loop: "{{ rsyncd_modules.keys() }}"
+

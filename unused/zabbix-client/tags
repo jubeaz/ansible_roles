@@ -1,0 +1,41 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/benmusashi/dev/ansible/roles/zabbix-client/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	/p5.9.20220828.0/
+.travis.yml	.travis.yml	1;"	F	language:Yaml	epoch:1637323939
+Archlinux.yml	tasks/Archlinux.yml	1;"	F	language:Yaml	epoch:1647741215
+Archlinux.yml	vars/Archlinux.yml	1;"	F	language:Yaml	epoch:1646564420
+Author Information	README.md	/^Author Information$/;"	s	language:Markdown	chapter:Role Name
+Dependencies	README.md	/^Dependencies$/;"	s	language:Markdown	chapter:Role Name
+Example Playbook	README.md	/^Example Playbook$/;"	s	language:Markdown	chapter:Role Name
+Get installed packages	tasks/main.yml	/^- name: Get installed packages$/;"	p	language:AnsiblePlaybook
+Include OS-specific variables	tasks/main.yml	/^- name: Include OS-specific variables$/;"	p	language:AnsiblePlaybook
+Include common variables	tasks/main.yml	/^- name: Include common variables$/;"	p	language:AnsiblePlaybook
+Install zabbix agent	tasks/Ubuntu.yml	/^- name: Install zabbix agent$/;"	p	language:AnsiblePlaybook
+Insure zabbix agent is started	handlers/main.yml	/^- name: Insure zabbix agent is started$/;"	p	language:AnsiblePlaybook
+Kali.yml	tasks/Kali.yml	1;"	F	language:Yaml	epoch:1646564091
+Kali.yml	vars/Kali.yml	1;"	F	language:Yaml	epoch:1646564369
+License	README.md	/^License$/;"	s	language:Markdown	chapter:Role Name
+README.md	README.md	1;"	F	language:Markdown	epoch:1637323939
+Requirements	README.md	/^Requirements$/;"	s	language:Markdown	chapter:Role Name
+Role Name	README.md	/^Role Name$/;"	c	language:Markdown
+Role Variables	README.md	/^Role Variables$/;"	s	language:Markdown	chapter:Role Name
+Ubuntu.yml	tasks/Ubuntu.yml	1;"	F	language:Yaml	epoch:1637323939
+Ubuntu.yml	vars/Ubuntu.yml	1;"	F	language:Yaml	epoch:1646564365
+assert proper distribution	tasks/main.yml	/^- name: assert proper distribution$/;"	p	language:AnsiblePlaybook
+common.yml	vars/common.yml	1;"	F	language:Yaml	epoch:1646564295
+install zabbix agent	tasks/Archlinux.yml	/^- name: install zabbix agent$/;"	p	language:AnsiblePlaybook
+main.yml	defaults/main.yml	1;"	F	language:Yaml	epoch:1637323939
+main.yml	handlers/main.yml	1;"	F	language:Yaml	epoch:1637323939
+main.yml	meta/main.yml	1;"	F	language:Yaml	epoch:1637323939
+main.yml	tasks/main.yml	1;"	F	language:Yaml	epoch:1646564489
+open firewall ports for zabbix agent	tasks/main.yml	/^- name: open firewall ports for zabbix agent$/;"	p	language:AnsiblePlaybook
+set-config	tasks/main.yml	/^- name: set-config$/;"	p	language:AnsiblePlaybook
+test.yml	tests/test.yml	1;"	F	language:Yaml	epoch:1637323939

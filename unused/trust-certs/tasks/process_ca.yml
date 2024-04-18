@@ -1,0 +1,32 @@
+---
+- name: Get certificate
+  become: false
+  synchronize:
+    src: "{{hostvars[_ca_name].ca_base_dir }}/{{ hostvars[_ca_name].ca_certs_dir }}/{{ hostvars[_ca_name].ca_file_basename }}.pem"
+    dest: "/tmp/"
+    use_ssh_args: true
+    mode: push
+  delegate_to: "{{ _ca_name }}"
+
+- name: copy root ca certificate on archlinux hosts
+  copy:
+    src: "/tmp/{{ hostvars[_ca_name].ca_file_basename }}.pem"
+    dest: "{{ _ca_trust_certs_dest_dir }}"
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: true
+  when: ansible_distribution == 'Archlinux'
+  notify: Trust root ca Archlinux
+
+
+- name: copy root ca certificate on archlinux hosts
+  copy:
+    src: "/tmp/{{ hostvars[_ca_name].ca_file_basename }}.pem"
+    dest: "{{ _ca_trust_certs_dest_dir }}/{{ hostvars[_ca_name].ca_file_basename }}.crt"
+    owner: root
+    group: root
+    mode: 0644
+    remote_src: true
+  when: ansible_distribution == 'Ubuntu'
+  notify: Trust root ca Ubuntu 

@@ -1,0 +1,4 @@
+---
+- name: Install rclone 
+  snap:
+    name: rclone
