@@ -1,0 +1,69 @@
+- name: create the System Management Container
+  ansible.windows.win_powershell:
+    script: |
+      $systemDN = "CN=System," + (Get-ADDomain).DistinguishedName
+      New-ADObject -Type container -Name "System Management" -Path $systemDN
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+
+- name: create the System Management Container
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $SCCMServer
+      )
+      $systemMgmtDN = "CN=System Management,CN=System," + (Get-ADDomain).DistinguishedName
+      $acl = Get-ACL -Path "AD:\$systemMgmtDN"
+      $sccmIdentity = Get-ADComputer -Identity $SCCMServer
+      $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $sccmIdentity.SID, "GenericAll", "Allow"
+      $acl.AddAccessRule($ace)
+      Set-ACL -Path "AD:\$systemMgmtDN" -AclObject $acl
+    parameters:
+      SCCMServer: "{{sccm_server}}"
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
+    
+- name: create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: directory
+
+- name: check MECM installation media exists
+  win_stat:
+    path: C:\setup\MCM_Configmgr_2303.exe
+  register: mecm_installer_file
+
+- name: download MECM installation media
+  ansible.windows.win_get_url:
+    url: https://go.microsoft.com/fwlink/p/?LinkID=2195628&clcid=0x409&culture=en-us&country=us
+    dest: C:\setup\MCM_Configmgr_2303.exe
+  when: not mecm_installer_file.stat.exists
+
+- name: Remove directory if exist
+  ansible.windows.win_file:
+    path: C:\setup\cd.retail.LN
+    state: absent
+
+- name: extract MECM installation media
+  win_shell: .\MCM_Configmgr_2303.exe -s
+  args:
+    chdir: C:\setup
+
+- name: launching the Active Directory schema extension
+  win_shell: .\extadsch.exe
+  args:
+    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
+  vars:
+    ansible_become: yes
+    ansible_become_method: runas
+    domain_name: "{{domain}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
+    ansible_become_password: "{{domain_password}}"
