@@ -64,6 +64,5 @@
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    domain_name: "{{domain}}"
     ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
