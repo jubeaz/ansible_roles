@@ -9,6 +9,7 @@
   with_dict: "{{laps_path}}"
 
 
+
 - name: Install LAPS Package on Servers
   ansible.windows.win_package:
     arguments: "ADDLOCAL=Management.PS,Management.ADMX ALLUSERS=1 /qn"
@@ -25,6 +26,39 @@
     reboot_timeout: 900
     post_reboot_delay: 100
   when: pri_laps_install.reboot_required
+
+- name: "Get Sync status"
+  win_shell: repadmin  /replsummary
+  register: sync_summary
+  become: yes
+  become_method: runas
+  become_user: "{{domain_name}}\\Administrator"
+  vars:
+    ansible_become_pass: "{{domain_password}}"
+
+- debug: var=sync_summary.stdout_lines
+
+- name: "Get Sync status"
+  win_shell: repadmin  /Queue
+  register: sync_queue
+  become: yes
+  become_method: runas
+  become_user: "{{domain_name}}\\Administrator"
+  vars:
+    ansible_become_pass: "{{domain_password}}"
+
+- debug: var=sync_queue.stdout_lines
+
+- name: "Get Sync status"
+  win_shell: repadmin  /Queue
+  register: sync_status
+  become: yes
+  become_method: runas
+  become_user: "{{domain_name}}\\Administrator"
+  vars:
+    ansible_become_pass: "{{domain_password}}"
+
+- debug: var=sync_status.stdout_lines
 
 - name: Configure Password Properties
   win_ad_object:

@@ -9,7 +9,7 @@
     ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
 
-- name: create the System Management Container
+- name: grant {{sccm_server}} GenericAll on the System Management Container
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
