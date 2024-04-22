@@ -100,7 +100,7 @@
 
 
 - name: "synchronizes all domains"
-  win_shell: repadmin /syncall /Ade
+  win_shell: repadmin /syncall /AdeP
   become: yes
   become_method: runas
   become_user: "{{domain_name}}\\Administrator"
