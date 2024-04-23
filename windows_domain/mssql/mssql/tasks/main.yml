@@ -179,10 +179,9 @@
 - include_tasks: sqlcmd.yml 
   when: ISGMSA == false 
 
-
-- name: Restart service
+- name: Restart service MSSQL
   win_service:
-    name: 'MSSQL${{ sql_instance_name }}'
+    name: '{{mssql_service_name}}'
     force_dependent_services: yes
     state: restarted
   register: mssql_status
