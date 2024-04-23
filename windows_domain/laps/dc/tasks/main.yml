@@ -62,9 +62,9 @@
 ##
 ##- debug: var=sync_status.stdout_lines
 
-#- name: Pause for 20 minutes due to dc_weyland replication problem
-#  ansible.builtin.pause:
-#    minutes: 30
+- name: Pause for 20 minutes due to dc_weyland replication problem
+  ansible.builtin.pause:
+    minutes: "{{replication_wait_in_minutes}}"
 #
 #- name: "Get Sync status"
 #  win_shell: repadmin  /replsummary

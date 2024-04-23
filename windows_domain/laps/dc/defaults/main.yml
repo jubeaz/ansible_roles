@@ -6,3 +6,4 @@ create_gpo: False
 gpo_linked: False
 install_servers: False
 test_deployment: False
+replication_wait_in_minutes: 1
