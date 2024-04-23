@@ -1,11 +1,12 @@
 ---
+# https://github.com/dsccommunity/NetworkingDsc/wiki/FirewallProfile
 - name: Update Firewall profiles
   win_dsc:
     resource_name           : xFirewallProfile
     Name                    : "{{profile.key}}"
-    Enabled                 : "{{profile.value.Enabled}}"
-    DefaultInboundAction    : "{{profile.value.DefaultInboundAction}}"
-    DefaultOutboundAction   : "{{profile.value.DefaultOutboundAction}}"
+    Enabled                 : "{{profile.value.enabled}}"
+    DefaultInboundAction    : "{{profile.value.inbound}}"
+    DefaultOutboundAction   : "{{profile.value.outbound}}"
 #    AllowInboundRules       : 'True'
 #    AllowLocalFirewallRules : 'False'
 #    AllowLocalIPsecRules    : 'False'

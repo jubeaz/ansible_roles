@@ -172,7 +172,7 @@
 - name: Wait for port 1433 to become open on the host, start checking every 5 seconds
   ansible.windows.win_wait_for:
     port: 1433
-    delay: 15
+    delay: 20
 
 - include_tasks: sqlcmd_gmsa.yml 
   when: ISGMSA 

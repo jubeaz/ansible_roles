@@ -16,7 +16,7 @@
 ## when not same domain, not parent or child and not already direct trusted domain
 
 
-- name: Create A record for child domain in parent domain
+- name: Add dns server zone
   community.windows.win_dns_zone:
     name: "{{item[1]}}"
     type: forwarder
