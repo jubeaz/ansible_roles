@@ -28,12 +28,13 @@
           }
       }
     parameters:
-      siteCode: "{{site_code}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      siteCode: "{{sccm_site_code}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
       device: "{{item}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
-  loop: "{{clients}}"
+    ansible_become_flags: logon_flags=
+  loop: "{{sccm_clients}}"
