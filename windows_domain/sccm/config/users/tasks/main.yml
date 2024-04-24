@@ -27,12 +27,13 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{site_code}}"
+      siteCode: "{{sccm_site_code}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
       username: "{{item}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
-  loop: "{{ admins }}"
+    ansible_become_flags: logon_flags=
+  loop: "{{ sccm_admins }}"
