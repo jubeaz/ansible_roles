@@ -30,44 +30,7 @@
   args:
     chdir: C:\setup\
 
-#- name: move the MECM installation media to C:\
-#  ansible.windows.win_powershell:
-#    script: Move-Item -Path C:\Windows\Temp\cd.retail.LN -Destination C:\
-
-- name: create directory to store the downloaded prerequisite files
-  ansible.windows.win_file:
-    path: C:\updates
-    state: directory
-
-- name: download prerequisite files
-  win_shell: .\setupdl.exe /NoUI C:\updates
-  args:
-    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
-
-# Step 15 – Install SCCM 1902 using Baseline Media
-# --------------------------------------------------------------
-
-- name: copy the configuration file
-  win_template:
-    src: files/ConfigMgrAutoSave.ini
-    dest: C:\setup\ConfigMgrAutoSave.ini
-
-- name: Fix MSSQL generate certificate issue (change crypto rsa permissions)
-  ansible.windows.win_acl:
-    path: C:\ProgramData\Microsoft\Crypto\RSA
-    user: Administrators
-    rights: FullControl
-    type: allow
-    state: present
-    inherit: ContainerInherit, ObjectInherit
-    propagation: 'InheritOnly'
-
-- name: install MECM (this one take an eternity ~ 1 hour  )
-  win_shell: .\setup.exe /SCRIPT "C:\setup\ConfigMgrAutoSave.ini"
-  args:
-    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
-  vars:
-    ansible_become: yes
-    ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+- include_tasks: install_console.yml 
+  when: install_type == "console" 
+- include_tasks: install_server.yml 
+  when: install_type == "server"
