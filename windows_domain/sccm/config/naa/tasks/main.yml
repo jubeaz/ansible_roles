@@ -42,7 +42,7 @@
     parameters:
       siteCode: "{{sccm_site_code}}"
       sccmFQDN: "{{hostname}}.{{domain_name}}"
-      pushAccount: "{{domain_name}}\\{{sccm_network_access_account}}"      
+      user: "{{domain_name}}\\{{sccm_network_access_account}}"      
   vars:
     ansible_become: yes
     ansible_become_method: runas
