@@ -75,14 +75,15 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{site_code}}"
-      shareServer: "{{sccm_server}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      siteCode: "{{sccm_site_code}}"
+      shareServer: "{{hostname}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
+    ansible_become_flags: logon_flags=
 
 # Create task sequence
 - name: Create Task sequence
@@ -170,19 +171,20 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{site_code}}"
-      shareServer: "{{sccm_server}}"
-      adminPass: "{{admin_pass}}"
-      domainName : "{{domain}}"
-      ou: "{{ou_location}}"
+      siteCode: "{{sccm_site_code}}"
+      shareServer: "{{hostname}}"
+      adminPass: "{{sccm_pxe_admin_pass}}"
+      domainName : "{{domain_name}}"
+      ou: "{{sccm_pxe_location}}"
       domainAccount: "{{naa_user}}"
       domainPassword: "{{naa_pass}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
+    ansible_become_flags: logon_flags=
 
 # start distribute content
 - name: Start distribute content
@@ -220,14 +222,15 @@
       }
       Start-CMContentDistribution -DeploymentPackageName "Configuration Manager Client Package" -DistributionPointName $distributionPoint
     parameters:
-      siteCode: "{{site_code}}"
-      distributionPoint: "{{sccm_server}}.{{domain}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      siteCode: "{{sccm_site_code}}"
+      distributionPoint: "{{hostname}}.{{domain_name}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
+    ansible_become_flags: logon_flags=
 
 # update unknow computers
 - name: Update unknow computers collection
@@ -249,13 +252,14 @@
       Set-Location ($siteCode +":")
       Get-CMCollection -Name "All Unknown Computers" | Invoke-CMCollectionUpdate
     parameters:
-      siteCode: "{{site_code}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      siteCode: "{{sccm_site_code}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
+    ansible_become_flags: logon_flags=
 
 # Deploy sequence
 - name: Deploy Task sequence
@@ -304,11 +308,12 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{site_code}}"
-      domainName : "{{domain}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
+      siteCode: "{{sccm_site_code}}"
+      domainName : "{{domain_name}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"
+    ansible_become_flags: logon_flags=
