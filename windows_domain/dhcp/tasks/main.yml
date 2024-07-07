@@ -1,7 +1,7 @@
 # https://www.faqforge.com/windows/configure-dhcp-powershell/
 
 - name: Install DHCP
-  win_feature:
+  ansible.windows.win_feature:
     name: DHCP
     state: present
     include_management_tools: yes

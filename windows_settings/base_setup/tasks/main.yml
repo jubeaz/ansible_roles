@@ -1,100 +1,100 @@
-- name: "Force a DNS on the adapter {{domain_adapter}}"
+- name: "Force a DNS on the adapter {{ domain_adapter }}"
   ansible.windows.win_dns_client:
-    adapter_names: "{{domain_adapter}}"
-    dns_servers: 
-      - "{{dns_server}}"
+    adapter_names: "{{ domain_adapter }}"
+    dns_servers:
+      - "{{ dns_server }}"
 #      - "{{hostvars[dns_domain].ansible_host}}"
-  when: force_dns_server == true
+  when: force_dns_server
 
-#- fail:
-#    msg: "stop"
+# - fail:
+#     msg: "stop"
 
-- name: "Set priority to {{domain_adapter}} (Domain)"
+- name: "Set priority to domain adapter {{ domain_adapter }}"
   ansible.windows.win_shell:
-    Set-NetIPInterface -InterfaceAlias {{domain_adapter | ansible.windows.quote(shell='powershell')}} -InterfaceMetric 10
-  when: two_adapters == true
+    Set-NetIPInterface -InterfaceAlias {{ domain_adapter | ansible.windows.quote(shell='powershell') }} -InterfaceMetric 10
+  when: two_adapters
 
 
 - name: Set a proxy for specific protocols
   community.windows.win_http_proxy:
     proxy:
-      http: "{{ad_http_proxy}}"
-      https: "{{ad_https_proxy}}"
-  when: http_proxy == true
+      http: "{{ ad_http_proxy }}"
+      https: "{{ ad_https_proxy }}"
+  when: http_proxy
 
 - name: Configure IE to use a specific proxy per protocol
   community.windows.win_inet_proxy:
     proxy:
-      http: "{{ad_http_proxy}}"
-      https: "{{ad_https_proxy}}"
-  when: http_proxy == true
+      http: "{{ ad_http_proxy }}"
+      https: "{{ ad_https_proxy }}"
+  when: http_proxy
 
 - name: Upgrade module PowerShellGet to fix accept license issue on last windows ansible version
-  win_shell: |
+  ansible.windows.win_shel: |
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     Install-PackageProvider -Name NuGet -Force
     Install-Module PowerShellGet -Force
 
 - name: Windows | Check for ComputerManagementDsc Powershell module
-  win_psmodule:
+  community.windows.win_psmodule:
     name: ComputerManagementDsc
     state: present
 
 - name: Windows | Enable Remote Desktop
-  win_dsc:
+  ansible.windows.win_dsc:
     resource_name: RemoteDesktopAdmin
-    IsSingleInstance : 'yes'
+    IsSingleInstance: 'yes'
     Ensure: present
     UserAuthentication: Secure
 
 - name: Windows | Check for xNetworking Powershell module
-  win_psmodule:
+  community.windows.win_psmodule:
     name: xNetworking
     state: present
 
 # https://github.com/dsccommunity/NetworkingDsc/wiki/Firewall
 - name: Firewall | Allow RDP for Anasible host
-  win_dsc:
+  ansible.windows.win_dsc:
     resource_name: xFirewall
-    Name:           "ansible_rdp"
-    Group:          "Windows Remote Management"
-    Ensure:         present
-    Enabled:        True
-    Action:         "Allow"
-    Profile:        ["Domain", "Public", "Private"]
-    Direction:      "Inbound"
-    Localport:      "3389"
-    Protocol:       "TCP"
-    RemoteAddress:  "{{ansible_controller_ip}}"
-    Description:    "Opens the listener port for RDP"
+    Name: "ansible_rdp"
+    Group: "Windows Remote Management"
+    Ensure: present
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    Localport: "3389"
+    Protocol: "TCP"
+    RemoteAddress: "{{ ansible_controller_ip }}"
+    Description: "Opens the listener port for RDP"
 #
-#- name: Firewall | Allow RDP for Anasible host
-#  community.windows.win_firewall_rule:
-#    name: ansible_rdp
-#    group: Windows Remote Management
-#    localport: 3389
-#    action: allow
-#    direction: in
-#    protocol: tcp
-#    state: present
-#    enabled: yes
-#    remoteip: "{{ansible_controller_ip}}"
-#    description: "Opens the listener port for RDP"
-#    profiles: ["Domain", "Public", "Private"]
+# - name: Firewall | Allow RDP for Anasible host
+#   community.windows.win_firewall_rule:
+#     name: ansible_rdp
+#     group: Windows Remote Management
+#     localport: 3389
+#     action: allow
+#     direction: in
+#     protocol: tcp
+#     state: present
+#     enabled: yes
+#     remoteip: "{{ansible_controller_ip}}"
+#     description: "Opens the listener port for RDP"
+#     profiles: ["Domain", "Public", "Private"]
 #
 - name: Firewall | Allow WinRM for Anasible host
-  win_dsc:
-    resource_name:  xFirewall
-    Name:           "ansible_winrm"
-    Group:          "Windows Remote Management"
-    Ensure:         "Present"
-    Enabled:        True
-    Action:         "Allow"
-    Profile:        ["Domain", "Public", "Private"]
-    Direction:      "Inbound"
-    Localport:      ["5985", "5986"]
-    Protocol:       "TCP"
-    RemoteAddress:  "{{ansible_controller_ip}}"
+  ansible.windows.win_dsc:
+    resource_name: xFirewall
+    Name: "ansible_winrm"
+    Group: "Windows Remote Management"
+    Ensure: "Present"
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    Localport: ["5985", "5986"]
+    Protocol: "TCP"
+    RemoteAddress: "{{ansible_controller_ip}}"
 
 - name: Set explorer show hidden files
   ansible.windows.win_powershell:
@@ -105,30 +105,30 @@
   ansible.windows.win_powershell:
     script: |
        Set-ItemProperty hkcu:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name HideFileExt -Value 0
-#- name: Firewall | Allow WinRM for Anasible host
-#  community.windows.win_firewall_rule:
-#    name: ansible_winrm
-#    group: Windows Remote Management
-#    localport: 5985
-#    action: allow
-#    direction: in
-#    protocol: tcp
-#    state: present
-#    enabled: yes
-#    remoteip: "{{ansible_controller_ip}}"
-#    description: "Opens the listener port for RDP"
-#    profiles: ["Domain", "Public", "Private"]
+# - name: Firewall | Allow WinRM for Anasible host
+#   community.windows.win_firewall_rule:
+#     name: ansible_winrm
+#     group: Windows Remote Management
+#     localport: 5985
+#     action: allow
+#     direction: in
+#     protocol: tcp
+#     state: present
+#     enabled: yes
+#     remoteip: "{{ansible_controller_ip}}"
+#     description: "Opens the listener port for RDP"
+#     profiles: ["Domain", "Public", "Private"]
 #
-#- name: Firewall | Allow WinRMs for Anasible host
-#  community.windows.win_firewall_rule:
-#    name: ansible_winrms
-#    group: Windows Remote Management
-#    localport: 5986
-#    action: allow
-#    direction: in
-#    protocol: tcp
-#    state: present
-#    enabled: yes
-#    remoteip: "{{ansible_controller_ip}}"
-#    description: "Opens the listener port for RDP"
-#    profiles: ["Domain", "Public", "Private"]
+# - name: Firewall | Allow WinRMs for Anasible host
+#   community.windows.win_firewall_rule:
+#     name: ansible_winrms
+#     group: Windows Remote Management
+#     localport: 5986
+#     action: allow
+#     direction: in
+#     protocol: tcp
+#     state: present
+#     enabled: yes
+#     remoteip: "{{ansible_controller_ip}}"
+#     description: "Opens the listener port for RDP"
+#     profiles: ["Domain", "Public", "Private"]

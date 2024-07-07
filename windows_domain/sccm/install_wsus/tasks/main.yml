@@ -2,7 +2,7 @@
 # --------------------------------------------------------------
 
 - name: install WSUS
-  win_feature:
+  ansible.windows.win_feature:
     name:
       - UpdateServices-Services
       - UpdateServices-DB

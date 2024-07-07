@@ -2,7 +2,7 @@
   ansible.windows.win_command: gpupdate /force
 
 - name: Install windows features - RSAT-ADDS
-  win_feature:
+  ansible.windows.win_feature:
     name: RSAT-ADDS
     state: present
     include_management_tools: yes

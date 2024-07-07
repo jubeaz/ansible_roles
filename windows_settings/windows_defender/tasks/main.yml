@@ -2,7 +2,7 @@
 - name: Manage windows defender on server
   block:
     - name: Install windows defender
-      win_feature:
+      ansible.windows.win_feature:
         name: Windows-Defender
         state: "{{'present' if windows_defender == true else 'absent'}}"
       register: win_defender_install

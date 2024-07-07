@@ -3,7 +3,7 @@
 #         - TrustedForDelegation:       false
 #         - TrustedToAuthForDelegation: true
 #     - msDS-AllowedToDelegateTo:       list of SPN
-# 
+#
 # KCD without protocol transition:
 #     - UAC :
 #         - TrustedForDelegation:       false
@@ -14,14 +14,14 @@
 #         - TrustedForDelegation:       true
 #         - TrustedToAuthForDelegation: false
 #     - msDS-AllowedToDelegateTo:       empty
-# RBCD: 
+# RBCD:
 #     - msDS-AllowedToActOnBehalfOfOtherIdentity:  list of DN
 #
 #
 # RBCD IS NOT MANAGED WILL BE MANAGED DURING OBJECT CREATION
 
 
-- name: Create Kerberos Delegation 
+- name: Create Kerberos Delegation
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -55,18 +55,17 @@
           $TrustedForDeleg = $false
           $TrustedToAuth = $false
           $type = "KCD"
-        }        
+        }
         # object UAC
         Set-ADAccountControl $obj -TrustedForDelegation $TrustedForDeleg -TrustedToAuthForDelegation $TrustedToAuth
         Write-Output "[$type] Set-ADAccountControl: -TrustedForDelegation $TrustedForDeleg -TrustedToAuthForDelegation $TrustedToAuth"
-      
         if ($DelegationType -eq "KCD"){
           $obj | Set-ADObject -Add @{"msDS-AllowedToDelegateTo"=$DelegateTo}
           Write-Output "Set msDS-AllowedToDelegateTo $DelegateTo"
         } else {
           $obj | Set-ADObject -Clear 'msDS-AllowedToDelegateTo'
           Write-Output "Cleared msDS-AllowedToDelegateTo"
-        }      
+        }
         $Ansible.Failed = $false
       } catch {
         $Ansible.Failed = $true
@@ -75,18 +74,18 @@
       }
     error_action: stop
     parameters:
-      Id: "CN={{item.key}},{{item.value.path}}"
-      DelegationType: "{{item.value.delegation_type}}"
-      ProtoTransition: "{{item.value.proto_transition | default(false)}}"
-      DelegateTo: "{{item.value.constrained | default([])}}"
+      Id: "CN={{ item.key }},{{ item.value.path }}"
+      DelegationType: "{{ item.value.delegation_type }}"
+      ProtoTransition: "{{ item.value.proto_transition | default(false) }}"
+      DelegateTo: "{{ item.value.constrained | default([]) }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
-  when: item.value.delegation_type | default(false) != false
-  with_dict: "{{ objects | default({})}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+  when: item.value.delegation_type | default(false)
+  with_dict: "{{ objects | default({}) }}"
   register: kerberos_delegations
 
-#- debug:
-#    var: kerberos_delegations
+# - debug:
+#     var: kerberos_delegations

@@ -1,18 +1,18 @@
 - name: Install IIS Management Features
-  win_feature:
-    name: Web-Mgmt-Tools, 
-          Web-Scripting-Tools, 
+  ansible.windows.win_feature:
+    name: Web-Mgmt-Tools,
+          Web-Scripting-Tools,
           Web-Mgmt-Service
     state: present
-- name: Install IIS Management console 
-  win_feature:
-    name: Web-Mgmt-Console 
+- name: Install IIS Management console
+  ansible.windows.win_feature:
+    name: Web-Mgmt-Console
     state: present
-  when: is_core_install == false
+  when: not is_core_install
 
 
 - name: Add SYSTEM allow rights to machine keys (required for installation of IIS 6 components)
-  win_acl:
+  ansible.windows.win_acl:
     path: C:\ProgramData\Microsoft\Crypto\RSA\MachineKeys\
     user: SYSTEM
     rights: FullControl
@@ -21,40 +21,40 @@
     inherit: ContainerInherit, ObjectInherit
     propagation: 'InheritOnly'
 
-- name: Install IIS 6 Compatibility Features 
-  win_feature:
+- name: Install IIS 6 Compatibility Features
+  ansible.windows.win_feature:
     name: Web-Mgmt-Compat,
           Web-Metabase,
           Web-Lgcy-Scripting,
           Web-WMI
     state: present
 
-- name: Install IIS 6 CompatibilityManagement console 
-  win_feature:
-    name: Web-Lgcy-Mgmt-Console 
+- name: Install IIS 6 CompatibilityManagement console
+  ansible.windows.win_feature:
+    name: Web-Lgcy-Mgmt-Console
     state: present
-  when: is_core_install == false
+  when: not is_core_install
 
 - name: Install IIS Web-Server with sub features and management tools
-  win_feature:
+  ansible.windows.win_feature:
     name: Web-Server
     state: present
-    include_sub_features: yes
-    include_management_tools: yes
+    include_sub_features: true
+    include_management_tools: true
   register: win_feature
 
 - name: Create directory
-  win_file:
+  ansible.windows.win_file:
     path: C:\\inetpub
     state: directory
 
 - name: Create directory
-  win_file:
+  ansible.windows.win_file:
     path: C:\\inetpub\\wwwroot
     state: directory
 
-- name: default-website-index
-  win_copy:
+- name: Default-website-index
+  ansible.windows.win_copy:
     src: files/index.html
     dest: "C:\\inetpub\\wwwroot\\index.html"
 

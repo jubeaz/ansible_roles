@@ -204,7 +204,7 @@
   with_dict: "{{laps_path}}"
 
 - name: Install GPO feature
-  win_feature:
+  ansible.windows.win_feature:
     name: GPMC
     state: present
     include_sub_features: yes

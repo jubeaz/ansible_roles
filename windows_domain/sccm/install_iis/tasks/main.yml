@@ -12,7 +12,7 @@
     state: directory
 
 - name: install features Remote Differential Compression feature and BITS
-  win_feature:
+  ansible.windows.win_feature:
     name: 
       - RDC
       - BITS
@@ -37,7 +37,7 @@
     ansible_become_password: "{{domain_password}}"
 
 - name: install IIS feature and other components
-  win_feature:
+  ansible.windows.win_feature:
     name:
       - Web-Server
       - Web-Dyn-Compression

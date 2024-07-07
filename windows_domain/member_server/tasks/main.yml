@@ -12,7 +12,7 @@
     log_path: C:\dns_log.txt
 
 - name: Verify File Server Role is installed.
-  win_feature:
+  ansible.windows.win_feature:
     name: File-Services, FS-FileServer
     state: present
     include_management_tools: True
