@@ -34,10 +34,9 @@
       } catch {
         try {
           $gMSA_Principals =  @()
-          Add-KDSRootKey -EffectiveTime (Get-Date).AddHours(-10)
           $gMSA_Principals += $gMSA_HostNames | ForEach-Object { Get-ADComputer -Identity $_ }
           $gMSA_Principals += $gMSA_Groups | ForEach-Object { Get-ADGroup -Identity $_ }
-          $obj = New-ADServiceAccount -Name $gMSA_Name -DNSHostName $gMSA_FQDN -PrincipalsAllowedToRetrieveManagedPassword $gMSA_Principals -ServicePrincipalNames $gMSA_SPNs 
+          $obj = New-ADServiceAccount -Name $gMSA_Name -DNSHostName $gMSA_FQDN -PrincipalsAllowedToRetrieveManagedPassword $gMSA_Principals -ServicePrincipalNames $gMSA_SPNs
           Write-Output -InputObject $obj
           $Ansible.Failed = $false
         } catch {
@@ -48,19 +47,19 @@
       }
     error_action: stop
     parameters:
-      gMSA_Name: "{{item.value.gMSA_Name}}"
-      gMSA_FQDN: "{{item.value.gMSA_FQDN}}"
-      gMSA_SPNs: "{{item.value.gMSA_SPNs}}"
-      gMSA_HostNames: "{{item.value.gMSA_HostNames | default([])}}"
-      gMSA_Groups: "{{item.value.gMSA_Groups | default([])}}"
+      gMSA_Name: "{{ item.value.gMSA_Name }}"
+      gMSA_FQDN: "{{ item.value.gMSA_FQDN }}"
+      gMSA_SPNs: "{{ item.value.gMSA_SPNs }}"
+      gMSA_HostNames: "{{ item.value.gMSA_HostNames | default([]) }}"
+      gMSA_Groups: "{{ item.value.gMSA_Groups | default([]) }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   with_dict: "{{ objects }}"
   when: action |default('create') != "add_delegates"
-  register:  gmsa_account_result
+  register: gmsa_account_result
 
 
 # read msDS-AllowedToActOnBehalfOfOtherIdentity
@@ -96,13 +95,13 @@
       }
     error_action: stop
     parameters:
-      gMSA_Name: "{{item.value.gMSA_Name}}"
-      delegates: "{{item.value.delegates | default([])}}"
+      gMSA_Name: "{{ item.value.gMSA_Name }}"
+      delegates: "{{ item.value.delegates | default([]) }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   with_dict: "{{ objects }}"
   when: action |default('create') == "add_delegates"  and item.value.delegates | default([]) | length > 0
-  register:  gmsa_delegation_result
+  register: gmsa_delegation_result

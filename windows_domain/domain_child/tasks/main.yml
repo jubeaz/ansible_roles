@@ -1,8 +1,8 @@
 
 
-- name: "disable the registration of the {{pub_adapter}} interface (PUB address) in DNS"
-  ansible.windows.win_shell: Get-NetAdapter {{pub_adapter}} | Set-DNSClient -RegisterThisConnectionsAddress $False
-  when: two_adapters == true
+- name: "Disable the registration of the {{ pub_adapter }} interface (PUB address) in DNS"
+  ansible.windows.win_shell: Get-NetAdapter {{ pub_adapter }} | Set-DNSClient -RegisterThisConnectionsAddress $False
+  when: two_adapters
 
 #- name: debug
 #  ansible.builtin.debug:
@@ -10,38 +10,36 @@
 #      - "domain_parent_source_dc: {{domain_parent_dc_name}}.{{domain_parent_domain_name}}"
 #      - "domain_parent_dc_ip: {{domain_parent_dc_ip}}"
 
-- name: "Set configure dns to {{domain_parent_dc_name}} {{domain_parent_dc_ip}}"
-  win_dns_client:
-    adapter_names: "{{domain_adapter}}"
+- name: "Set configure dns to {{ domain_parent_dc_name }} {{ domain_parent_dc_ip }}"
+  ansible.windows.win_dns_client:
+    adapter_names: "{{ domain_adapter }}"
     ipv4_addresses:
-      - "{{domain_parent_dc_ip}}"
+      - "{{ domain_parent_dc_ip }}"
     log_path: C:\dns_log.txt
 
 - name: Install windows features - AD Domain Services
-  win_feature:
+  ansible.windows.win_feature:
     name: AD-Domain-Services
     state: present
-    include_management_tools: yes
-    include_sub_features: yes
+    include_management_tools: true
+    include_sub_features: true
   register: features_adds
 
 
 - name: Install windows features - RSAT-ADDS
-  win_feature:
+  ansible.windows.win_feature:
     name: RSAT-ADDS
     state: present
-    include_management_tools: yes
+    include_management_tools: true
   register: features_rsat
 
-- name: features | Installing Windows DNS Server
-  win_feature:
+- name: Features | Installing Windows DNS Server
+  ansible.windows.win_feature:
     name: DNS
     state: present
-    include_management_tools: yes
-    include_sub_features: yes
+    include_management_tools: true
+    include_sub_features: true
   register: features_dns
-
-
 
 - name: add child domain to parent domain
   ansible.windows.win_powershell:
@@ -99,26 +97,26 @@
         $Ansible.Changed = $false
       }
     parameters:
-      Password: "{{domain_parent_domain_password}}"
-      DomSafePassword: "{{domain_password}}"
-      DomainAdmin: "Administrator@{{domain_parent_domain_name}}"
-      ParentDomainName: "{{domain_parent_domain_name}}"
-      ReplicationSourceDC: "{{domain_parent_dc_name}}.{{domain_parent_domain_name}}"
-      NewDomainNetbiosName: "{{domain_netbios_name}}"
-      NewDomainName: "{{domain_netbios_name | lower}}"
-      SiteName: "{{domain_site_name}}"
+      Password: "{{ domain_parent_domain_password }}"
+      DomSafePassword: "{{ domain_password }}"
+      DomainAdmin: "Administrator@{{ domain_parent_domain_name }}"
+      ParentDomainName: "{{ domain_parent_domain_name }}"
+      ReplicationSourceDC: "{{ domain_parent_dc_name }}.{{ domain_parent_domain_name }}"
+      NewDomainNetbiosName: "{{ domain_netbios_name }}"
+      NewDomainName: "{{ domain_netbios_name | lower }}"
+      SiteName: "{{ domain_site_name }}"
   register: child_result
 
 - debug:
     msg:
-       - "Password: {{domain_parent_domain_password}}"
-       - "DomSafePassword: {{domain_password}}"
-       - "DomainAdmin: Administrator@{{domain_parent_domain_name}}"
-       - "ParentDomainName: {{domain_parent_domain_name}}"
-       - "ReplicationSourceDC: {{domain_parent_dc_name}}.{{domain_parent_domain_name}}"
-       - "NewDomainNetbiosName: {{domain_netbios_name}}"
-       - "NewDomainName: {{domain_netbios_name | lower}}"
-       - "SiteName: {{domain_site_name}}"
+       - "Password: {{ domain_parent_domain_password }}"
+       - "DomSafePassword: {{ domain_password }}"
+       - "DomainAdmin: Administrator@{{ domain_parent_domain_name }}"
+       - "ParentDomainName: {{ domain_parent_domain_name }}"
+       - "ReplicationSourceDC: {{ domain_parent_dc_name}}.{{domain_parent_domain_name }}"
+       - "NewDomainNetbiosName: {{ domain_netbios_name }}"
+       - "NewDomainName: {{ domain_netbios_name | lower }}"
+       - "SiteName: {{ domain_site_name }}"
   when: child_result.error | default([]) | length > 0
 
 - debug:
@@ -130,13 +128,13 @@
   when: child_result.error | default([]) | length > 0
 
 - name: Reboot
-  win_reboot:
+  ansible.windows.win_reboot:
     reboot_timeout: 900
     post_reboot_delay: 300
   when: child_result.changed
 
 - name: Show powershell  child result
-  debug: 
+  ansible.builtin.debug: 
     var: child_result.stdout_lines
   when: child_result.stdout_lines is defined
 
@@ -144,8 +142,8 @@
   ansible.windows.win_shell: Get-NetAdapter {{pub_adapter}} | Set-DNSClient -RegisterThisConnectionsAddress $True
   when: two_adapters == true
 
-- name: "Install XactiveDirectory"
-  win_psmodule:
+- name: Install XactiveDirectory
+  community.windows.win_psmodule:
     name: ActiveDirectoryDSC
     state: present
 
