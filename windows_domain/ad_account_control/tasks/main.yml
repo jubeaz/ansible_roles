@@ -1,4 +1,4 @@
-- name: Set AD Account Control 
+- name: Set AD Account Control
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -21,7 +21,7 @@
       Import-Module ActiveDirectory
       Set-Location AD:
       try {
-        $obj = ActiveDirectory\Get-ADObject -Identity $Id 
+        $obj = ActiveDirectory\Get-ADObject -Identity $Id
         Write-Output "Object Found: $obj"
         # object UAC
         Set-ADAccountControl $obj `
@@ -29,7 +29,7 @@
           -AllowReversiblePasswordEncryption $AllowReversiblePasswordEncryption `
           -CannotChangePassword $CannotChangePassword `
           -PasswordNeverExpires $PasswordNeverExpires `
-          -PasswordNotRequired $PasswordNotRequired 
+          -PasswordNotRequired $PasswordNotRequired
 
         $obj = ActiveDirectory\Get-ADObject -Identity $Id -Properties UserAccountControl
         Write-Output "Object Found: $obj with $($obj.UserAccountControl)"
@@ -40,7 +40,7 @@
           $obj.UserAccountControl = $obj.UserAccountControl -bxor 0x00400000
         }
         Write-Output "Modified: $($obj.UserAccountControl)"
-        Set-AdObject -Instance $obj 
+        Set-AdObject -Instance $obj
         $Ansible.Failed = $false
       } catch {
         $Ansible.Failed = $true
@@ -49,18 +49,18 @@
       }
     error_action: stop
     parameters:
-      Id: "CN={{item.key}},{{item.value.path}}"
-      AccountNotDelegated: "{{item.value.ADAC.AccountNotDelegated | default(false)}}"
-      AllowReversiblePasswordEncryption: "{{item.value.ADAC.AllowReversiblePasswordEncryption | default(false)}}"
-      CannotChangePassword: "{{item.value.ADAC.CannotChangePassword | default(false)}}"
-      PasswordNeverExpires: "{{item.value.ADAC.PasswordNeverExpires | default(false)}}"
-      PasswordNotRequired: "{{item.value.ADAC.PasswordNotRequired | default(false)}}"
-      DoesNotRequirePreAuth: "{{item.value.ADAC.DoesNotRequirePreAuth | default(false)}}"
+      Id: "CN={{ item.key }},{{ item.value.path }}"
+      AccountNotDelegated: "{{ item.value.ADAC.AccountNotDelegated | default(false) }}"
+      AllowReversiblePasswordEncryption: "{{ item.value.ADAC.AllowReversiblePasswordEncryption | default(false) }}"
+      CannotChangePassword: "{{ item.value.ADAC.CannotChangePassword | default(false) }}"
+      PasswordNeverExpires: "{{ item.value.ADAC.PasswordNeverExpires | default(false) }}"
+      PasswordNotRequired: "{{ item.value.ADAC.PasswordNotRequired | default(false) }}"
+      DoesNotRequirePreAuth: "{{ item.value.ADAC.DoesNotRequirePreAuth | default(false) }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   when: item.value.ADAC | default({}) | length > 0
-  with_dict: "{{ objects | default({})}}"
+  with_dict: "{{ objects | default({}) }}"
   register: ad_accountcontrol

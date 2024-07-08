@@ -1,37 +1,39 @@
 # https://answers.microsoft.com/en-us/protect/forum/protect_defender-protect_start-windows_10/how-do-i-stop-sending-antivirus-samples-to/a2e7b280-a8ba-43f5-b391-0a12c109f990
 - name: Manage windows defender on server
+  when: is_server_os
   block:
     - name: Install windows defender
       ansible.windows.win_feature:
         name: Windows-Defender
-        state: "{{'present' if windows_defender == true else 'absent'}}"
+        state: "{{  'present' if windows_defender == true else 'absent' }}"
       register: win_defender_install
       when: windows_defender is defined
+
     - name: Reboot if needed
-      win_reboot:
+      ansible.windows.win_reboot:
         reboot_timeout: 600
         post_reboot_delay: 30
       when: windows_defender is defined and win_defender_install.reboot_required
     - name: Get info for a single feature
       community.windows.win_feature_info:
         name: Windows-Defender
-      register: win_defender_install  
-  when: is_server_os
+      register: win_defender_install
 
-- name: disable real-time protection
-  win_shell: |
-    Set-MpPreference -DisableRealtimeMonitoring {{0 if windows_defender | default(true) else 1}}
-  when: is_server_os == false
-  become: yes
+
+- name: Disable real-time protection
+  ansible.windows.win_shell: |
+    Set-MpPreference -DisableRealtimeMonitoring {{ 0 if windows_defender | default(true) else 1 }}
+  when: not is_server_os
+  become: true
   become_user: SYSTEM
-  become_method: runas
-#- debug: 
-#    var: win_defender_install
+  become_method: ansible.builtin.runas
+# - debug:
+#     var: win_defender_install
 
 - name: Disable windows defender sending sample (MAPSReporting)
-  win_shell: Set-MpPreference -MAPSReporting 0
-  when: is_server_os == false or win_defender_install.features[0].installed == true
+  ansible.windows.win_shell: Set-MpPreference -MAPSReporting 0
+  when: (not is_server_os) or win_defender_install.features[0].installed
 
 - name: Disable windows defender sending sample (SubmitSamplesConsent)
-  win_shell: Set-MpPreference -SubmitSamplesConsent 2
-  when: is_server_os == false or win_defender_install.features[0].installed == true
+  ansible.windows.win_shell: Set-MpPreference -SubmitSamplesConsent 2
+  when: (not is_server_os) or win_defender_install.features[0].installed

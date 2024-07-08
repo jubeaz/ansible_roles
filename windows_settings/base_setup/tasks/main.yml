@@ -94,7 +94,7 @@
     Direction: "Inbound"
     Localport: ["5985", "5986"]
     Protocol: "TCP"
-    RemoteAddress: "{{ansible_controller_ip}}"
+    RemoteAddress: "{{ ansible_controller_ip }}"
 
 - name: Set explorer show hidden files
   ansible.windows.win_powershell:

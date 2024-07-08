@@ -18,7 +18,7 @@
 # Synchronize
 # WriteDacl
 # WriteOwner
-# WriteProperty 
+# WriteProperty
 
 ## extend rights
 # "00299570-246d-11d0-a768-00aa006e0529" {$right = "User-Force-Change-Password"}
@@ -27,17 +27,15 @@
 # "ba33815a-4f93-4c76-87f3-57574bff8109" {$right = "Manage-SID-History"}
 # "1131f6ad-9c07-11d1-f79f-00c04fc2dcd2" {$right = "DS-Replication-Get-Changes-All"}
 
-# acl extended values allowed : 
-# Ext-User-Force-Change-Password', 'Ext-Self-Self-Membership', 'Ext-Write-Self-Membership'
+# acl extended values allowed :
+#  Ext-User-Force-Change-Password', 'Ext-Self-Self-Membership', 'Ext-Write-Self-Membership'
 # ACL abuse scenarios
 # https://sensepost.com/blog/2020/ace-to-rce/
 # https://www.ired.team/offensive-security-experiments/active-directory-kerberos-abuse/abusing-active-directory-acls-aces
 # https://adsecurity.org/?p=3658
-# https://docs.microsoft.com/en-us/previous-versions/tn-archive/ff405676(v=msdn.10)
+#  https://docs.microsoft.com/en-us/previous-versions/tn-archive/ff405676(v=msdn.10)
 
-
-
-- name: set acl 
+- name: Set acl
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -59,7 +57,6 @@
 
       $aclValues = 'AccessSystemSecurity', 'CreateChild', 'Delete', 'DeleteChild', 'DeleteTree', 'ExtendedRight', 'GenericAll', 'GenericExecute', 'GenericRead', 'GenericWrite', 'ListChildren', 'ListObject', 'ReadControl', 'ReadProperty', 'Self', 'Synchronize', 'WriteDacl', 'WriteOwner', 'WriteProperty'
       $aclExtendValues = 'Ext-User-Force-Change-Password', 'Ext-Self-Self-Membership', 'Ext-Write-Self-Membership'
-      
       if ($for.StartsWith("NT AUTHORITY")) {
         $forSID = New-Object System.Security.Principal.NTAccount "$for"
       } else {
@@ -113,14 +110,13 @@
 
     error_action: stop
     parameters:
-      for: "{{item.value.for}}"
-      to: "{{item.value.to}}"
-      right: "{{item.value.right}}"
-      inheritance: "{{item.value.inheritance}}"
+      for: "{{ item.value.for }}"
+      to: "{{ item.value.to }}"
+      right: "{{ item.value.right }}"
+      inheritance: "{{ item.value.inheritance }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   with_dict: "{{ ad_acls }}"
-
