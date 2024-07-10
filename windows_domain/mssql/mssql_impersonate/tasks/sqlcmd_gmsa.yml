@@ -1,0 +1,13 @@
+- name: Add IMPERSONATE on login (GMSA)
+  ansible.windows.win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "GRANT IMPERSONATE ON LOGIN::[{{item.value}}] TO [{{item.key}}]"
+  with_dict: "{{executeaslogin}}"
+  when: ISGMSA
+
+- name: Add IMPERSONATE on user (GMSA)
+  ansible.windows.win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "CREATE LOGIN [{{item.key}}] FROM WINDOWS"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "USE {{item.value.db}};CREATE USER [{{item.value.user}}] FOR LOGIN [{{item.value.user}}]"
+    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "USE {{item.value.db}};GRANT IMPERSONATE ON USER::[{{item.value.impersonate}}] TO [{{item.value.user}}]"
+  with_dict: "{{executeasuser}}"
+  when: ISGMSA

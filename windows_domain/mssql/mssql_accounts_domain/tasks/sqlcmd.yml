@@ -1,0 +1,10 @@
+---
+- name: Add domain account (non GMSA)
+  ansible.windows.win_shell: |
+    SqlCmd {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] FROM WINDOWS"
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ SQLSVCACCOUNT }}"
+  vars:
+    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+  loop: "{{ sql_domain_accounts }}"

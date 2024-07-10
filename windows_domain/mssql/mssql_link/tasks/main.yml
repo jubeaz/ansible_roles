@@ -1,8 +1,12 @@
-- name: Create SQL Linked server and enable RPC
+- name: Set connection method
+  ansible.builtin.set_fact:
+    connection_type: "{{ connection_type_2022 if sql_version == 'MSSQL_2022' else connection_type_2019 }}"
+
+- name: Create SQL Linked server and enable RPC (non GMSA)
   ansible.windows.win_shell: |
-    SqlCmd -E -Q "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
-    SqlCmd -E -Q "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
-    SqlCmd -E -Q "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
+    SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
+    SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
+    SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
   become: true
   become_method: ansible.builtin.runas
   become_user: "{{ SQLSVCACCOUNT }}"
@@ -11,24 +15,17 @@
   with_dict: "{{ linked_servers }}"
   when: not ISGMSA
 
-- name: Create SQL Linked server and enable RPC
+- name: Create SQL Linked server and enable RPC (GMSA)
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd -E -Q "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd -E -Q "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd -E -Q "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
   with_dict: "{{ linked_servers }}"
   when: ISGMSA
 
-- name: Create logins
-  ansible.builtin.include_tasks: logins.yml
-  vars:
-    linked_server: "{{ item.key }}"
-    users_mapping: "{{ item.value.users_mapping }}"
-  with_dict: "{{ linked_servers }}"
-
-- name: Default login impersonation
+- name: Default login impersonation (non GMSA)
   ansible.windows.win_shell: |
-    SqlCmd -E -Q "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
+    SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
   become: true
   become_method: ansible.builtin.runas
   become_user: "{{ SQLSVCACCOUNT }}"
@@ -37,8 +34,8 @@
   with_dict: "{{ linked_servers }}"
   when: not ISGMSA
 
-- name: Default login impersonation
+- name: Default login impersonation (GMSA)
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd -E -Q "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
   with_dict: "{{ linked_servers }}"
   when: ISGMSA

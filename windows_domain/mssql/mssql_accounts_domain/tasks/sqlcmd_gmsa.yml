@@ -1,0 +1,6 @@
+---
+- name: Add domain account (GMSA)
+  ansible.windows.win_shell: |
+    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd.exe {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] FROM WINDOWS"
+  loop: "{{ sql_domain_accounts }}"
+  when: ISGMSA

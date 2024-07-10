@@ -1,0 +1,21 @@
+- name: Add IMPERSONATE on login (non GMSA)
+  ansible.windows.win_shell: |
+    SqlCmd {{ connection_type }} -Q "GRANT IMPERSONATE ON LOGIN::[{{ item.value }}] TO [{{ item.key }}]"
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ SQLSVCACCOUNT }}"
+  vars:
+    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+  with_dict: "{{ executeaslogin }}"
+
+- name: Add IMPERSONATE on user (non GMSA)
+  ansible.windows.win_shell: |
+    SqlCmd {{ connection_type }} -Q "CREATE LOGIN [{{ item.key }}] FROM WINDOWS"
+    SqlCmd {{ connection_type }} -Q "USE {{ item.value.db }};CREATE USER [{{ item.value.user }}] FOR LOGIN [{{ item.value.user }}]"
+    SqlCmd {{ connection_type }} -Q "USE {{ item.value.db }};GRANT IMPERSONATE ON USER::[{{ item.value.impersonate }}] TO [{{ item.value.user }}]"
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ SQLSVCACCOUNT }}"
+  vars:
+    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+  with_dict: "{{ executeasuser }}"

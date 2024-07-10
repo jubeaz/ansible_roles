@@ -166,19 +166,19 @@
   until: "add_laps_attribute is not failed"
   retries: 3
   delay: 120
-  become: yes
-  become_method: runas
+  become: true
+  become_method: ansible.builtin.runas
   become_user: SYSTEM
   when: dc_level == 0
 
 
-- name: "synchronizes all domains"
-  win_shell: repadmin /syncall /AdeP
-  become: yes
-  become_method: runas
-  become_user: "{{domain_name}}\\Administrator"
+- name: Synchronizes all domains
+  ansible.windows.win_shell: repadmin /syncall /AdeP
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{domain_password}}"
+    ansible_become_pass: "{{ domain_password }}"
 
 
 

@@ -1,8 +1,10 @@
-- name: Create local account
+- name: Create local account (non GMSA)
   ansible.windows.win_shell: |
    SqlCmd {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] WITH PASSWORD = N'{{ item.value }}'"
   become: true
   become_method: ansible.builtin.runas
   become_user: "{{ SQLSVCACCOUNT }}"
-  with_dict: "{{ mssql_localaccounts }}"
+  vars:
+    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+  with_dict: "{{ sql_local_accounts }}"
   when: not ISGMSA

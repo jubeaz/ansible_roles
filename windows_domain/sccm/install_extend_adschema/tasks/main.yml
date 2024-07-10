@@ -1,15 +1,15 @@
-- name: create the System Management Container
+- name: Create the System Management Container
   ansible.windows.win_powershell:
     script: |
       $systemDN = "CN=System," + (Get-ADDomain).DistinguishedName
       New-ADObject -Type container -Name "System Management" -Path $systemDN
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
 
-- name: grant {{sccm_server}} GenericAll on the System Management Container
+- name: grant GenericAll on the System Management Container to "{{ sccm_server }}"
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -24,24 +24,24 @@
       $acl.AddAccessRule($ace)
       Set-ACL -Path "AD:\$systemMgmtDN" -AclObject $acl
     parameters:
-      SCCMServer: "{{sccm_server}}"
+      SCCMServer: "{{ sccm_server }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
-    
-- name: create directory to store the downloaded prerequisite files
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+
+- name: Create directory to store the downloaded prerequisite files
   ansible.windows.win_file:
     path: C:\setup
     state: directory
 
-- name: check MECM installation media exists
-  win_stat:
+- name: Check MECM installation media exists
+  ansible.windows.win_stat:
     path: C:\setup\MCM_Configmgr_2303.exe
   register: mecm_installer_file
 
-- name: download MECM installation media
+- name: Download MECM installation media
   ansible.windows.win_get_url:
     url: https://go.microsoft.com/fwlink/p/?LinkID=2195628&clcid=0x409&culture=en-us&country=us
     dest: C:\setup\MCM_Configmgr_2303.exe
@@ -52,17 +52,26 @@
     path: C:\setup\cd.retail.LN
     state: absent
 
-- name: extract MECM installation media
-  win_shell: .\MCM_Configmgr_2303.exe -s
+- name: Extract MECM installation media
+  ansible.windows.win_shell: .\MCM_Configmgr_2303.exe -s
   args:
     chdir: C:\setup
 
-- name: launching the Active Directory schema extension
-  win_shell: .\extadsch.exe
+
+- name: Synchronizes all domains
+  ansible.windows.win_shell: repadmin /syncall /AdeP
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ domain_password }}"
+
+- name: Launching the Active Directory schema extension
+  ansible.windows.win_shell: .\extadsch.exe
   args:
     chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"

@@ -1,0 +1,5 @@
+- name: Create local account (GMSA)
+  ansible.windows.win_shell: |
+   c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd.exe {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] WITH PASSWORD = N'{{ item.value }}'"
+  with_dict: "{{ sql_local_accounts }}"
+  when: ISGMSA

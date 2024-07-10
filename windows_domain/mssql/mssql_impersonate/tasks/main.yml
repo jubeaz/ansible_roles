@@ -1,0 +1,11 @@
+- name: Set connection method
+  ansible.builtin.set_fact:
+    connection_type: "{{ connection_type_2022 if sql_version == 'MSSQL_2022' else connection_type_2019 }}"
+
+- name: Impersonate (GMSA)
+  ansible.builtin.include_tasks: sqlcmd_gmsa.yml
+  when: ISGMSA
+
+- name: Impersonate (non GMSA)
+  ansible.builtin.include_tasks: sqlcmd.yml
+  when: not ISGMSA

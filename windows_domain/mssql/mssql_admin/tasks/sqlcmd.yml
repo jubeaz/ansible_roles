@@ -1,0 +1,9 @@
+- name: Add MSSQL admin (non GMSA)
+  ansible.windows.win_shell: |
+    SqlCmd {{ connection_type }} -Q "SP_ADDSRVROLEMEMBER '{{ item }}','SYSADMIN'"
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ SQLSVCACCOUNT }}"
+  vars:
+    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+  loop: "{{ sql_sysadmins }}"
