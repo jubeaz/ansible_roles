@@ -1,4 +1,4 @@
-- name: set acl on CA
+- name: Set acl on CA
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -20,19 +20,19 @@
       $CA | Get-CertificationAuthorityAcl | Add-CertificationAuthorityAcl -Identity $for -AccessType "Allow" -AccessMask $right | Set-CertificationAuthorityAcl 
     error_action: stop
     parameters:
-      for: "{{item.value.for}}"
-      to: "{{item.value.to}}"
-      right: "{{item.value.right}}"
-      inheritance: "{{item.value.inheritance}}"
+      for: "{{ item.value.for }}"
+      to: "{{ item.value.to }}"
+      right: "{{ item.value.right }}"
+      inheritance: "{{ item.value.inheritance }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
-  with_dict: "{{ acls }}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+  with_dict: "{{  acls  }}"
   register: adcs_acl_authority_result
 
-- name: restart CA
+- name: Restart CA
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -49,12 +49,12 @@
 
     error_action: stop
     parameters:
-      CAName: "{{CAName}}"
+      CAName: "{{ CAName }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
 
 - debug:
     var: adcs_acl_authority_result
