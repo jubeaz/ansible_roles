@@ -1,4 +1,4 @@
-- name: set password policy
+- name: Set password policy
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -20,7 +20,9 @@
       )
       $Domain = (gwmi WIN32_ComputerSystem).Domain
       try {
-        Set-ADDefaultDomainPasswordPolicy -Identity $Domain -AuthType Negotiate -LockoutDuration $LockoutDuration -LockoutObservationWindow $LockoutObservationWindow -LockoutThreshold $LockoutThreshold -ComplexityEnabled $ComplexityEnabled -ReversibleEncryptionEnabled $False -MinPasswordLength $MinPasswordLength -MaxPasswordAge "10675199.00:00:00"
+        Set-ADDefaultDomainPasswordPolicy -Identity $Domain -AuthType Negotiate -LockoutDuration $LockoutDuration `
+          -LockoutObservationWindow $LockoutObservationWindow -LockoutThreshold $LockoutThreshold -ComplexityEnabled $ComplexityEnabled `
+          -ReversibleEncryptionEnabled $False -MinPasswordLength $MinPasswordLength -MaxPasswordAge "10675199.00:00:00"
         $Ansible.Failed = $false
       } catch {
         $Ansible.Failed = $true
@@ -29,8 +31,8 @@
       }
     error_action: stop
     parameters:
-      LockoutThreshold: "{{policy.try_before_lock | default('5')}}"
-      MinPasswordLength: "{{policy.pass_length | default('5')}}"
-      LockoutDuration: "{{policy.lock_duration | default('00:05:00')}}"
-      LockoutObservationWindow: "{{policy.lock_observation | default('00:05:00')}}"
-      ComplexityEnabled: "{{policy.complexity| default(false)}}"
+      LockoutThreshold: "{{ policy.try_before_lock | default('5') }}"
+      MinPasswordLength: "{{ policy.pass_length | default('5') }}"
+      LockoutDuration: "{{ policy.lock_duration | default('00:05:00') }}"
+      LockoutObservationWindow: "{{ policy.lock_observation | default('00:05:00') }}"
+      ComplexityEnabled: "{{ policy.complexity | default(false) }}"

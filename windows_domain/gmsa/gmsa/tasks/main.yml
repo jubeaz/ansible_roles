@@ -36,7 +36,8 @@
           $gMSA_Principals =  @()
           $gMSA_Principals += $gMSA_HostNames | ForEach-Object { Get-ADComputer -Identity $_ }
           $gMSA_Principals += $gMSA_Groups | ForEach-Object { Get-ADGroup -Identity $_ }
-          $obj = New-ADServiceAccount -Name $gMSA_Name -DNSHostName $gMSA_FQDN -PrincipalsAllowedToRetrieveManagedPassword $gMSA_Principals -ServicePrincipalNames $gMSA_SPNs
+          $obj = New-ADServiceAccount -Name $gMSA_Name -DNSHostName $gMSA_FQDN -PrincipalsAllowedToRetrieveManagedPassword $gMSA_Principals `
+            -ServicePrincipalNames $gMSA_SPNs
           Write-Output -InputObject $obj
           $Ansible.Failed = $false
         } catch {

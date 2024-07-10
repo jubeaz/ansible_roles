@@ -1,11 +1,11 @@
 - name: Install-WindowsFeature RSAT-AD-PowerShell
   ansible.windows.win_feature:
-    name: RSAT-AD-PowerShell 
+    name: RSAT-AD-PowerShell
     state: present
   when: installed_gmsa | default([]) | length > 0
 
-- name: refresh krb token
-  win_shell:  klist -li 0x3e7 purge
+- name: Refresh krb token
+  nsible.windows.win_shell: klist -li 0x3e7 purge
 
 - name: Install ADServiceAccount
   ansible.windows.win_powershell:
@@ -18,10 +18,10 @@
       Install-ADServiceAccount -Identity $gMSA_Name
     error_action: stop
     parameters:
-        gMSA_Name: "{{item}}"
+      gMSA_Name: "{{ item }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   with_items: "{{ installed_gmsa }}"

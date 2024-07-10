@@ -60,12 +60,12 @@
     src: files/sql_conf.ini.{{ sql_version }}.j2
     dest: c:\setup\mssql\sql_conf.ini
 
-- name: check downloaded file exists
+- name: Check downloaded file exists
   ansible.windows.win_stat:
     path: c:\setup\mssql\sql_installer.exe
   register: installer_file
 
-- name: get the installer
+- name: Get the installer
   ansible.windows.win_get_url:
     url: "{{ download_url }}"
     dest: 'c:\setup\mssql\sql_installer.exe'

@@ -11,8 +11,8 @@
   ansible.windows.win_reboot:
   when: win_feature.reboot_required
 
-#- name: Reboot if installing windows feature requires it
-#  ansible.windows.win_reboot:
+# - name: Reboot if installing windows feature requires it
+#   ansible.windows.win_reboot:
 
 - name: Display mssql variables in use
   ansible.builtin.debug:

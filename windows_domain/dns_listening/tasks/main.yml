@@ -1,7 +1,5 @@
-
-
 # https://petri.com/configure-dns-on-domain-controller-two-ip-addresses/
-- name: "Set DS DNS to listen on {{domain_dc_ip}} (domain)" 
+- name: "Set DS DNS to listen on domain interface {{ domain_dc_ip }}"
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -24,45 +22,45 @@
       }
     error_action: stop
     parameters:
-      IP: "{{domain_dc_ip}}"
+      IP: "{{ domain_dc_ip }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   register: set_dns_server_ip
   when: two_adapters
 
-- debug:
-    var: set_dns_server_ip
-  when: two_adapters
+# - debug:
+#     var: set_dns_server_ip
+#   when: two_adapters
 
 - name: Retrieve DNS Server config
-  win_shell: |
+  ansible.windows.win_shell: |
     $obj = Get-DnsServerSetting
     Write-Output  $obj
   register: get_dns_server_listeningip
   when: two_adapters
 
-- name: Show DNS Server config
-  debug: 
-    var: get_dns_server_listeningip
-  when: two_adapters
+# - name: Show DNS Server config
+#   debug:
+#     var: get_dns_server_listeningip
+#   when: two_adapters
 
 - name: Reboot
-  win_reboot:
+  ansible.windows.win_reboot:
     reboot_timeout: 900
     post_reboot_delay: 100
   when: two_adapters
 
 - name: Retrieve DNS Server config
-  win_shell: |
+  ansible.windows.win_shell: |
     $obj = Get-DnsServerSetting
     Write-Output  $obj
   register: get_dns_server_listeningip
   when: two_adapters
 
-- name: Show DNS Server config
-  debug: 
-    var: get_dns_server_listeningip
-  when: two_adapters
+# - name: Show DNS Server config
+#   debug:
+#     var: get_dns_server_listeningip
+#   when: two_adapters

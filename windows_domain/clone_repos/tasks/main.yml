@@ -1,11 +1,10 @@
-
-- name: create directory for repositories
-  win_file: 
-    path: "c:\\users\\{{user}}\\Desktop\\repositories"
+- name: Create directory for repositories
+  ansible.windows.win_file:
+    path: "c:\\users\\{{ user }}\\Desktop\\repositories"
     state: directory
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{net_bios}}\\{{user}}"
+    ansible_become_user: "{{ net_bios }}\\{{ user }}"
     ansible_become_password: "{{ password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
 
@@ -28,11 +27,11 @@
     parameters:
       Repo: "{{ item[1] }}"
       Folder: "{{ item[0] }}"
-      Base: "c:\\users\\{{user}}\\Desktop\\repositories" 
+      Base: "c:\\users\\{{ user }}\\Desktop\\repositories"
   loop: "{{ repositories }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{net_bios}}\\{{user}}"
+    ansible_become_user: "{{ net_bios }}\\{{ user }}"
     ansible_become_password: "{{ password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only

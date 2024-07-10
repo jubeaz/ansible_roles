@@ -1,4 +1,3 @@
-
 - name: Ensure chocolatey is installed
   chocolatey.chocolatey.win_chocolatey:
     name:

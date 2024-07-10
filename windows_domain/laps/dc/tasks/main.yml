@@ -4,11 +4,9 @@
     name: "{{ item.value.name }}"
     path: "{{ item.value.path }}"
     state: present
-    domain_username: "{{domain_name}}\\Administrator"
-    domain_password: "{{domain_password}}"
-  with_dict: "{{laps_path}}"
-
-
+    domain_username: "{{ domain_name }}\\Administrator"
+    domain_password: "{{ domain_password }}"
+  with_dict: "{{ laps_path }}"
 
 - name: Install LAPS Package on Servers
   ansible.windows.win_package:
@@ -30,74 +28,74 @@
 
 # https://activedirectorypro.com/repadmin-how-to-check-active-directory-replication/
 - name: "Get Sync status"
-  win_shell: repadmin  /replsummary
+  ansible.windows.win_shell: repadmin  /replsummary
   register: sync_summary
-  become: yes
-  become_method: runas
-  become_user: "{{domain_name}}\\Administrator"
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{domain_password}}"
+    ansible_become_pass: "{{ domain_password }}"
 
-- debug: var=sync_summary.stdout_lines
+#  debug: var=sync_summary.stdout_lines
 
 - name: "Get Sync status"
-  win_shell: repadmin  /Queue
+  ansible.windows.win_shell: repadmin  /Queue
   register: sync_queue
-  become: yes
+  become: true
   become_method: runas
-  become_user: "{{domain_name}}\\Administrator"
+  become_user: "{{ domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{domain_password}}"
+    ansible_become_pass: "{{ domain_password }}"
 
-- debug: var=sync_queue.stdout_lines
+# - debug: var=sync_queue.stdout_lines
 
-##- name: "Get Sync status"
-##  win_shell: repadmin  /showrepl
-##  register: sync_status
-##  become: yes
-##  become_method: runas
-##  become_user: "{{domain_name}}\\Administrator"
-##  vars:
-##    ansible_become_pass: "{{domain_password}}"
-##
-##- debug: var=sync_status.stdout_lines
+# - name: "Get Sync status"
+#   win_shell: repadmin  /showrepl
+#   register: sync_status
+#   become: yes
+#   become_method: runas
+#   become_user: "{{domain_name}}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{domain_password}}"
+#
+# - debug: var=sync_status.stdout_lines
 
 - name: Pause for 20 minutes due to dc_weyland replication problem
   ansible.builtin.pause:
-    minutes: "{{replication_wait_in_minutes}}"
+    minutes: "{{ replication_wait_in_minutes }}"
 #
-#- name: "Get Sync status"
-#  win_shell: repadmin  /replsummary
-#  register: sync_summary
-#  become: yes
-#  become_method: runas
-#  become_user: "{{domain_name}}\\Administrator"
-#  vars:
-#    ansible_become_pass: "{{domain_password}}"
+# - name: "Get Sync status"
+#   win_shell: repadmin  /replsummary
+#   register: sync_summary
+#   become: yes
+#   become_method: runas
+#   become_user: "{{domain_name}}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{domain_password}}"
 #
-#- debug: var=sync_summary.stdout_lines
+# - debug: var=sync_summary.stdout_lines
 #
-#- name: "Get Sync status"
-#  win_shell: repadmin  /showrepl
-#  register: sync_queue
-#  become: yes
-#  become_method: runas
-#  become_user: "{{domain_name}}\\Administrator"
-#  vars:
-#    ansible_become_pass: "{{domain_password}}"
+# - name: "Get Sync status"
+#   win_shell: repadmin  /showrepl
+#   register: sync_queue
+#   become: yes
+#   become_method: runas
+#   become_user: "{{domain_name}}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{domain_password}}"
 #
-#- debug: var=sync_queue.stdout_lines
+# - debug: var=sync_queue.stdout_lines
 #
-##- name: "Get Sync status"
-##  win_shell: repadmin  /showrepl
-##  register: sync_status
-##  become: yes
-##  become_method: runas
-##  become_user: "{{domain_name}}\\Administrator"
-##  vars:
-##    ansible_become_pass: "{{domain_password}}"
-##
-##- debug: var=sync_status.stdout_lines
+# #- name: "Get Sync status"
+# #  win_shell: repadmin  /showrepl
+# #  register: sync_status
+# #  become: yes
+# #  become_method: runas
+# #  become_user: "{{domain_name}}\\Administrator"
+# #  vars:
+# #    ansible_become_pass: "{{domain_password}}"
+# #
+# #- debug: var=sync_status.stdout_lines
 
 - name: Configure Password Properties
   win_ad_object:

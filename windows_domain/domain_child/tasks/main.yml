@@ -1,16 +1,14 @@
-
-
-- name: "Disable the registration of the {{ pub_adapter }} interface (PUB address) in DNS"
+- name: "Disable the registration of the interface (PUB address) in DNS {{ pub_adapter }}"
   ansible.windows.win_shell: Get-NetAdapter {{ pub_adapter }} | Set-DNSClient -RegisterThisConnectionsAddress $False
   when: two_adapters
 
-#- name: debug
-#  ansible.builtin.debug:
-#    msg:
-#      - "domain_parent_source_dc: {{domain_parent_dc_name}}.{{domain_parent_domain_name}}"
-#      - "domain_parent_dc_ip: {{domain_parent_dc_ip}}"
+# - name: debug
+#   ansible.builtin.debug:
+#     msg:
+#       - "domain_parent_source_dc: {{domain_parent_dc_name}}.{{domain_parent_domain_name}}"
+#       - "domain_parent_dc_ip: {{domain_parent_dc_ip}}"
 
-- name: "Set configure dns to {{ domain_parent_dc_name }} {{ domain_parent_dc_ip }}"
+- name: "Set configure dns to {{ domain_parent_dc_ip }}"
   ansible.windows.win_dns_client:
     adapter_names: "{{ domain_adapter }}"
     ipv4_addresses:
@@ -41,7 +39,7 @@
     include_sub_features: true
   register: features_dns
 
-- name: add child domain to parent domain
+- name: Add child domain to parent domain
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -80,7 +78,7 @@
       }
       if (-not $domainExist) {
         $Ansible.Changed = $true
-        $pass = ConvertTo-SecureString $Password -AsPlainText -Force 
+        $pass = ConvertTo-SecureString $Password -AsPlainText -Force
         $Cred = New-Object System.Management.Automation.PSCredential ($DomainAdmin, $pass)
         $safePassword = ConvertTo-SecureString $DomSafePassword -AsPlainText -Force
         Install-ADDSDomain `
@@ -107,25 +105,25 @@
       SiteName: "{{ domain_site_name }}"
   register: child_result
 
-- debug:
-    msg:
-       - "Password: {{ domain_parent_domain_password }}"
-       - "DomSafePassword: {{ domain_password }}"
-       - "DomainAdmin: Administrator@{{ domain_parent_domain_name }}"
-       - "ParentDomainName: {{ domain_parent_domain_name }}"
-       - "ReplicationSourceDC: {{ domain_parent_dc_name}}.{{domain_parent_domain_name }}"
-       - "NewDomainNetbiosName: {{ domain_netbios_name }}"
-       - "NewDomainName: {{ domain_netbios_name | lower }}"
-       - "SiteName: {{ domain_site_name }}"
-  when: child_result.error | default([]) | length > 0
+# - debug:
+#     msg:
+#        - "Password: {{ domain_parent_domain_password }}"
+#        - "DomSafePassword: {{ domain_password }}"
+#        - "DomainAdmin: Administrator@{{ domain_parent_domain_name }}"
+#        - "ParentDomainName: {{ domain_parent_domain_name }}"
+#        - "ReplicationSourceDC: {{ domain_parent_dc_name}}.{{domain_parent_domain_name }}"
+#        - "NewDomainNetbiosName: {{ domain_netbios_name }}"
+#        - "NewDomainName: {{ domain_netbios_name | lower }}"
+#        - "SiteName: {{ domain_site_name }}"
+#   when: child_result.error | default([]) | length > 0
 
-- debug:
-    var: child_result
-  when: child_result.error | default([]) | length > 0
-
-- fail:
-    msg: "No domain created"
-  when: child_result.error | default([]) | length > 0
+# - debug:
+#     var: child_result
+#   when: child_result.error | default([]) | length > 0
+#
+# - fail:
+#     msg: "No domain created"
+#   when: child_result.error | default([]) | length > 0
 
 - name: Reboot
   ansible.windows.win_reboot:
@@ -134,16 +132,15 @@
   when: child_result.changed
 
 - name: Show powershell  child result
-  ansible.builtin.debug: 
+  ansible.builtin.debug:
     var: child_result.stdout_lines
   when: child_result.stdout_lines is defined
 
-- name: enable the {{domain_adapter}} interface (local) for DNS client requests
-  ansible.windows.win_shell: Get-NetAdapter {{pub_adapter}} | Set-DNSClient -RegisterThisConnectionsAddress $True
-  when: two_adapters == true
+- name: Enable the local interface for DNS client requests "{{ domain_adapter }}"
+  ansible.windows.win_shell: Get-NetAdapter {{ pub_adapter }} | Set-DNSClient -RegisterThisConnectionsAddress $True
+  when: two_adapters
 
 - name: Install XactiveDirectory
   community.windows.win_psmodule:
     name: ActiveDirectoryDSC
     state: present
-

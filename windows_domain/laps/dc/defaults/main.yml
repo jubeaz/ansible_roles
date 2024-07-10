@@ -1,9 +1,9 @@
 ---
-move_computer: False
-prep_servers: False
-apply_dacl: False
-create_gpo: False
-gpo_linked: False
-install_servers: False
-test_deployment: False
+move_computer: false
+prep_servers: false
+apply_dacl: false
+create_gpo: false
+gpo_linked: false
+install_servers: false
+test_deployment: false
 replication_wait_in_minutes: 1

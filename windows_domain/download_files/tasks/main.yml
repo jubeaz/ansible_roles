@@ -1,22 +1,21 @@
-
-- name: create directory for repositories
-  win_file: 
-    path: "c:\\users\\{{user}}\\Desktop\\downloads"
+- name: Create directory for repositories
+  ansible.windows.win_file:
+    path: "c:\\users\\{{ user }}\\Desktop\\downloads"
     state: directory
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{net_bios}}\\{{user}}"
+    ansible_become_user: "{{ net_bios }}\\{{ user }}"
     ansible_become_password: "{{ password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
-    
-- name: download some files
+
+- name: Download some files
   ansible.windows.win_get_url:
     url: "{{ item[1] }}"
-    dest: "c:\\users\\{{user}}\\Desktop\\downloads\\{{ item[0] }}"
+    dest: "c:\\users\\{{ user }}\\Desktop\\downloads\\{{ item[0] }}"
   loop: "{{ downloads }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{net_bios}}\\{{user}}"
+    ansible_become_user: "{{ net_bios }}\\{{ user }}"
     ansible_become_password: "{{ password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
