@@ -10,7 +10,7 @@
   register: features_rsat
 
 - name: Install ADCSTemplate module
-  ansible.windows.win_psmodule:
+  community.windows.win_psmodule:
     name: ADCSTemplate
     skip_publisher_check: true
     state: present

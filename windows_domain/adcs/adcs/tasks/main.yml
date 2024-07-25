@@ -19,7 +19,7 @@
   when: ca_vulns is defined and "'ESC8' in ca_vulns"
 
 - name: Install pspki
-  ansible.windows.win_psmodule:
+  community.windows.win_psmodule:
     name: pspki
     skip_publisher_check: true
     state: present
