@@ -58,8 +58,8 @@
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
-  with_dict: "{{ objects }}"
-  when: action |default('create') != "add_delegates"
+  with_dict: "{{ ad_gmsas }}"
+  when: domain_data_action |default('create') != "add_delegates"
   register: gmsa_account_result
 
 
@@ -103,6 +103,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
-  with_dict: "{{ objects }}"
-  when: action |default('create') == "add_delegates"  and item.value.delegates | default([]) | length > 0
+  with_dict: "{{ ad_gmsas }}"
+  when: domain_data_action |default('create') == "add_delegates"  and item.value.delegates | default([]) | length > 0
   register: gmsa_delegation_result

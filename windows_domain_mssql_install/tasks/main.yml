@@ -97,7 +97,7 @@
   failed_when: mssql_install_already_done is not defined
   ignore_errors: true
 
-- ansible.builtin.debug: msg="{{mssql_install_already_done}}"
+# - ansible.builtin.debug: msg="{{ mssql_install_already_done }}"
 
 # Install the database with a domain admin user
 - name: Install the database
@@ -134,10 +134,13 @@
     data: 1433
   register: win_reg
   when: sql_version == "MSSQL_2019"
+  notify:
+    Reboot
 
-- name: Reboot
-  ansible.windows.win_reboot:
-  when: win_reg.changed
+
+- name: Flush reboot handlers
+  ansible.builtin.meta:
+    flush_handlers
 
 - name: Firewall | Allow MSSQL through Firewall
   ansible.windows.win_dsc:
@@ -175,13 +178,13 @@
     port: 1433
     delay: "{{ delay_for_1433 }}"
 
-#- name: Local Account (GMSA)
-#  ansible.builtin.include_tasks: local_account_gmsa.yml
-#  when: ISGMSA
-#
-#- name: Local Account (non GMSA)
-#  ansible.builtin.include_tasks: local_account.yml
-#  when: not ISGMSA
+# - name: Local Account (GMSA)
+#   ansible.builtin.include_tasks: local_account_gmsa.yml
+#   when: ISGMSA
+# 
+# - name: Local Account (non GMSA)
+#   ansible.builtin.include_tasks: local_account.yml
+#   when: not ISGMSA
 #
 - name: SQL cmd (GMSA)
   ansible.builtin.include_tasks: sqlcmd_gmsa.yml

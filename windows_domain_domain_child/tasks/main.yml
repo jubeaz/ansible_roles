@@ -104,6 +104,13 @@
       NewDomainName: "{{ domain_netbios_name | lower }}"
       SiteName: "{{ domain_site_name }}"
   register: child_result
+  notify:
+    Reboot
+
+
+- name: Flush reboot handlers
+  ansible.builtin.meta:
+    flush_handlers
 
 # - debug:
 #     msg:
@@ -124,12 +131,6 @@
 # - fail:
 #     msg: "No domain created"
 #   when: child_result.error | default([]) | length > 0
-
-- name: Reboot
-  ansible.windows.win_reboot:
-    reboot_timeout: 900
-    post_reboot_delay: 300
-  when: child_result.changed
 
 - name: Show powershell  child result
   ansible.builtin.debug:

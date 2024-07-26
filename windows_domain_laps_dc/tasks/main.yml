@@ -38,11 +38,11 @@
 
 #  debug: var=sync_summary.stdout_lines
 
-- name: "Get Sync status"
+- name: Get Sync status
   ansible.windows.win_shell: repadmin  /Queue
   register: sync_queue
   become: true
-  become_method: runas
+  become_method: ansible.builtin.runas
   become_user: "{{ domain_name }}\\Administrator"
   vars:
     ansible_become_pass: "{{ domain_password }}"
@@ -107,21 +107,21 @@
       attributeId: 1.2.840.113556.1.8000.2554.50051.45980.28112.18903.35903.6685103.1224907.2.1
       attributeSyntax: '2.5.5.5'  # String(IAS)
       omSyntax: 19  # String(Printable)
-      isSingleValued: True
-      systemOnly: False
-      isMemberOfPartialAttributeSet: False
+      isSingleValued: true
+      systemOnly: false
+      isMemberOfPartialAttributeSet: false
       searchFlags: 904  # RO,NV,CF,PR - http://www.frickelsoft.net/blog/?p=151
-      showInAdvancedViewOnly: False
+      showInAdvancedViewOnly: false
     context: schema
     type: attribute
-    update_schema: True
+    update_schema: true
   # privileges required to update the schema attributes
   register: passwordprop
   until: "passwordprop is not failed"
   retries: 3
   delay: 120
-  become: yes
-  become_method: runas
+  become: true
+  become_method: ansible.builtin.runas
   become_user: SYSTEM
   when: dc_level == 0
 
@@ -135,20 +135,20 @@
       attributeId: 1.2.840.113556.1.8000.2554.50051.45980.28112.18903.35903.6685103.1224907.2.2
       attributeSyntax: '2.5.5.16'  # LargeInteger
       omSyntax: 65  # LargeInteger
-      isSingleValued: True
-      systemOnly: False
-      isMemberOfPartialAttributeSet: False
+      isSingleValued: true
+      systemOnly: false
+      isMemberOfPartialAttributeSet: false
       searchFlags: 0
-      showInAdvancedViewOnly: False
+      showInAdvancedViewOnly: false
     context: schema
     type: attribute
-    update_schema: True
+    update_schema: true
   register: password_expire_time
   until: "password_expire_time is not failed"
   retries: 3
   delay: 120
-  become: yes
-  become_method: runas
+  become: true
+  become_method: ansible.builtin.runas
   become_user: SYSTEM
   when: dc_level == 0
 
@@ -156,10 +156,10 @@
   win_ad_object:
     name: Computer
     may_contain:
-    - ms-Mcs-AdmPwd
-    - ms-Mcs-AdmPwdExpirationTime
+      - ms-Mcs-AdmPwd
+      - ms-Mcs-AdmPwdExpirationTime
     context: schema
-    update_schema: True
+    update_schema: true
   register: add_laps_attribute
   until: "add_laps_attribute is not failed"
   retries: 3
@@ -178,35 +178,34 @@
   vars:
     ansible_become_pass: "{{ domain_password }}"
 
-
-
-- name: "Apply DACL to OU Containers"
+- name: Apply DACL to OU Containers
   win_ad_dacl:
-    path: "OU={{item.value.name}},{{ item.value.path }}"
+    path: "OU={{ item.value.name }},{{ item.value.path }}"
     state: present
     aces:
-    - rights:
-      - ReadProperty
-      - WriteProperty
-      inheritance_type: Descendents
-      inherited_object_type: Computer
-      object_type: ms-Mcs-AdmPwdExpirationTime
-      access: allow
-      account: S-1-5-10  # NT AUTHORITY\SELF
-    - rights: WriteProperty
-      inheritance_type: Descendents
-      inherited_object_type: Computer
-      object_type: ms-Mcs-AdmPwd
-      access: allow
-      account: S-1-5-10
-  with_dict: "{{laps_path}}"
+      - rights:
+          - ReadProperty
+          - WriteProperty
+        inheritance_type: Descendents
+        inherited_object_type: Computer
+        object_type: ms-Mcs-AdmPwdExpirationTime
+        access: allow
+        account: S-1-5-10  # NT AUTHORITY\SELF
+      - rights:
+          - WriteProperty
+        inheritance_type: Descendents
+        inherited_object_type: Computer
+        object_type: ms-Mcs-AdmPwd
+        access: allow
+        account: S-1-5-10
+  with_dict: "{{ laps_path }}"
 
 - name: Install GPO feature
   ansible.windows.win_feature:
     name: GPMC
     state: present
-    include_sub_features: yes
-    include_management_tools: yes
+    include_sub_features: true
+    include_management_tools: true
   register: win_feature
 
 
@@ -234,12 +233,12 @@
     type: dword
     value: '{{ item.value }}'
   with_items:
-  - name: PasswordComplexity
-    value: 4
-  - name: PasswordLength
-    value: 14
-  - name: PasswordAgeDays
-    value: 30
+    - name: PasswordComplexity
+      value: 4
+    - name: PasswordLength
+      value: 14
+    - name: PasswordAgeDays
+      value: 30
 
 - name: Configure Expiration Protection on GPO
   win_gpo_reg:
@@ -282,8 +281,8 @@
 - name: Ensure GPO is Linked
   win_gpo_link:
     name: '{{ opt_laps_gpo_name }}'
-    target: "OU={{item.value.name}},{{ item.value.path }}"
+    target: "OU={{ item.value.name }},{{ item.value.path }}"
     state: present
-    enforced: True
-    enabled: True
-  with_dict: "{{laps_path}}"
+    enforced: true
+    enabled: true
+  with_dict: "{{ laps_path }}"

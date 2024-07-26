@@ -1,4 +1,4 @@
-- name: "Add foreign {{object_type}} to {{local_group_name}}"
+- name: "Add foreign {{ object_type }} to {{ local_group_name }}"
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -56,5 +56,4 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
   with_items: "{{ foreign_objects }}"
-  when:  foreign_objects | length > 0
-
+  when: foreign_objects | length > 0

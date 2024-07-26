@@ -40,7 +40,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
-  with_dict: "{{ acls }}"
+  with_dict: "{{ templates_acls }}"
   register: adcs_acl_template_result
 
 # - debug:

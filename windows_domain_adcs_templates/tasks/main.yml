@@ -15,8 +15,8 @@
     skip_publisher_check: true
     state: present
 
-- name: create a directory for templates
-  ansible.windows.win_file: 
+- name: Create a directory for templates
+  ansible.windows.win_file:
     path: c:\setup
     state: directory
 
@@ -28,7 +28,8 @@
 
 - name: Install templates
   ansible.windows.win_shell: |
-    if (-not(Get-ADCSTemplate -DisplayName "{{ item }}")) { New-ADCSTemplate -DisplayName "{{ item }}" -JSON (Get-Content c:\setup\{{ item }}.json -Raw) -Identity "{{ domain_name }}\Domain Users" -Publish }
+    if (-not(Get-ADCSTemplate -DisplayName "{{ item }}")) { New-ADCSTemplate -DisplayName "{{ item }}" `
+     -JSON (Get-Content c:\setup\{{ item }}.json -Raw) -Identity "{{ domain_name }}\Domain Users" -Publish }
   vars:
     ansible_become: true
     ansible_become_method: runas

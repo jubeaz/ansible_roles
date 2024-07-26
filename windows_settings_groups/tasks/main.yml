@@ -1,10 +1,10 @@
 ---
 - name: Create local groups
   ansible.windows.win_group:
-    name: "{{item.key}}"
+    name: "{{ item.key }}"
     state: present
   with_dict: "{{ local_groups }}"
-  when: action == "create"
+  when: group_action == "create"
 
 
 - name: Add members to local groups
@@ -12,5 +12,5 @@
     name: "{{ item.key }}"
     members: "{{ item.value }}"
     state: present
-  with_dict: "{{local_groups}}"
-  when: action == "add_members"
+  with_dict: "{{ local_groups }}"
+  when: group_action == "add_members"

@@ -1,7 +1,7 @@
 ---
 # https://github.com/dsccommunity/NetworkingDsc/wiki/FirewallProfile
 - name: Update Firewall profiles
-  ansible.windows.win_dscwin_dsc:
+  ansible.windows.win_dsc:
     resource_name           : xFirewallProfile
     Name                    : "{{ profile.key }}"
     Enabled                 : "{{ profile.value.enabled }}"

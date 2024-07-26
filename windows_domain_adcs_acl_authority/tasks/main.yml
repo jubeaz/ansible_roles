@@ -30,7 +30,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
-  with_dict: "{{  acls  }}"
+  with_dict: "{{  authority_acls  }}"
   register: adcs_acl_authority_result
 
 - name: Restart CA
@@ -50,7 +50,7 @@
 
     error_action: stop
     parameters:
-      CAName: "{{ CAName }}"
+      CAName: "{{ authority_ca_name }}"
   vars:
     ansible_become: true
     ansible_become_method: runas
