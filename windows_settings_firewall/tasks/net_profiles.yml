@@ -9,4 +9,3 @@
   with_dict: "{{ connection_profiles | default({}) }}"
   loop_control:
     loop_var: profile
-

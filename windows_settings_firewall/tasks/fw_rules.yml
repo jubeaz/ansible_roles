@@ -19,3 +19,4 @@
     RemotePort: "{{i tem.value.remoteport | default('Any') }}"
     Group: "{{ item.value.group | default('ansible') }}"
   with_dict: "{{ firewall_rules }}"
+  

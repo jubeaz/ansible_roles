@@ -1,7 +1,7 @@
 - name: Enable run as PPL
-  win_regedit:
+  ansible.windows.win_regedit:
     path: HKLM:\SYSTEM\CurrentControlSet\Control\Lsa
     name: RunAsPPL
-    data: "{{1 if run_as_ppl == true else 0}}"
+    data: "{{ 1 if run_as_ppl == true else 0 }}"
     type: dword
   when: run_as_ppl is defined

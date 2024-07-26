@@ -4,7 +4,7 @@
     SqlCmd {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] FROM WINDOWS"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   loop: "{{ sql_domain_accounts }}"

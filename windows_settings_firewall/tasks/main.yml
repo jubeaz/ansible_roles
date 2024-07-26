@@ -1,12 +1,18 @@
 ---
 
 - name: Windows | Check for xNetworking Powershell module
-  win_psmodule:
+  community.windows.win_psmodule:
     name: xNetworking
     state: present
 
-- include_tasks: fw_rules.yml
-- include_tasks: fw_profiles.yml
-# Change network profile of domainAuthenticated interface 
+- name: Manage firewall rules
+  ansible.builtin.include_tasks: fw_rules.yml
+
+- name: Manage firewall rules
+  ansible.builtin.include_tasks: fw_profiles.yml
+
+# Change network profile of domainAuthenticated interface
 # https://woshub.com/how-to-change-a-network-type-from-public-to-private-in-windows/
-- include_tasks: net_profiles.yml
+
+- name: Manage firewall rules
+  ansible.builtin.include_tasks: net_profiles.yml

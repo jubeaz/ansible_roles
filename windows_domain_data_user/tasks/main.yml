@@ -17,9 +17,9 @@
 - name: "Create users"
   microsoft.ad.user:
     sam_account_name: "{{ item.key }}"
-    upn: "{{ item.key + '@' + domain_name  }}"
+    upn: "{{ item.key + '@' + domain_name }}"
     name: "{{ item.key }}"
-    firstname: "{{item.value.firstname }}"
+    firstname: "{{ item.value.firstname }}"
     surname: "{{ item.value.surname | default(item.value.firstname) }}"
     password: "{{ item.value.password }}"
     password_never_expires: true
@@ -33,7 +33,7 @@
     protect_from_deletion: "{{ item.value.sensitive | default(false) }}"
     domain_username: "{{ domain_name }}\\Administrator"
     domain_password: "{{ domain_password }}"
-  with_dict: "{{ad_users | default({}) }}"
+  with_dict: "{{ ad_users | default({}) }}"
   when: domain_data_action |default('create') == "create"
   register: user_creation
 

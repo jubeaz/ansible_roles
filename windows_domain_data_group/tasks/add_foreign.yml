@@ -1,4 +1,4 @@
-- name: "Add foreign {{ object_type }} to {{ local_group_name }}"
+- name: Add foreign to "{{ local_group_name }}"
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]

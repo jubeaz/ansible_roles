@@ -3,9 +3,9 @@
     SqlCmd {{ connection_type }} -Q "GRANT IMPERSONATE ON LOGIN::[{{ item.value }}] TO [{{ item.key }}]"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   with_dict: "{{ executeaslogin }}"
 
 - name: Add IMPERSONATE on user (non GMSA)
@@ -15,7 +15,7 @@
     SqlCmd {{ connection_type }} -Q "USE {{ item.value.db }};GRANT IMPERSONATE ON USER::[{{ item.value.impersonate }}] TO [{{ item.value.user }}]"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   with_dict: "{{ executeasuser }}"

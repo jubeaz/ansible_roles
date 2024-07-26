@@ -1,17 +1,16 @@
 ---
 - name: Add local users
   ansible.windows.win_user:
-    name: "{{item.key}}"
-    password: "{{item.value.password}}"
+    name: "{{ item.key }}"
+    password: "{{ item.value.password }}"
     state: present
   with_dict: "{{ local_users }}"
 
-  
 - name: Create local users home directory
   ansible.windows.win_command: whoami
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{item.key}}"
-    ansible_become_password: "{{item.value.password}}"
+    ansible_become_user: "{{ item.key }}"
+    ansible_become_password: "{{ item.value.password }}"
   with_dict: "{{ local_users }}"

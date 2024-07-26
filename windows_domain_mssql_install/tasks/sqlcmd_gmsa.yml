@@ -1,11 +1,11 @@
 ---
 - name: Enable sa account
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "ALTER LOGIN sa ENABLE"
-    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "ALTER LOGIN sa WITH PASSWORD = '{{sa_password}}' , CHECK_POLICY=OFF"
-  when: ISGMSA
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} -Q "ALTER LOGIN sa ENABLE"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} -Q "ALTER LOGIN sa WITH PASSWORD = '{{ sa_password }}' , CHECK_POLICY=OFF"
+  when: isgmsa
 
 - name: enable MSSQL authentication and windows authent
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{SQLSVCACCOUNT}} -p ~ SqlCmd {{connection_type}} -Q "EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2"
-  when: ISGMSA
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} -Q "EXEC xp_instance_regwrite N'HKEY_LOCAL_MACHINE', N'Software\Microsoft\MSSQLServer\MSSQLServer', N'LoginMode', REG_DWORD, 2"
+  when: isgmsa

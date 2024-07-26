@@ -1,18 +1,18 @@
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: outer_item.key
 
 - name: Debug
-  debug:
+  ansible.builtin.debug:
     var: outer_item.value.spns
 
 - name: Set computers SPN
   microsoft.ad.computer:
     name: "{{ outer_item.key }}"
-    path: "{{outer_item.value.path}}"
-    spn: 
-      add: 
+    path: "{{ outer_item.value.path }}"
+    spn:
+      add:
         - "{{ item }}"
-    domain_username: "{{domain_name}}\\Administrator"
-    domain_password: "{{domain_password}}"
+    domain_username: "{{ domain_name }}\\Administrator"
+    domain_password: "{{ domain_password }}"
   loop: "{{ outer_item.value.spns }}"

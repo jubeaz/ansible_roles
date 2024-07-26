@@ -9,33 +9,33 @@
     SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   with_dict: "{{ linked_servers }}"
-  when: not ISGMSA
+  when: not isgmsa
 
 - name: Create SQL Linked server and enable RPC (GMSA)
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedserver @server = N'{{ item.key }}', @srvproduct=N'', @provider=N'SQLOLEDB', @datasrc=N'{{ item.value.data_src }}'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc', @optvalue=N'true'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_serveroption @server=N'{{ item.key }}', @optname=N'rpc out', @optvalue=N'true'"
   with_dict: "{{ linked_servers }}"
-  when: ISGMSA
+  when: isgmsa
 
 - name: Default login impersonation (non GMSA)
   ansible.windows.win_shell: |
     SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   with_dict: "{{ linked_servers }}"
-  when: not ISGMSA
+  when: not isgmsa
 
 - name: Default login impersonation (GMSA)
   ansible.windows.win_shell: |
-    c:\setup\PSExec64.exe -accepteula -i -u {{ SQLSVCACCOUNT }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
+    c:\setup\PSExec64.exe -accepteula -i -u {{ sql_svc_account }} -p ~ SqlCmd {{ connection_type }} "EXEC master.dbo.sp_addlinkedsrvlogin @rmtsrvname = N'{{ item.key }}', @locallogin = NULL , @useself = N'True'"
   with_dict: "{{ linked_servers }}"
-  when: ISGMSA
+  when: isgmsa

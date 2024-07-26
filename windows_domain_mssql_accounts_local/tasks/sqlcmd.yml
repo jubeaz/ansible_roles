@@ -3,8 +3,8 @@
    SqlCmd {{ connection_type }} -Q "CREATE LOGIN [{{ item }}] WITH PASSWORD = N'{{ item.value }}'"
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ SQLSVCACCOUNT }}"
+  become_user: "{{ sql_svc_account }}"
   vars:
-    ansible_become_pass: "{{ SQLSVCPASSWORD }}"
+    ansible_become_pass: "{{ sql_svc_password }}"
   with_dict: "{{ sql_local_accounts }}"
-  when: not ISGMSA
+  when: not isgmsa

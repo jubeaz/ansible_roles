@@ -26,7 +26,7 @@
       - "MSSQL download url   : {{ download_url }}"
       - "MSSQL instance       : {{ sql_instance_name }}"
       - "MSSQL connection use : {{ connection_type }}"
-      - "SQLSVCACCOUNT        : {{ SQLSVCACCOUNT }}"
+      - "sql_svc_account        : {{ sql_svc_account }}"
 
 - name: Create a directory for installer download
   ansible.windows.win_file:
@@ -37,13 +37,13 @@
   ansible.windows.win_get_url:
     url: "https://download.sysinternals.com/files/PSTools.zip"
     dest: 'c:\setup\PSTools.zip'
-  when: ISGMSA
+  when: isgmsa
 
 - name: Unzip PSTools
   community.windows.win_unzip:
     src: c:\setup\PSTools.zip
     dest: c:\setup
-  when: ISGMSA
+  when: isgmsa
 
 - name: Create a directory for installer extraction
   ansible.windows.win_file:
@@ -75,15 +75,15 @@
   ansible.windows.win_user_right:
     name: SeServiceLogonRight
     users:
-      - '{{ SQLSVCACCOUNT }}'
+      - '{{ sql_svc_account }}'
     action: add
   when: not mssql_svcaccount_method == 'local'
 
 
 # - name: Setup service account
-# Set-ADUser -Identity "{{SQLSVCACCOUNT}}" -ServicePrincipalNames @{Add='MSSQLSvc/castelblack.north.sevenkingdoms.local'}
-# Get-ADUser -Identity "{{SQLSVCACCOUNT}}" | Set-ADAccountControl -TrustedToAuthForDelegation $true
-# Set-ADUser -Identity "{{SQLSVCACCOUNT}}" -Add @{'msDS-AllowedToDelegateTo'=@('CIFS/winterfell.north.sevenkingdoms.local','CIFS/winterfell')}
+# Set-ADUser -Identity "{{sql_svc_account}}" -ServicePrincipalNames @{Add='MSSQLSvc/castelblack.north.sevenkingdoms.local'}
+# Get-ADUser -Identity "{{sql_svc_account}}" | Set-ADAccountControl -TrustedToAuthForDelegation $true
+# Set-ADUser -Identity "{{sql_svc_account}}" -Add @{'msDS-AllowedToDelegateTo'=@('CIFS/winterfell.north.sevenkingdoms.local','CIFS/winterfell')}
 
 # - name: check install already done
 #   win_stat:
@@ -180,19 +180,19 @@
 
 # - name: Local Account (GMSA)
 #   ansible.builtin.include_tasks: local_account_gmsa.yml
-#   when: ISGMSA
+#   when: isgmsa
 # 
 # - name: Local Account (non GMSA)
 #   ansible.builtin.include_tasks: local_account.yml
-#   when: not ISGMSA
+#   when: not isgmsa
 #
 - name: SQL cmd (GMSA)
   ansible.builtin.include_tasks: sqlcmd_gmsa.yml
-  when: ISGMSA
+  when: isgmsa
 
 - name: SQL cmd (non GMSA)
   ansible.builtin.include_tasks: sqlcmd.yml
-  when: not ISGMSA
+  when: not isgmsa
 
 - name: Restart service MSSQL
   ansible.windows.win_service:
