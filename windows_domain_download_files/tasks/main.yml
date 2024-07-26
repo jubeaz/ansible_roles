@@ -1,21 +1,21 @@
 - name: Create directory for repositories
   ansible.windows.win_file:
-    path: "c:\\users\\{{ user }}\\Desktop\\downloads"
+    path: "c:\\users\\{{ windows_domain_download_files_user }}\\Desktop\\downloads"
     state: directory
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ net_bios }}\\{{ user }}"
-    ansible_become_password: "{{ password }}"
+    ansible_become_user: "{{ windows_domain_download_files_net_bios }}\\{{ windows_domain_download_files_user }}"
+    ansible_become_password: "{{ windows_domain_download_files_password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
 
 - name: Download some files
   ansible.windows.win_get_url:
     url: "{{ item[1] }}"
-    dest: "c:\\users\\{{ user }}\\Desktop\\downloads\\{{ item[0] }}"
-  loop: "{{ downloads }}"
+    dest: "c:\\users\\{{ windows_domain_download_files_user }}\\Desktop\\downloads\\{{ item[0] }}"
+  loop: "{{ windows_domain_download_files_downloads }}"
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ net_bios }}\\{{ user }}"
-    ansible_become_password: "{{ password }}"
+    ansible_become_user: "{{ windows_domain_download_files_net_bios }}\\{{ windows_domain_download_files_user }}"
+    ansible_become_password: "{{ windows_domain_download_files_password }}"
     ansible_become_flags: logon_type=new_credentials logon_flags=netcredentials_only
