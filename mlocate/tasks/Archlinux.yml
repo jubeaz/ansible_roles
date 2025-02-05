@@ -1,7 +1,7 @@
 ---
 - name: Install mlocate
   pacman: 
-    name: mlocate
+    name: plocate
     state: present
     update_cache: true
   register: __pacman

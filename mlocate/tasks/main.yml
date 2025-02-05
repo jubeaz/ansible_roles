@@ -2,7 +2,7 @@
 - name: assert proper distribution
   assert:
     that:
-      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+      - ansible_distribution in ['Archlinux']
     quiet: true
 
 - name: Include OS-specific variables
@@ -17,14 +17,14 @@
 
 - name: restart updatedb
   service:
-    name: updatedb
+    name: plocate-updatedb
     state: restarted
     enabled: true
   when: ansible_distribution == "Archlinux" and __pacman.changed
 
 - name: restart updatedb timer
   systemd:
-    name: updatedb.timer
+    name: plocate-updatedb.timer
     state: restarted
     enabled: true 
   when: ansible_distribution == "Archlinux" and __pacman.changed
