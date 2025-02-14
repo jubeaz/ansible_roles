@@ -1,0 +1,14 @@
+---
+- name: Create directory to store the data
+  ansible.windows.win_file:
+    path: C:\Hardenkitty
+    state: directory
+
+- name: Generate findings
+  ansible.builtin.include_tasks: generate_findings.yml
+  when: hardeningkitty_action == "generate"
+
+- name: Generate findings
+  ansible.builtin.include_tasks: play_findings.yml
+  when: hardeningkitty_action == "play"
+

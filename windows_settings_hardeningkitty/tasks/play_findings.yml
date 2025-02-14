@@ -1,0 +1,41 @@
+
+- name: HardenKitty psm1 exists
+  ansible.windows.win_stat:
+    path: C:\Hardenkitty\HardeningKitty.psm1
+  register: hardeningkitty_psm1_file
+  
+- name: Download HardenKitty psm1
+  ansible.windows.win_get_url:
+    url: https://github.com/scipag/HardeningKitty/raw/refs/heads/master/HardeningKitty.psm1
+    dest: C:\Hardenkitty\HardeningKitty.psm1
+  when: not hardeningkitty_psm1_file.stat.exists
+
+- name: Play HardeningKitty Findings
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+           [String]$FileFindingList
+      )
+      Import-Module C:\Hardenkitty\HardeningKitty.psm1 -Force
+      Invoke-HardeningKitty -Mode HailMary -Log -Report -SkipRestorePoint -FileFindingList $FileFindingList
+
+    error_action: stop
+    parameters:
+      FileFindingList: "C:\\Hardenkitty\\{{ item.value.FileOut }}"
+  vars:
+    chdir: "C:\\Hardenkitty"
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+  register:
+    hardeningkitty_play_result
+  with_dict: "{{ HardeningKitty }}"
+  notify:
+    Reboot and wait for the AD system to restart
+#        $localForest.CreateTrustRelationship($distantForest,"Bidirectional")
+#        $localForest.CreateTrustRelationship($distantForest,"Inbound")
+- name: Flush reboot handlers
+  ansible.builtin.meta:
+    flush_handlers
