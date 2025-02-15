@@ -20,7 +20,7 @@
       Import-Module C:\Hardenkitty\HardeningKitty.psm1 -Force
       Invoke-HardeningKitty -Mode HailMary -Log -Report -SkipRestorePoint -FileFindingList $FileFindingList
 
-    error_action: stop
+    error_action: silently_continue
     parameters:
       FileFindingList: "C:\\Hardenkitty\\{{ item.value.FileOut }}"
   vars:

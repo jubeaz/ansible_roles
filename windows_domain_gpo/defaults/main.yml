@@ -1,0 +1,9 @@
+---
+move_computer: false
+prep_servers: false
+apply_dacl: false
+create_gpo: false
+gpo_linked: false
+install_servers: false
+test_deployment: false
+replication_wait_in_minutes: 1

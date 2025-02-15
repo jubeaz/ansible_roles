@@ -96,6 +96,20 @@
     Protocol: "TCP"
     RemoteAddress: "{{ ansible_controller_ip }}"
 
+- name: Firewall | Allow Any port for Anasible host
+  ansible.windows.win_dsc:
+    resource_name: xFirewall
+    Name: "Lab Admin"
+    Group: "Windows Remote Management"
+    Ensure: "Present"
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    #Localport: "*"
+    Protocol: "TCP"
+    RemoteAddress: "{{ ansible_controller_ip }}"
+
 - name: Set explorer show hidden files
   ansible.windows.win_powershell:
     script: |
