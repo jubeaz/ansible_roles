@@ -22,5 +22,5 @@
     type: forwarder
     replication: "{{ replication }}"
     dns_servers:
-      - "{{ hostvars[item[0]].ansible_host }}"
+      - "{{ item[0] }}"
   loop: "{{ forward_info }}"

@@ -6,7 +6,7 @@
     state: present
     domain_username: "{{ domain_name }}\\Administrator"
     domain_password: "{{ domain_password }}"
-  with_dict: "{{ gpo_ous }}"
+  with_dict: "{{ windows_domain_gpo_ous }}"
 
 - name: Install GPO feature
   ansible.windows.win_feature:
@@ -18,30 +18,29 @@
 
 - name: Create GPO
   win_gpo:
-    name: '{{ gpo_name }}'
-    description: '{{ gpo_desc }}'
+    name: '{{ windows_domain_gpo_name }}'
+    description: '{{ windows_domain_gpo_desc }}'
     state: present
   register: pri_gpo
 
-#- name: Add LAPS extension to GPO
-#  win_ad_object:
-#    name: '{{ pri_laps_gpo.path }}'
-#    attributes:
-#      # [Registry:Admin Tool][AdmPwd:Admin Tool]
-#      gPCMachineExtensionNames: "[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]\
-#        [{D76B9641-3288-4F75-942D-087DE603E3EA}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]"
-
+# - name: Add LAPS extension to GPO
+#   win_ad_object:
+#     name: '{{ pri_laps_gpo.path }}'
+#     attributes:
+#       # [Registry:Admin Tool][AdmPwd:Admin Tool]
+#       gPCMachineExtensionNames: "[{35378EAC-683F-11D2-A89A-00C04FBBCFA2}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]\
+#         [{D76B9641-3288-4F75-942D-087DE603E3EA}{D02B1F72-3407-48AE-BA88-E8213C6761F1}]"
 
 
 - name: CConfigure GPO with registry
   win_gpo_reg:
-    gpo: '{{ gpo_name }}'
+    gpo: '{{ windows_domain_gpo_name }}'
     name: '{{ reg.key }}'
     path: "{{ reg.value.path }}"
     state: "{{ reg.value.state }}"
     type: "{{ reg.value.type }}"
     value: "{{ reg.value.value }}"
-  loop: "{{ gpo_registry | dict2items }}"
+  loop: "{{ windows_domain_gpo_registry | dict2items }}"
   loop_control:
     loop_var: reg
 
@@ -53,18 +52,18 @@
 
 - name: Ensure GPO is Linked on OU
   win_gpo_link:
-    name: '{{ gpo_name }}'
+    name: '{{ windows_domain_gpo_name }}'
     target: "OU={{ item.value.name }},{{ item.value.path }}"
     state: '{{ item.value.state }}'
     enforced: '{{ item.value.enforced }}'
     enabled: '{{ item.value.enabled }}'
-  with_dict: "{{ gpo_ous }}"
+  with_dict: "{{ windows_domain_gpo_ous }}"
 
 - name: Ensure GPO is Linked on Domain
   win_gpo_link:
-    name: '{{ gpo_name }}'
+    name: '{{ windows_domain_gpo_name }}'
     target: "{{ domain_ldap_name }}"
-    state: '{{ gpo_domain_state }}'
-    enforced: '{{ gpo_domain_enforced }}'
-    enabled: '{{ gpo_domain_enabled }}'
-  when: gpo_domain
+    state: '{{ windows_domain_gpo_domain_state }}'
+    enforced: '{{ windows_domain_gpo_domain_enforced }}'
+    enabled: '{{ windows_domain_gpo_domain_enabled }}'
+  when: windows_domain_gpo_domain

@@ -3,7 +3,7 @@
     name:
       - chocolatey
       - chocolatey-core.extension
-    state: present
+    state: latest
 
 - name: Disable enhanced exit codes
   chocolatey.chocolatey.win_chocolatey_feature:
