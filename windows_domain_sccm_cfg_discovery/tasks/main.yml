@@ -47,6 +47,7 @@
 
       # Group
       try {
+        $LDAPPath="LDAP://$((get-adgroup -Identity $group_ldap).DistinguishedName)"
         Set-CMDiscoveryMethod -SiteCode $siteCode `
         -ActiveDirectoryGroupDiscovery -Enabled $true `
         -EnableDeltaDiscovery $true -DeltaDiscoveryIntervalMinutes 5 `
@@ -54,7 +55,7 @@
         -EnableFilteringExpiredPassword $true -TimeSinceLastPasswordUpdateDays 90 `
         -DiscoverDistributionGroupsMembership $true `
         -AddGroupDiscoveryScope (New-CMADGroupDiscoveryScope `
-            -name MyScope -SiteCode $siteCode -LdapLocation $group_ldap -RecursiveSearch $true)
+            -name MyScope -SiteCode $siteCode -LdapLocation $LDAPPath -RecursiveSearch $true)
       } catch {
         # already exist
         $Ansible.Changed = $false
@@ -71,11 +72,14 @@
     error_action: stop
     parameters:
       siteCode: "{{site_code}}"
-      sccmFQDN: "{{sccm_server}}.{{domain}}"
-      group_ldap: "LDAP://CN=SCCM-Managed-Device,CN=USERS,DC=sccm,DC=lab"
-      computer: "MECM"
+      #sccmFQDN: "{{sccm_server}}.{{domain}}"
+      sccmFQDN: "{{hostname}}.{{domain_name}}"
+#      group_ldap: "LDAP://CN=SCCM-Managed-Device,CN=USERS,DC=sccm,DC=lab"
+      group_ldap: "{{ sccm_discovery_group }}""
+#      computer: "MECM"
+      computer: "{{hostname}}"
   vars:
     ansible_become: yes
     ansible_become_method: runas
-    ansible_become_user: "{{domain_username}}"
+    ansible_become_user: "{{domain_name}}\\Administrator"
     ansible_become_password: "{{domain_password}}"

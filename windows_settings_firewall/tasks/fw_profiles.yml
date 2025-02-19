@@ -2,11 +2,11 @@
 # https://github.com/dsccommunity/NetworkingDsc/wiki/FirewallProfile
 - name: Update Firewall profiles
   ansible.windows.win_dsc:
-    resource_name           : xFirewallProfile
-    Name                    : "{{ profile.key }}"
-    Enabled                 : "{{ profile.value.enabled }}"
-    DefaultInboundAction    : "{{ profile.value.inbound }}"
-    DefaultOutboundAction   : "{{ profile.value.outbound }}"
+    resource_name: xFirewallProfile
+    Name: "{{ profile.key }}"
+    Enabled: "{{ profile.value.enabled }}"
+    DefaultInboundAction: "{{ profile.value.inbound }}"
+    DefaultOutboundAction: "{{ profile.value.outbound }}"
 #    AllowInboundRules       : 'True'
 #    AllowLocalFirewallRules : 'False'
 #    AllowLocalIPsecRules    : 'False'
