@@ -9,7 +9,7 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
 
-- name: grant GenericAll on the System Management Container to "{{ sccm_server }}"
+- name: Grant GenericAll on the System Management Container to "{{ sccm_server }}"
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -57,7 +57,6 @@
   args:
     chdir: C:\setup
 
-
 - name: Synchronizes all domains
   ansible.windows.win_shell: repadmin /syncall /AdeP
   become: true
@@ -75,3 +74,50 @@
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
+  register: extadsch_result
+
+# - debug: var=extadsch_result.stdout_lines
+
+# https://activedirectorypro.com/repadmin-how-to-check-active-directory-replication/
+
+- name: Replication partner and status
+  ansible.windows.win_shell: repadmin  /showrepl
+  register: sync_status
+  become: true
+  become_user: "{{ domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ domain_password }}"
+  when: extadsch_result.failed
+
+# - debug: var=sync_status.stdout_lines
+
+- name: Show replication Queue
+  ansible.windows.win_shell: repadmin  /Queue
+  register: sync_queue
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ domain_password }}"
+  when: extadsch_result.failed
+
+# - debug: var=sync_queue.stdout_lines
+
+
+# - name: Replication status summary (overall health)
+#   ansible.windows.win_shell: repadmin  /replsummary
+#   register: sync_summary
+#   become: true
+#   become_method: ansible.builtin.runas
+#   become_user: "{{ domain_name }}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{ domain_password }}"
+#   when: extadsch_result.failed
+
+#  debug: var=sync_summary.stdout_lines
+
+- name: Remove directory storing prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: absent
+  when: extadsch_result is succeeded

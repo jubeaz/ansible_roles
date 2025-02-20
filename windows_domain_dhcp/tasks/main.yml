@@ -46,10 +46,12 @@
   ansible.windows.win_shell: |
     (Get-NetRoute -DestinationPrefix "0.0.0.0/0").NextHop
   register: ip_gateway_command
+  changed_when: false
 
 - name: Set ip_gateway
   ansible.builtin.set_fact:
     ip_gateway: "{{ ip_gateway_command.stdout | trim }}"
+  changed_when: false
 
 - name: Add DNS Server, Router Gateway Options in DHCP
   ansible.windows.win_shell: |

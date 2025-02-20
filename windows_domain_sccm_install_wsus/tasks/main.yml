@@ -20,8 +20,6 @@
     path: C:\sources\WSUS
     state: directory
 
-# %COMPUTERNAME% won't work. Neither $env:computername.
-# So, I put a hardcoded server name for now.
 - name: WSUS Post-installation (setup the link with the SQL Server database and a directory to store updates)
   ansible.windows.win_shell: .\wsusutil.exe PostInstall SQL_INSTANCE_NAME={{ sccm_mssql_server }} CONTENT_DIR=C:\sources\WSUS
   args:

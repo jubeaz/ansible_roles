@@ -1,0 +1,16 @@
+- name: Install MS SQL ODBC Driver 18
+  ansible.windows.win_package:
+    path: C:\setup\msodbcsql.msi
+    # product_id: '{566C6178-4AE9-40FF-A84F-4A021FF39816}'
+    state: present
+    arguments:
+      - /passive  IACCEPTMSODBCSQLLICENSETERMS=YES /lv+ C:\setup\msodbcsql-install.log
+  register: odbc_install
+
+- name: Download MECM prerequisite files
+  ansible.windows.win_shell: .\setupdl.exe /NoUI C:\updates
+  args:
+    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
+
+- name: Reboot after installing ODBC if required
+  ansible.windows.win_reboot:
