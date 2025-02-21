@@ -5,7 +5,7 @@
 
 - name: Download Visual C++ 2017 Redistributable
   chocolatey.chocolatey.win_chocolatey:
-    name: "{{ sccm_cpp_redist }}"
+    name: "{{ sccm_installation_cpp_redist }}"
     state: present
 
 - name: Download MS SQL ODBC Driver 18
