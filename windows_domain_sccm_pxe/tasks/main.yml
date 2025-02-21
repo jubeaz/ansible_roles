@@ -1,44 +1,44 @@
 # Download win10 iso
-- name: check downloaded iso file exists
-  win_stat:
+- name: Check downloaded iso file exists
+  ansible.windows.win_stat:
     path: c:\setup\win_10_22h2.iso
   register: iso_file
 
-- name: check wim file exists
-  win_stat:
+- name: Check wim file exists
+  ansible.windows.win_stat:
     path: c:\share_iso\install.wim
   register: wim_file
 
-- name: download win10 iso file (~ 5.4GB )
-  win_get_url:
-      url: "{{win10_iso_url}}"
-      dest: 'c:\setup\win_10_22h2.iso'
+- name: Download win10 iso file (~ 5.4GB )
+  ansible.windows.win_get_url:
+    url: "{{ win10_iso_url }}"
+    dest: 'c:\setup\win_10_22h2.iso'
   when: not (iso_file.stat.exists or wim_file.stat.exists)
 
-- name: create share folder
-  win_file:
+- name: Create share folder
+  ansible.windows.win_file:
     path: C:\share_iso
     state: directory
 
 - name: Ensure share exists
-  win_share:
+  ansible.windows.win_share:
     name: share_iso
     description: iso share for all domain users
     path: C:\share_iso
-    list: yes
+    list: true
     full: Administrators
     change: Users
 
-- name: check wim file exists
-  win_stat:
+- name: Check wim file exists
+  ansible.windows.win_stat:
     path: c:\share_iso\install.wim
   register: wim_file
 
 # Extract setup.wim from iso
-- name: open ISO and extract wim file
+- name: Open ISO and extract wim file
   ansible.windows.win_powershell:
     script: |
-      $mountResult = Mount-DiskImage -ImagePath "c:\setup\win_10_22h2.iso" 
+      $mountResult = Mount-DiskImage -ImagePath "c:\setup\win_10_22h2.iso"
       $driveLetter = ($mountResult | Get-Volume).DriveLetter
       copy "${driveLetter}:\sources\install.wim" "c:\share_iso\install.wim"
       Dismount-DiskImage -ImagePath "c:\setup\win_10_22h2.iso"
@@ -75,14 +75,14 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      shareServer: "{{hostname}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
+      siteCode: "{{ sccm_site_code }}"
+      shareServer: "{{ hostname }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
     ansible_become_flags: logon_flags=
 
 # Create task sequence
@@ -136,7 +136,7 @@
 
         # client package
         $cp = Get-CMPackage -name "Configuration Manager Client Package"
-        
+
         $parameters = @{
           InstallOperatingSystemImage = $true
           Name = $name
@@ -171,19 +171,19 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      shareServer: "{{hostname}}"
-      adminPass: "{{sccm_pxe_admin_pass}}"
-      domainName : "{{domain_name}}"
-      ou: "{{sccm_pxe_location}}"
-      domainAccount: "{{naa_user}}"
-      domainPassword: "{{naa_pass}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
+      siteCode: "{{ sccm_site_code }}"
+      shareServer: "{{ hostname }}"
+      adminPass: "{{ sccm_pxe_admin_pass }}"
+      domainName: "{{ domain_name }}"
+      ou: "{{ sccm_pxe_location }}"
+      domainAccount: "{{ naa_user }}"
+      domainPassword: "{{ naa_pass }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
     ansible_become_flags: logon_flags=
 
 # start distribute content
@@ -222,14 +222,14 @@
       }
       Start-CMContentDistribution -DeploymentPackageName "Configuration Manager Client Package" -DistributionPointName $distributionPoint
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      distributionPoint: "{{hostname}}.{{domain_name}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
+      siteCode: "{{ sccm_site_code }}"
+      distributionPoint: "{{ hostname }}.{{ domain_name }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
     ansible_become_flags: logon_flags=
 
 # update unknow computers
@@ -252,13 +252,13 @@
       Set-Location ($siteCode +":")
       Get-CMCollection -Name "All Unknown Computers" | Invoke-CMCollectionUpdate
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
+      siteCode: "{{ sccm_site_code }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
     ansible_become_flags: logon_flags=
 
 # Deploy sequence
@@ -308,12 +308,12 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      domainName : "{{domain_name}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
+      siteCode: "{{ sccm_site_code }}"
+      domainName: "{{ domain_name }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
     ansible_become_flags: logon_flags=
