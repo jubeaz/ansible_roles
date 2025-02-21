@@ -2,14 +2,10 @@
   ansible.windows.win_file:
     path: C:\updates
     state: directory
-#  register: mecm_update_dir
   notify: Download MECM prerequisite files
 
 - name: Force Download MECM prerequisite files
   ansible.builtin.meta: flush_handlers
-
-# Step 15 – Install SCCM 1902 using Baseline Media
-# --------------------------------------------------------------
 
 - name: Copy the configuration file
   ansible.windows.win_template:
@@ -26,8 +22,9 @@
     inherit: ContainerInherit, ObjectInherit
     propagation: 'InheritOnly'
 
+
 - name: Install MECM (this one take an eternity ~ 1 hour  )
-  ansible.windows.win_shell: .\setup.exe /SCRIPT "C:\setup\ConfigMgrAutoSave.ini"
+  ansible.windows.win_shell: .\setup.exe /HIDDEN /SCRIPT "C:\setup\ConfigMgrAutoSave.ini"
   args:
     chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
   vars:
@@ -41,6 +38,6 @@
 
 - name: Remove directory storing prerequisite files
   ansible.windows.win_file:
-    path: C:\setup
+    path: C:\updates
     state: absent
   when: mecm_setup_result is succeeded

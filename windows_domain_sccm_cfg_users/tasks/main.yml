@@ -1,4 +1,4 @@
-- name: Add full administrators accounts
+- name: Create CM Administrative User
   ansible.windows.win_powershell:
     script: |
       [CmdletBinding()]
@@ -27,13 +27,12 @@
         $Ansible.Changed = $false
       }
     parameters:
-      siteCode: "{{sccm_site_code}}"
-      sccmFQDN: "{{hostname}}.{{domain_name}}"
-      username: "{{item}}"
+      siteCode: "{{ sccm_site_code }}"
+      sccmFQDN: "{{ hostname }}.{{ domain_name }}"
+      username: "{{ item }}"
+  loop: "{{ sccm_domain_admins }}"
   vars:
-    ansible_become: yes
+    ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{domain_name}}\\Administrator"
-    ansible_become_password: "{{domain_password}}"
-    ansible_become_flags: logon_flags=
-  loop: "{{ sccm_admins }}"
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
