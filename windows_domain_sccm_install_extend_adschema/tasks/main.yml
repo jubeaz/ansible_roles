@@ -1,8 +1,17 @@
-- name: Create the System Management Container
+- name: Create the System Management Container in forest domains
   ansible.windows.win_powershell:
     script: |
-      $systemDN = "CN=System," + (Get-ADDomain).DistinguishedName
-      New-ADObject -Type container -Name "System Management" -Path $systemDN
+      $domains = Get-ADForest | Select-Object -ExpandProperty Domains
+      foreach ($domain in $domains) {
+          $d = (Get-ADDomain -Identity $domain)
+          $systemDN = "CN=System," + $d.DistinguishedName
+          try{
+              Get-ADObject -Identity "CN=System Management,$systemDN" -Server $d.DNSRoot
+          }
+          catch {
+              New-ADObject -Type container -Name "System Management" -Path $systemDN -Server $d.DNSRoot
+          }
+      }
   vars:
     ansible_become: true
     ansible_become_method: runas
@@ -17,14 +26,29 @@
           [String]
           $SCCMServer
       )
-      $systemMgmtDN = "CN=System Management,CN=System," + (Get-ADDomain).DistinguishedName
-      $acl = Get-ACL -Path "AD:\$systemMgmtDN"
-      $sccmIdentity = Get-ADComputer -Identity $SCCMServer
-      $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $sccmIdentity.SID, "GenericAll", "Allow"
-      $acl.AddAccessRule($ace)
-      Set-ACL -Path "AD:\$systemMgmtDN" -AclObject $acl
+        $parts = $SCCMServer.Split('\')
+        $s = (Get-ADDomain $parts[0]).DNSRoot
+        $sccmIdentity = Get-ADComputer -Identity $parts[1] -Server $s
+        $inheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance] "All"
+        $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $sccmIdentity.SID, "GenericAll", "Allow", $inheritanceType
+
+        $domains = Get-ADForest | Select-Object -ExpandProperty Domains
+        foreach ($domain in $domains) {
+            $d = (Get-ADDomain -Identity $domain)
+            New-PSDrive -Name AD2 -PSProvider ActiveDirectory -Server $d.DNSRoot -root "//RootDSE/"
+            $systemMgmtDN = "CN=System Management,CN=System," + $d.DistinguishedName
+            write-host $systemMgmtDN
+            $acl = Get-ACL -Path "AD2:\$systemMgmtDN"
+            $acl.AddAccessRule($ace)
+            try{
+                Set-ACL -Path "AD2:\$systemMgmtDN" -AclObject $acl
+            }
+            catch {
+            }
+            Remove-PSDrive -Name AD2
+        }
     parameters:
-      SCCMServer: "{{ sccm_server }}"
+      SCCMServer: "{{ domain_name }}\\{{ sccm_server_cn }}"
   vars:
     ansible_become: true
     ansible_become_method: runas
@@ -38,7 +62,7 @@
 
 - name: Check MECM installation media exists
   ansible.windows.win_stat:
-    path: "C:\\setup\\{{ sccm_installation_media_url }}"
+    path: "C:\\setup\\{{ sccm_installation_media_name }}"
   register: mecm_installer_file
 
 - name: Download MECM installation media

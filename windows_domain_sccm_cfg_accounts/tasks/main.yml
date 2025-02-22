@@ -1,3 +1,12 @@
+# - name: Toto
+#   ansible.builtin.debug:
+#     var:
+#       siteCode: "{{ sccm_site_code }}"
+#       sccmFQDN: "{{ hostname }}.{{ domain_name }}"
+#       username: "{{ domain_name }}\\{{ item.value.name }}"
+#       password: "{{ item.value.password }}"
+#   with_dict: "{{ sccm_accounts }}"
+
 - name: Create CM Accounts
   ansible.windows.win_powershell:
     script: |
@@ -34,7 +43,7 @@
     parameters:
       siteCode: "{{ sccm_site_code }}"
       sccmFQDN: "{{ hostname }}.{{ domain_name }}"
-      username: "{{ item.value.name }}"
+      username: "{{ domain_name }}\\{{ item.value.name }}"
       password: "{{ item.value.password }}"
   with_dict: "{{ sccm_accounts }}"
   vars:
