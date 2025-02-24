@@ -21,7 +21,7 @@
   become_user: "{{ domain_name }}\\Administrator"
   vars:
     ansible_become_pass: "{{ domain_password }}"
-  when: domain_data_action == "add_members"
+  when: domain_data_action == "add_members" and domain_data_add_foreign is true
 
 - name: "Add members to domain groups"
   microsoft.ad.group:
@@ -47,7 +47,7 @@
   with_dict: "{{ ad_groups }}"
   loop_control:
     loop_var: group
-  when: domain_data_action == "add_members" and domain_data_add_foreign
+  when: domain_data_action == "add_members" and domain_data_add_foreign is true
 
 - name: "Add foreign GMSA to domain group"
   ansible.builtin.include_tasks: add_foreign.yml
@@ -58,7 +58,7 @@
   with_dict: "{{ ad_groups }}"
   loop_control:
     loop_var: group
-  when: domain_data_action == "add_members" and domain_data_add_foreign
+  when: domain_data_action == "add_members" and domain_data_add_foreign is true
 
 - name: "Add foreign Computer to domain group"
   ansible.builtin.include_tasks: add_foreign.yml
@@ -69,7 +69,7 @@
   with_dict: "{{ ad_groups }}"
   loop_control:
     loop_var: group
-  when: domain_data_action == "add_members" and domain_data_add_foreign
+  when: domain_data_action == "add_members" and domain_data_add_foreign is true
 
 - name: "Add foreign groups to domain group"
   ansible.builtin.include_tasks: add_foreign.yml
@@ -80,4 +80,4 @@
   with_dict: "{{ ad_groups }}"
   loop_control:
     loop_var: group
-  when: domain_data_action == "add_members" and domain_data_add_foreign
+  when: domain_data_action == "add_members" and domain_data_add_foreign is true
