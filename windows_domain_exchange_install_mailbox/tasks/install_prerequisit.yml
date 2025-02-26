@@ -1,0 +1,54 @@
+
+- name: "{{ requiered_app_name }} Present"
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $AppName,
+          [String]
+          $URL,
+          [String]
+          $AppPath,
+          [String]
+          $InstallCommand
+      )
+      $Ansible.Changed = $false
+      $Ansible.Failed = $false
+      try {
+        $app = Get-Package -ProviderName Programs -IncludeWindowsInstaller |  where {$_.name -eq $AppName }
+      }
+      Catch {
+        $app=$null
+      }
+      if ($app -eq $null) {
+        $Ansible.Changed = $true
+        try {
+          invoke-webrequest -URI $URL -Output $AppPath -UseBasicParsing
+        }
+        catch {
+          $Ansible.Failed = $true
+          Throw "Error Downloading"
+        }
+        invoke-expression $InstallCommand
+        try {
+          $app = Get-Package -ProviderName Programs -IncludeWindowsInstaller |  where {$_.name -eq $AppName }
+        }
+        Catch {
+          $app=$null
+        }
+        if ($app -eq $null) {
+          $Ansible.Failed = $true
+          $Ansible.Result = "Failed to install"
+        }
+      }
+    parameters:
+      AppName: "{{ requiered_app_name }}"
+      URL: "{{ requiered_app_url }}"
+      AppPath: "{{ requiered_app_path }}"
+      InstallCommand: "{{ requiered_app_install_cmd }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"

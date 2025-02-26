@@ -1,0 +1,31 @@
+- name: Validate AD Schema
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $RangeUpper
+      )
+      Import-Module ActiveDirectory
+      $Ansible.Changed = $false
+      $Ansible.Failed = $false
+      $c = $false
+      $domain = Get-ADDomain
+      try {
+        $c = Get-ADObject -Identity "CN=ms-Exch-Schema-Version-Pt,CN=Schema,CN=Configuration,$($domain.DistinguishedName)" -Property RangeUpper | select RangeUpper
+      }
+      Catch {
+        $c = $false
+      }
+      if ($c -eq $false -or $c.RangeUpper -ne $RangeUpper) {
+        $Ansible.Failed = $true
+      }
+    parameters:
+      RangeUpper: "{{ range_upper }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+  register: validate_ad_schema
+  ignore_errors: true

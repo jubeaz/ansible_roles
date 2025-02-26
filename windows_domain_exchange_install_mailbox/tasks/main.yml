@@ -1,0 +1,62 @@
+
+- name: Create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: directory
+
+- name: Install IIS URL Rewrite Module 
+  ansible.builtin.include_tasks: install_prerequisit.yml
+  vars:
+    requiered_app_name: "IIS URL Rewrite Module 2"
+    requiered_app_url: "{{ exchange_iis_url_rewrite_url }}"
+    requiered_app_path: "c:\\setup\\{{ exchange_iis_url_rewrite_name }}"
+    requiered_app_install_cmd: "msiexec /i c:\\Setup\\{{ exchange_iis_url_rewrite_name }} /quiet /norestart /log c:\\setup\\{{ exchange_iis_url_rewrite_name }}-install.log"
+
+- name: Install IUnified Communications Managed API
+  ansible.builtin.include_tasks: install_prerequisit.yml
+  vars:
+    requiered_app_name: "Microsoft Unified Communications Managed API 4.0, Runtime"
+    requiered_app_url: "{{ exchange_umca_url }}"
+    requiered_app_path: "c:\\setup\\{{ exchange_umca_name }}"
+    requiered_app_install_cmd: "c:\\Setup\\{{ exchange_umca_name }} -q"
+
+- name: Install Visual C++ 2017 Redistributable
+  chocolatey.chocolatey.win_chocolatey:
+    name: "{{ exchange_installation_cpp_redist }}"
+    state: present
+
+- name: Check Echange installation media exists
+  ansible.windows.win_stat:
+    path: "C:\\setup\\{{ exchange_installation_media_name }}"
+  register: echange_installer_file
+
+- name: Download Echange installation media
+  ansible.windows.win_get_url:
+    url: "{{ exchange_installation_media_url }}"
+    dest: "C:\\setup\\{{ exchange_installation_media_name }}"
+  when: not echange_installer_file.stat.exists
+
+- name: Install Exchange mailbox role 
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $ISOName,
+          [String]
+          $CorpName
+      )
+      $mountResult = Mount-DiskImage -ImagePath "c:\setup\$ISOName"
+      $driveLetter = ($mountResult | Get-Volume).DriveLetter
+      $command = "${driveLetter}:\Setup.exe /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /InstallWindowsComponents /Mode:Install /Roles:Mailbox /on:`"$CorpName`""
+      Invoke-Expression $command
+      Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
+    parameters:
+      ISOName: "{{ exchange_installation_media_name }}"
+      CorpName: "{{ hostvars[domain_dc_ansible_inventory_key].exchange_corp_name }}" 
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+  register: install_mailbox_role
