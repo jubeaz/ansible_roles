@@ -1,0 +1,39 @@
+
+# https://github.com/microsoft/CSS-Exchange/releases/latest/download/Test-AMSI.ps1
+
+- name: Download Test-AMSI.ps1
+  ansible.windows.win_get_url:
+    url: "https://github.com/microsoft/CSS-Exchange/releases/latest/download/Test-AMSI.ps1"
+    dest: "C:\\setup\\Test-AMSI.ps1"
+
+- name: Check if Microsoft Defender is installed using PowerShell
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+      )
+      $Ansible.Changed = $false
+      $Ansible.Failed = $true
+      $defenderService = Get-Service -Name "WinDefend" -ErrorAction SilentlyContinue
+      if ($defenderService -and $defenderService.Status -eq 'Running') {
+        $Ansible.Failed = $false
+        $Ansible.Result = "running."
+      }
+      elseif ($defenderService -eq $null) {
+        $Ansible.Result = "not_installed." 
+      }
+      else {
+        $Ansible.Result = "not_running"
+      }
+  register: defender_check
+  ignore_errors: true
+
+- name: Set defender_status
+  ansible.builtin.set_fact:
+    defender_status: "{{ defender_check.result }}"
+
+- name: Display Defender status
+  ansible.builtin.debug:
+    msg: "{{ defender_status }}"
+
+# fatal: [haas_srv02]: FAILED! => {"changed": true, "debug": [], "error": [{"category_info": {"activity": "", "category": "ParserError", "category_id": 17, "reason": "ParentContainsErrorRecordException", "target_name": "", "target_type": ""}, "error_details": null, "exception": {"help_link": null, "hresult": -2146233087, "inner_exception": null, "message": "At line:10 char:1\r\n+ }\r\n+ ~\nUnexpected token '}' in expression or statement.", "source": null, "type": "System.Management.Automation.ParentContainsErrorRecordException"}, "fully_qualified_error_id": "UnexpectedToken", "output": "At line:10 char:1\r\n+ }\r\n+ ~\r\nUnexpected token '}' in expression or statement.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : UnexpectedToken\r\n \r\n", "pipeline_iteration_info": [], "script_stack_trace": "", "target_object": null}], "host_err": "", "host_out": "", "information": [], "output": [], "result": {}, "verbose": [], "warning": []}

@@ -60,3 +60,10 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
   register: install_mailbox_role
+
+- name: Set an environment ExchangeInstallPath for all users
+  ansible.windows.win_environment:
+    state: present
+    name: ExchangeInstallPath
+    value: "{{ exchange_installation_path }}"
+    level: machine

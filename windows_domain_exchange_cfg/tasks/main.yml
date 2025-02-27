@@ -1,7 +1,3 @@
-- name: Connectors configuration
-  ansible.builtin.include_tasks: connector.yml
-  when: windows_domain_exchange_cfg_action == "connector"
-    
-- name: Mailblox configuration
-  ansible.builtin.include_tasks: mailbox.yml
-  when: windows_domain_exchange_cfg_action == "mailbox"
+ 
+- name: security configuration
+  ansible.builtin.include_tasks: "{{windows_domain_exchange_cfg_action}}.yml"
