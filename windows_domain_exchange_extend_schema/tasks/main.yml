@@ -1,3 +1,14 @@
+- name: Save timeout parameters
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout_save: "{{ ansible_psrp_connection_timeout }}"
+    ansible_psrp_operation_timeout_save: "{{ ansible_psrp_operation_timeout }}"
+    ansible_winrm_connection_timeout_save: "{{ ansible_winrm_connection_timeout }}"
+
+- name: ansible timeout to 1 hour
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout: 3600
+    ansible_psrp_operation_timeout: 3600
+    ansible_winrm_connection_timeout: 3600
 
 - name: Create directory to store the downloaded prerequisite files
   ansible.windows.win_file:
@@ -156,7 +167,9 @@
   ansible.builtin.include_tasks: validate_ad_schema.yml
   when: validate_ad_prepared.failed
 
-- name: HALT
-  ansible.builtin.fail:
-    msg: "AD schema update failed"
-  when: validate_ad_schema.failed
+- name: restore timeout 
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout: "{{ ansible_psrp_connection_timeout_save }}"
+    ansible_psrp_operation_timeout: "{{ ansible_psrp_operation_timeout_save }}"
+    ansible_winrm_connection_timeout: "{{ ansible_winrm_connection_timeout_save }}"
+

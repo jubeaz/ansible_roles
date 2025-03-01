@@ -1,8 +1,27 @@
+- name: Save timeout parameters
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout_save: "{{ ansible_psrp_connection_timeout }}"
+    ansible_psrp_operation_timeout_save: "{{ ansible_psrp_operation_timeout }}"
+    ansible_winrm_connection_timeout_save: "{{ ansible_winrm_connection_timeout }}"
+    ansible_psrp_read_timeout_save: "{{ ansible_psrp_read_timeout }}"
+
+- name: ansible timeout to 1 hour
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout: 3600
+    ansible_psrp_operation_timeout: 3600
+    ansible_winrm_connection_timeout: 3600
+    ansible_psrp_read_timeout: 3600
 
 - name: Create directory to store the downloaded prerequisite files
   ansible.windows.win_file:
     path: C:\setup
     state: directory
+
+- name: Install-WindowsFeature Web-Server
+  ansible.windows.win_feature:
+    name: Web-Server
+    state: present
+    include_management_tools: true
 
 - name: Install IIS URL Rewrite Module 
   ansible.builtin.include_tasks: install_prerequisit.yml
@@ -12,7 +31,7 @@
     requiered_app_path: "c:\\setup\\{{ exchange_iis_url_rewrite_name }}"
     requiered_app_install_cmd: "msiexec /i c:\\Setup\\{{ exchange_iis_url_rewrite_name }} /quiet /norestart /log c:\\setup\\{{ exchange_iis_url_rewrite_name }}-install.log"
 
-- name: Install IUnified Communications Managed API
+- name: Install Unified Communications Managed API
   ansible.builtin.include_tasks: install_prerequisit.yml
   vars:
     requiered_app_name: "Microsoft Unified Communications Managed API 4.0, Runtime"
@@ -42,16 +61,35 @@
       [CmdletBinding()]
       param (
           [String]
+          $ModulePath,
+          [String]
           $ISOName,
           [String]
           $CorpName
       )
-      $mountResult = Mount-DiskImage -ImagePath "c:\setup\$ISOName"
-      $driveLetter = ($mountResult | Get-Volume).DriveLetter
-      $command = "${driveLetter}:\Setup.exe /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /InstallWindowsComponents /Mode:Install /Roles:Mailbox /on:`"$CorpName`""
-      Invoke-Expression $command
-      Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
+      $Ansible.Changed = $false
+      $Ansible.Failed = $false
+      try {
+        Import-Module $ModulePath
+        Connect-ExchangeServer -auto -ClientApplication:ManagementShell
+        $serverName = $env:COMPUTERNAME
+        $exchangeServer = Get-ExchangeServer -Identity $serverName
+        if($exchangeServer.ServerRole -ne "Mailbox") {
+          $Ansible.Changed = $true
+        }
+      } 
+      catch {
+        $Ansible.Changed = $true
+      }
+      if ($Ansible.Changed -eq $true) {
+        $mountResult = Mount-DiskImage -ImagePath "c:\setup\$ISOName"
+        $driveLetter = ($mountResult | Get-Volume).DriveLetter
+        $command = "${driveLetter}:\Setup.exe /IAcceptExchangeServerLicenseTerms_DiagnosticDataOFF /InstallWindowsComponents /Mode:Install /Roles:Mailbox /on:`"$CorpName`""
+        Invoke-Expression $command
+        Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
+      }
     parameters:
+      ModulePath: "{{ exchange_powershell_module }}"
       ISOName: "{{ exchange_installation_media_name }}"
       CorpName: "{{ hostvars[domain_dc_ansible_inventory_key].exchange_corp_name }}" 
   vars:
@@ -67,3 +105,10 @@
     name: ExchangeInstallPath
     value: "{{ exchange_installation_path }}"
     level: machine
+
+- name: restore timeout 
+  ansible.builtin.set_fact:
+    ansible_psrp_connection_timeout: "{{ ansible_psrp_connection_timeout_save }}"
+    ansible_psrp_operation_timeout: "{{ ansible_psrp_operation_timeout_save }}"
+    ansible_winrm_connection_timeout: "{{ ansible_winrm_connection_timeout_save }}"
+    ansible_psrp_read_timeout: "{{ ansible_psrp_read_timeout_save }}"

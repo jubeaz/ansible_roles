@@ -24,7 +24,7 @@
       if ($app -eq $null) {
         $Ansible.Changed = $true
         try {
-          invoke-webrequest -URI $URL -Output $AppPath -UseBasicParsing
+          invoke-webrequest -URI $URL -OutFile $AppPath -UseBasicParsing
         }
         catch {
           $Ansible.Failed = $true
