@@ -1,3 +1,8 @@
+- name: Create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: directory
+
 # Download win10 iso
 - name: Check downloaded iso file exists
   ansible.windows.win_stat:
@@ -5,14 +10,19 @@
   register: iso_file
 
 - name: Check wim file exists
-  ansible.windows.win_stat:
+  win_stat:
     path: c:\share_iso\install.wim
   register: wim_file
 
 - name: Download win10 iso file (~ 5.4GB )
-  ansible.windows.win_get_url:
-    url: "{{ win10_iso_url }}"
-    dest: 'c:\setup\win_10_22h2.iso'
+  debug:
+    msg: "neither wmi nor iso exist"
+  when: not (iso_file.stat.exists or wim_file.stat.exists)
+
+- name: Download win10 iso file (~ 5.4GB )
+  win_get_url:
+      url: "{{ win10_iso_url }}"
+      dest: 'c:\setup\win_10_22h2.iso'
   when: not (iso_file.stat.exists or wim_file.stat.exists)
 
 - name: Create share folder
@@ -68,9 +78,11 @@
       Set-Location ($siteCode +":")
 
       $opsys = Get-CMOperatingSystemImage -Name "Windows_10_22h2"
-      if ($null -eq $opsys){
+      if ($null -eq $opsys ){
         $image = New-CMOperatingSystemImage -Name "Windows_10_22h2" -Path "\\${shareServer}\share_iso\install.wim"
         $Ansible.Changed = $true
+        # New-CMBootImage -Path "\\${shareServer}\share_iso\install.wim" -Name "Boot image (x64)" -Description "Boot image (x64)" -Version $version -Index 1
+        # dism /Get-WimInfo /WimFile:$sourceWimPath
       } else {
         $Ansible.Changed = $false
       }
