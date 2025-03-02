@@ -32,7 +32,7 @@
         }
         invoke-expression $InstallCommand
         try {
-          $app = Get-Package -ProviderName Programs -IncludeWindowsInstaller |  where {$_.name -eq $AppName }
+          $app = Get-Package -ProviderName Programs -IncludeWindowsInstaller -Force |  where {$_.name -eq $AppName }
         }
         Catch {
           $app=$null

@@ -1,16 +1,16 @@
 - name: Save timeout parameters
   ansible.builtin.set_fact:
+    ansible_winrm_connection_timeout_save: "{{ ansible_winrm_connection_timeout }}"
     ansible_psrp_connection_timeout_save: "{{ ansible_psrp_connection_timeout }}"
     ansible_psrp_operation_timeout_save: "{{ ansible_psrp_operation_timeout }}"
-    ansible_winrm_connection_timeout_save: "{{ ansible_winrm_connection_timeout }}"
     ansible_psrp_read_timeout_save: "{{ ansible_psrp_read_timeout }}"
 
 - name: ansible timeout to 1 hour
   ansible.builtin.set_fact:
+    ansible_winrm_connection_timeout: 3600
     ansible_psrp_connection_timeout: 3600
     ansible_psrp_operation_timeout: 3600
-    ansible_winrm_connection_timeout: 3600
-    ansible_psrp_read_timeout: 3600
+    ansible_psrp_read_timeout: 3800
 
 - name: Create directory to store the downloaded prerequisite files
   ansible.windows.win_file:
@@ -23,10 +23,34 @@
     state: present
     include_management_tools: true
 
+- name: Install PowerShell 7.5 from msi with a permanent log
+  ansible.windows.win_package:
+    path: https://github.com/PowerShell/PowerShell/releases/download/v7.5.0/PowerShell-7.5.0-win-x64.msi
+    product_id: '{D012DCD1-67EA-4627-938F-19FD677FC03A}'
+    state: present
+    log_path: C:\setup\PowerShell-7.5.0.log
+
+#$msiPath = "C:\Path\To\YourFile.msi"
+#$windowsInstaller = New-Object -ComObject WindowsInstaller.Installer
+#$database = $windowsInstaller.GetType().InvokeMember("OpenDatabase", "InvokeMethod", $null, $windowsInstaller, @($msiPath, 0))
+#$productCodeQuery = "SELECT Value FROM Property WHERE Property = 'ProductCode'"
+#$view = $database.GetType().InvokeMember("OpenView", "InvokeMethod", $null, $database, @($productCodeQuery))
+#$view.GetType().InvokeMember("Execute", "InvokeMethod", $null, $view, $null)
+#$record = $view.GetType().InvokeMember("Fetch", "InvokeMethod", $null, $view, $null)
+#$productCode = $record.GetType().InvokeMember("StringData", "GetProperty", $null, $record, 1)
+#Write-Output "Product Code: $productCode"
+
+- name: Install Install IIS URL Rewrite Module  from msi with a permanent log
+  ansible.windows.win_package:
+    path: "{{ exchange_iis_url_rewrite_url }}"
+    product_id: "{{ exchange_iis_url_rewrite_product_id }}"
+    state: present
+    log_path: "C:\\setup\\{{ exchange_iis_url_rewrite_name }}.log
+
 - name: Install IIS URL Rewrite Module 
   ansible.builtin.include_tasks: install_prerequisit.yml
   vars:
-    requiered_app_name: "IIS URL Rewrite Module 2"
+    requiered_app_name: "{{ exchange_iis_url_rewrite_app }}"
     requiered_app_url: "{{ exchange_iis_url_rewrite_url }}"
     requiered_app_path: "c:\\setup\\{{ exchange_iis_url_rewrite_name }}"
     requiered_app_install_cmd: "msiexec /i c:\\Setup\\{{ exchange_iis_url_rewrite_name }} /quiet /norestart /log c:\\setup\\{{ exchange_iis_url_rewrite_name }}-install.log"
@@ -34,7 +58,7 @@
 - name: Install Unified Communications Managed API
   ansible.builtin.include_tasks: install_prerequisit.yml
   vars:
-    requiered_app_name: "Microsoft Unified Communications Managed API 4.0, Runtime"
+    requiered_app_name: "{{ exchange_umca_app }}"
     requiered_app_url: "{{ exchange_umca_url }}"
     requiered_app_path: "c:\\setup\\{{ exchange_umca_name }}"
     requiered_app_install_cmd: "c:\\Setup\\{{ exchange_umca_name }} -q"
@@ -49,10 +73,42 @@
     path: "C:\\setup\\{{ exchange_installation_media_name }}"
   register: echange_installer_file
 
-- name: Download Echange installation media
-  ansible.windows.win_get_url:
-    url: "{{ exchange_installation_media_url }}"
-    dest: "C:\\setup\\{{ exchange_installation_media_name }}"
+
+#- name: Download Echange installation media
+#  ansible.windows.win_get_url:
+#    url: "{{ exchange_installation_media_url }}"
+#    dest: "C:\\setup\\{{ exchange_installation_media_name }}"
+#    url_timeout: 3600
+#  when: not echange_installer_file.stat.exists
+
+
+- name: Download Echange installation media (Because Exception calling "CopyTo" with "1" argument(s))
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $URL,
+          [String]
+          $AppPath
+      )
+      $Ansible.Changed = $true
+      try {
+        invoke-webrequest -URI $URL -OutFile $AppPath -UseBasicParsing -OperationTimeoutSeconds 360
+      }
+      catch {
+        $Ansible.Failed = $true
+        Throw "Error Downloading"
+      }
+    parameters:
+      URL: "{{ exchange_installation_media_url }}"
+      AppPath: "c:\\Setup\\{{ exchange_installation_media_name }}"
+    executable: "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
   when: not echange_installer_file.stat.exists
 
 - name: Install Exchange mailbox role 
