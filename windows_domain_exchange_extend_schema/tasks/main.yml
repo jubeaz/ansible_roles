@@ -84,6 +84,12 @@
     state: present
     include_management_tools: true
 
+
+- name: Reboot Before Installing
+  ansible.windows.win_reboot:
+    reboot_timeout: 900
+    post_reboot_delay: 100
+
 - name: Check AD Schema
   ansible.builtin.include_tasks: validate_ad_schema.yml
 
@@ -109,18 +115,6 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
 
-## Need to remove the file since data are append
-## fail because utf8
-#- name: check log result
-#  community.windows.win_lineinfile:
-#    name: c:\ExchangeSetupLogs\ExchangeSetup.log
-#    line: "The Exchange Server setup operation completed successfully"
-#    state: present
-#  check_mode: true
-#  register:  ad_schema_update
-#  failed_when: (ad_schema_update is changed) or (ad_schema_update is failed)
-#  when: validate_ad_schema.failed
-
 - name: Check AD Schema updated successfully
   ansible.builtin.include_tasks: validate_ad_schema.yml
   when: validate_ad_schema.failed
@@ -132,7 +126,7 @@
 
 
 - name: Synchronizes all domains
-  ansible.windows.win_shell: repadmin /syncall /AdeP
+  ansible.windows.win_shell: repadmin /syncall {{ domain_dc_name }}.{{ domain_name }} /AdeP
   vars:
     become: true
     become_method: ansible.builtin.runas
@@ -202,18 +196,6 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
   when: validate_ad_prepared.failed
-
-## Need to remove the file since data are append
-## fail because utf8
-#- name: check log result AD Prepare All Domains
-#  community.windows.win_lineinfile:
-#    name: c:\ExchangeSetupLogs\ExchangeSetup.log
-#    line: "The Exchange Server setup operation completed successfully"
-#    state: present
-#  check_mode: true
-#  register:  ad_schema_update
-#  failed_when: (ad_schema_update is changed) or (ad_schema_update is failed)
-#  when: validate_ad_prepared.failed
 
 - name: Check AD Prepare successfully
   ansible.builtin.include_tasks: validate_ad_schema.yml

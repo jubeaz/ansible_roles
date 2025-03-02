@@ -45,7 +45,7 @@
     path: "{{ exchange_iis_url_rewrite_url }}"
     product_id: "{{ exchange_iis_url_rewrite_product_id }}"
     state: present
-    log_path: "C:\\setup\\{{ exchange_iis_url_rewrite_name }}.log
+    log_path: "C:\\setup\\{{ exchange_iis_url_rewrite_name }}.log"
 
 - name: Install IIS URL Rewrite Module 
   ansible.builtin.include_tasks: install_prerequisit.yml
