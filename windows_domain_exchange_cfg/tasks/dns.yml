@@ -1,0 +1,72 @@
+
+- name: Install WindowsFeature RSAT-ADDS
+  ansible.windows.win_feature:
+    name: RSAT-DNS-Server
+    state: present
+    include_management_tools: true
+
+- name: debug
+  debug:
+    var: domain_ip
+- name: Add Mail A record
+  win_dns_record:
+    type: "A"
+    name: "mail"
+    value: "{{ domain_ip }}"
+    ttl: 3600
+    zone: "{{ domain_name }}"
+    state: present
+    computer_name: "{{domain_dc_name}}.{{ domain_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+
+- name: Add OWA CNAME record
+  win_dns_record:
+    type: "CNAME"
+    name: "owa"
+    value: "mail.{{ domain_name }}"
+    ttl: 3600
+    zone: "{{ domain_name }}"
+    state: present
+    computer_name: "{{domain_dc_name}}.{{ domain_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+
+- name: Add autodiscover CNAME record
+  win_dns_record:
+    type: "CNAME"
+    name: "autodiscover"
+    value: "mail.{{ domain_name }}"
+    ttl: 3600
+    zone: "{{ domain_name }}"
+    state: present
+    computer_name: "{{domain_dc_name}}.{{ domain_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"
+
+- name: Add autodiscover service record
+  win_dns_record:
+    type: "SRV"
+    name: "_autodiscover"
+    port: 443
+    value: "{{ hostname }}.{{ domain_name }}"
+    priority: 0
+    weight: 0
+    ttl: 3600
+    zone: "{{ domain_name }}"
+    state: present
+    computer_name: "{{domain_dc_name}}.{{ domain_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"

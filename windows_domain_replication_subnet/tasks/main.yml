@@ -4,17 +4,11 @@
       [CmdletBinding()]
       param (
           [String]
-          $IPAddress,
+          $SubnetName,
           [String]
-          $Prefix
+          $SiteName
       )
       Import-Module ActiveDirectory
-      #$SubnetName = "172.16.2.1/24"
-      $SubnetMask = [ipaddress]([math]::pow(2, 32) -1 -bxor [math]::pow(2, (32 - $Prefix))-1)
-      $IP = [ipaddress]$IPAddress
-      $Subnet = [ipaddress]$SubnetMask.IPAddressToString
-      $NetID = [ipaddress]($IP.Address -band $Subnet.Address)
-      $SubnetName = "$($NetID.IPAddressToString)/$($Prefix)"
       try {
         $Subnet = Get-ADReplicationSubnet -Identity $SubnetName
       }
@@ -26,11 +20,12 @@
       }
       else {
         $Ansible.Changed = $true
-        New-ADReplicationSubnet -Name $SubnetName -Site "Default-First-Site-Name"
+        New-ADReplicationSubnet -Name $SubnetName -Site $SiteName
       }
     parameters:
-      IPAddress: "{{ ip_address }}"
-      Prefix: "{{ network_prefix: }}"
+      SubnetName: "{{ item }}"
+      SiteName: "{{ wdrs_site_name }}"
+  with_items: "{{ wdrs_subnets }}"
   vars:
     ansible_become: true
     ansible_become_method: runas

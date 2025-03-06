@@ -42,42 +42,42 @@
 
 - name: Install Install IIS URL Rewrite Module  from msi with a permanent log
   ansible.windows.win_package:
-    path: "{{ exchange_iis_url_rewrite_url }}"
-    product_id: "{{ exchange_iis_url_rewrite_product_id }}"
+    path: "{{ wd_xchg_im_iis_url_rewrite_url }}"
+    product_id: "{{ wd_xchg_im_iis_url_rewrite_product_id }}"
     state: present
-    log_path: "C:\\setup\\{{ exchange_iis_url_rewrite_name }}.log"
+    log_path: "C:\\setup\\{{ wd_xchg_im_iis_url_rewrite_name }}.log"
 
 - name: Install IIS URL Rewrite Module 
   ansible.builtin.include_tasks: install_prerequisit.yml
   vars:
-    requiered_app_name: "{{ exchange_iis_url_rewrite_app }}"
-    requiered_app_url: "{{ exchange_iis_url_rewrite_url }}"
-    requiered_app_path: "c:\\setup\\{{ exchange_iis_url_rewrite_name }}"
-    requiered_app_install_cmd: "msiexec /i c:\\Setup\\{{ exchange_iis_url_rewrite_name }} /quiet /norestart /log c:\\setup\\{{ exchange_iis_url_rewrite_name }}-install.log"
+    requiered_app_name: "{{ wd_xchg_im_iis_url_rewrite_app }}"
+    requiered_app_url: "{{ wd_xchg_im_iis_url_rewrite_url }}"
+    requiered_app_path: "c:\\setup\\{{ wd_xchg_im_iis_url_rewrite_name }}"
+    requiered_app_install_cmd: "msiexec /i c:\\Setup\\{{ wd_xchg_im_iis_url_rewrite_name }} /quiet /norestart /log c:\\setup\\{{ wd_xchg_im_iis_url_rewrite_name }}-install.log"
 
 - name: Install Unified Communications Managed API
   ansible.builtin.include_tasks: install_prerequisit.yml
   vars:
-    requiered_app_name: "{{ exchange_umca_app }}"
-    requiered_app_url: "{{ exchange_umca_url }}"
-    requiered_app_path: "c:\\setup\\{{ exchange_umca_name }}"
-    requiered_app_install_cmd: "c:\\Setup\\{{ exchange_umca_name }} -q"
+    requiered_app_name: "{{ wd_xchg_im_umca_app }}"
+    requiered_app_url: "{{ wd_xchg_im_umca_url }}"
+    requiered_app_path: "c:\\setup\\{{ wd_xchg_im_umca_name }}"
+    requiered_app_install_cmd: "c:\\Setup\\{{ wd_xchg_im_umca_name }} -q"
 
 - name: Install Visual C++ 2017 Redistributable
   chocolatey.chocolatey.win_chocolatey:
-    name: "{{ exchange_installation_cpp_redist }}"
+    name: "{{ wd_xchg_im_installation_cpp_redist }}"
     state: present
 
 - name: Check Echange installation media exists
   ansible.windows.win_stat:
-    path: "C:\\setup\\{{ exchange_installation_media_name }}"
+    path: "C:\\setup\\{{ wd_xchg_im_installation_media_name }}"
   register: echange_installer_file
 
 
 #- name: Download Echange installation media
 #  ansible.windows.win_get_url:
-#    url: "{{ exchange_installation_media_url }}"
-#    dest: "C:\\setup\\{{ exchange_installation_media_name }}"
+#    url: "{{ wd_xchg_im_installation_media_url }}"
+#    dest: "C:\\setup\\{{ wd_xchg_im_installation_media_name }}"
 #    url_timeout: 3600
 #  when: not echange_installer_file.stat.exists
 
@@ -101,8 +101,8 @@
         Throw "Error Downloading"
       }
     parameters:
-      URL: "{{ exchange_installation_media_url }}"
-      AppPath: "c:\\Setup\\{{ exchange_installation_media_name }}"
+      URL: "{{ wd_xchg_im_installation_media_url }}"
+      AppPath: "c:\\Setup\\{{ wd_xchg_im_installation_media_name }}"
     executable: "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   vars:
     ansible_become: true
@@ -145,9 +145,9 @@
         Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
       }
     parameters:
-      ModulePath: "{{ exchange_powershell_module }}"
-      ISOName: "{{ exchange_installation_media_name }}"
-      CorpName: "{{ hostvars[domain_dc_ansible_inventory_key].exchange_corp_name }}" 
+      ModulePath: "{{ wd_xchg_im_powershell_module }}"
+      ISOName: "{{ wd_xchg_im_installation_media_name }}"
+      CorpName: "{{ wd_xchg_im_corp_name }}" 
   vars:
     ansible_become: true
     ansible_become_method: runas
@@ -159,7 +159,7 @@
   ansible.windows.win_environment:
     state: present
     name: ExchangeInstallPath
-    value: "{{ exchange_installation_path }}"
+    value: "{{ wd_xchg_im_installation_path }}"
     level: machine
 
 - name: restore timeout 

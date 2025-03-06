@@ -91,6 +91,7 @@
           -DatabasePath "C:\Windows\NTDS" -SYSVOLPath "C:\Windows\SYSVOL" -LogPath "C:\Windows\Logs" `
           -SafeModeAdministratorPassword $safePassword `
           -Force -NoRebootOnCompletion
+          -SiteName $SiteName
       } else {
         $Ansible.Changed = $false
       }
@@ -102,7 +103,7 @@
       ReplicationSourceDC: "{{ domain_parent_dc_name }}.{{ domain_parent_domain_name }}"
       NewDomainNetbiosName: "{{ domain_netbios_name }}"
       NewDomainName: "{{ domain_netbios_name | lower }}"
-      SiteName: "{{ domain_site_name }}"
+      SiteName: "{{ site_name }}"
   register: child_result
   notify:
     Reboot

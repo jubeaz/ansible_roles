@@ -36,15 +36,15 @@
 
 # - ansible.builtin.debug: var=mecm_setup_result
 
-- name: Remove directory storing prerequisite files
-  ansible.windows.win_file:
-    path: C:\updates
-    state: absent
-  when: mecm_setup_result is succeeded
+# - name: Remove directory storing prerequisite files
+#   ansible.windows.win_file:
+#     path: C:\updates
+#     state: absent
+#   when: mecm_setup_result is succeeded
 
 
-- name: Reboot After Installing MECM on Servers
-  ansible.windows.win_reboot:
-    reboot_timeout: 900
-    post_reboot_delay: 100
-  when: mecm_setup_result is succeeded
+#- name: Reboot After Installing MECM on Servers
+#  ansible.windows.win_reboot:
+#    reboot_timeout: 900
+#    post_reboot_delay: 100
+#  when: mecm_setup_result is succeeded

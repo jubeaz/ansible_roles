@@ -32,8 +32,8 @@
   ansible.builtin.set_fact:
     defender_status: "{{ defender_check.result }}"
 
-- name: Display Defender status
-  ansible.builtin.debug:
-    msg: "{{ defender_status }}"
+#- name: Display Defender status
+#  ansible.builtin.debug:
+#    msg: "{{ defender_status }}"
 
 # fatal: [haas_srv02]: FAILED! => {"changed": true, "debug": [], "error": [{"category_info": {"activity": "", "category": "ParserError", "category_id": 17, "reason": "ParentContainsErrorRecordException", "target_name": "", "target_type": ""}, "error_details": null, "exception": {"help_link": null, "hresult": -2146233087, "inner_exception": null, "message": "At line:10 char:1\r\n+ }\r\n+ ~\nUnexpected token '}' in expression or statement.", "source": null, "type": "System.Management.Automation.ParentContainsErrorRecordException"}, "fully_qualified_error_id": "UnexpectedToken", "output": "At line:10 char:1\r\n+ }\r\n+ ~\r\nUnexpected token '}' in expression or statement.\r\n    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException\r\n    + FullyQualifiedErrorId : UnexpectedToken\r\n \r\n", "pipeline_iteration_info": [], "script_stack_trace": "", "target_object": null}], "host_err": "", "host_out": "", "information": [], "output": [], "result": {}, "verbose": [], "warning": []}

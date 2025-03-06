@@ -1,0 +1,60 @@
+
+- name: Install-WindowsFeature RSAT-AD-PowerShell
+  ansible.windows.win_feature:
+    name: RSAT-AD-PowerShell
+    state: present
+
+# https://learn.microsoft.com/en-us/exchange/mail-flow/accepted-domains/accepted-domains?view=exchserver-2019
+
+
+# Configure Email Address Policies:
+# 
+#     Create email address policies to ensure that users in each domain receive the appropriate email addresses.
+#     You can configure these policies in the EAC or using the Exchange Management Shell.
+# 
+# Configure Send Connectors:
+# 
+#     Create send connectors to route email between domains and to external recipients. Ensure that the connectors are configured to use the appropriate smart hosts or DNS settings.
+# 
+# Configure Recipients:
+# 
+#     Ensure that mailboxes, mail users, and other recipients are configured correctly in each domain. You may need to use scripts or manual processes to create and configure these recipients.
+
+
+
+
+- name: Create Accepted Domains
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $ModulePath
+      )
+      $Ansible.Failed = $false
+      $Ansible.Changed = $false
+      $Ansible.Result = $null | ConvertTo-Json
+
+      Import-Module ActiveDirectory
+      Import-Module $ModulePath
+
+      $allDomains = (Get-ADForest).domains
+      $childDomains = $allDomains | Where-Object { $_ -ne (Get-ADDomain).dnsroot }
+      $childDomains | Select-Object Name
+
+      Connect-ExchangeServer -auto -ClientApplication:ManagementShell
+      foreach ($d in $childDomains) {
+        #write-host "New-AcceptedDomain -Name `"$d`" -DomainName $d -DomainType Authoritative"
+        New-AcceptedDomain -Name "$d" -DomainName $d -DomainType Authoritative
+      }
+    parameters:
+      ModulePath: "{{ wd_xchg_cfg_pwsh_module }}"
+  register: exchange_cfg_result
+#  error_action: silently_continue  # ignore any errors and exceptions raised.
+#  error_action: continue (default) # errors are present in the error return value but only terminating exceptions will stop the script from continuing and set it as failed.
+#  error_action: stop               # treat errors like exceptions, will stop the script and set it as failed
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ domain_name }}\\Administrator"
+    ansible_become_password: "{{ domain_password }}"

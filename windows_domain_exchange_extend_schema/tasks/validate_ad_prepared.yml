@@ -34,9 +34,9 @@
         $Ansible.Failed = $true
       }
     parameters:
-      DefaultObjectVersion: "{{ default_objectVersion }}"
-      ConfigObjectVersion: "{{ config_objectVersion }}"
-      CorpName: "{{ corp_name }}"
+      DefaultObjectVersion: "{{ wd_xchg_es_default_objectVersion }}"
+      ConfigObjectVersion: "{{ wd_xchg_es_config_objectVersion }}"
+      CorpName: "{{ wd_xchg_es_corp_name }}"
   vars:
     ansible_become: true
     ansible_become_method: runas

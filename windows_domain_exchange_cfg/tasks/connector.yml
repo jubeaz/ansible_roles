@@ -15,7 +15,7 @@
       $Ansible.Result = Get-EmailAddressPolicy | Select-Object Name,Priority,Enabled*,RecipientFilterType,RecipientContainer,RecipientFilter,IncludedRecipients,Conditional* |  ConvertTo-Json
       # New-SendConnector -Name "Internal Send Connector" -Internal -AddressSpaces "SMTP:haas.local;1" -IsScopedConnector $false -DNSRoutingEnabled $true -SourceTransportServers "YourExchangeServerName"
     parameters:
-      ModulePath: "{{ exchange_powershell_module }}"
+      ModulePath: "{{ wd_xchg_cfg_pwsh_module }}"
   register: exchange_cfg_result
 #  error_action: silently_continue  # ignore any errors and exceptions raised.
 #  error_action: continue (default) # errors are present in the error return value but only terminating exceptions will stop the script from continuing and set it as failed.
@@ -26,8 +26,8 @@
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
 
-- name: Debug command
-  ansible.builtin.debug: 
-    var:  exchange_cfg_result
+#- name: Debug command
+#  ansible.builtin.debug: 
+#    var:  exchange_cfg_result
 
     

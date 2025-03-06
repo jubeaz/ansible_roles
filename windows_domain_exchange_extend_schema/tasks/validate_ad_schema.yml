@@ -21,7 +21,7 @@
         $Ansible.Failed = $true
       }
     parameters:
-      RangeUpper: "{{ range_upper }}"
+      RangeUpper: "{{ wd_xchg_es_range_upper }}"
   vars:
     ansible_become: true
     ansible_become_method: runas

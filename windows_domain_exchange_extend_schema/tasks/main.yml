@@ -27,8 +27,6 @@
 #$productCode = $record.GetType().InvokeMember("StringData", "GetProperty", $null, $record, 1)
 #Write-Output "Product Code: $productCode"
 
-
-
 - name: Install PowerShell 7.5 from msi with a permanent log
   ansible.windows.win_package:
     path: https://github.com/PowerShell/PowerShell/releases/download/v7.5.0/PowerShell-7.5.0-win-x64.msi
@@ -38,13 +36,13 @@
 
 - name: Check Echange installation media exists
   ansible.windows.win_stat:
-    path: "C:\\setup\\{{ exchange_installation_media_name }}"
+    path: "C:\\setup\\{{ wd_xchg_es_installation_media_name }}"
   register: echange_installer_file
 
 #- name: Download Echange installation media
 #  ansible.windows.win_get_url:
-#    url: "{{ exchange_installation_media_url }}"
-#    dest: "C:\\setup\\{{ exchange_installation_media_name }}"
+#    url: "{{ wd_xchg_es_installation_media_url }}"
+#    dest: "C:\\setup\\{{ wd_xchg_es_installation_media_name }}"
 #    url_timeout: 3600
 #  when: not echange_installer_file.stat.exists
 
@@ -68,8 +66,8 @@
         Throw "Error Downloading"
       }
     parameters:
-      URL: "{{ exchange_installation_media_url }}"
-      AppPath: "c:\\Setup\\{{ exchange_installation_media_name }}"
+      URL: "{{ wd_xchg_es_installation_media_url }}"
+      AppPath: "c:\\Setup\\{{ wd_xchg_es_installation_media_name }}"
     executable: "C:\\Program Files\\PowerShell\\7\\pwsh.exe"
   vars:
     ansible_become: true
@@ -83,12 +81,6 @@
     name: RSAT-ADDS
     state: present
     include_management_tools: true
-
-
-- name: Reboot Before Installing
-  ansible.windows.win_reboot:
-    reboot_timeout: 900
-    post_reboot_delay: 100
 
 - name: Check AD Schema
   ansible.builtin.include_tasks: validate_ad_schema.yml
@@ -107,7 +99,7 @@
       Invoke-Expression $command
       Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
     parameters:
-      ISOName: "{{ exchange_installation_media_name }}"
+      ISOName: "{{ wd_xchg_es_installation_media_name }}"
   when: validate_ad_schema.failed
   vars:
     ansible_become: true
@@ -124,15 +116,14 @@
     msg: "AD schema update failed"
   when: validate_ad_schema.failed
 
-
 - name: Synchronizes all domains
-  ansible.windows.win_shell: repadmin /syncall {{ domain_dc_name }}.{{ domain_name }} /AdeP
+  ansible.windows.win_shell: repadmin /syncall /AdeP
   vars:
     become: true
     become_method: ansible.builtin.runas
     become_user: "{{ domain_name }}\\Administrator"
     ansible_become_pass: "{{ domain_password }}"
-  when: multi_domain_forest is true
+  when: wd_xchg_es_multi_domain_forest
 
 - name: Check AD Prepared
   ansible.builtin.include_tasks: validate_ad_prepared.yml
@@ -153,27 +144,14 @@
       Invoke-Expression $command
       Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
     parameters:
-      ISOName: "{{ exchange_installation_media_name }}"
-      CorpName: "{{ corp_name }}" 
+      ISOName: "{{ wd_xchg_es_installation_media_name }}"
+      CorpName: "{{ wd_xchg_es_corp_name }}" 
   vars:
     ansible_become: true
     ansible_become_method: runas
     ansible_become_user: "{{ domain_name }}\\Administrator"
     ansible_become_password: "{{ domain_password }}"
   when: validate_ad_prepared.failed
-
-## Need to remove the file since data are append
-## fail because utf8
-#- name: check log result AD Prepare
-#  community.windows.win_lineinfile:
-#    name: c:\ExchangeSetupLogs\ExchangeSetup.log
-#    line: "The Exchange Server setup operation completed successfully"
-#    state: present
-#  check_mode: true
-#  register:  ad_schema_update
-#  failed_when: (ad_schema_update is changed) or (ad_schema_update is failed)
-#  when: validate_ad_prepared.failed
-
 
 - name: Prepare Active Directory Forest
   ansible.windows.win_powershell:
@@ -189,7 +167,7 @@
       Invoke-Expression $command
       Dismount-DiskImage -ImagePath "c:\setup\$ISOName"
     parameters:
-      ISOName: "{{ exchange_installation_media_name }}"
+      ISOName: "{{ wd_xchg_es_installation_media_name }}"
   vars:
     ansible_become: true
     ansible_become_method: runas
