@@ -1,6 +1,0 @@
-- name: Install windows features
-  ansible.windows.win_feature:
-    name: '{{ item }}'
-    state: present
-    include_management_tools: true
-  loop: '{{ features }}'

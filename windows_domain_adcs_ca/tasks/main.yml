@@ -49,9 +49,9 @@
       }
     error_action: stop
     parameters:
-      domain_username: "{{ domain_name }}\\Administrator"
-      domain_password: "{{ domain_password }}"
-      ca_common_name: "{{ ca_common_name }}"
+      domain_username: "{{ wd_adcs_ca_domain_name }}\\Administrator"
+      domain_password: "{{ wd_adcs_ca_domain_password }}"
+      ca_common_name: "{{ wd_adcs_ca_ca_common_name }}"
 
 # ESC 8
 # ignore error if already installed
@@ -67,7 +67,7 @@
         $Ansible.Changed = $false
       }
     error_action: stop
-  when: web_enrollment is defined and web_enrollment
+  when: wd_adcs_ca_web_enrollment is defined and wd_adcs_ca_web_enrollment
 
 - name: Refresh
   ansible.windows.win_command: gpupdate /force

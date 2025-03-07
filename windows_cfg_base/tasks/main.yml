@@ -1,0 +1,106 @@
+- name: Force a DNS on the adapter domain_adapter
+  ansible.windows.win_dns_client:
+    adapter_names: "{{ w_cfg_base_domain_adapter }}"
+    dns_servers:
+      - "{{ w_cfg_base_dns_server }}"
+  when: w_cfg_base_force_dns_server
+
+- name: Set priority to domain adapter domain_adapter
+  ansible.windows.win_shell:
+    Set-NetIPInterface -InterfaceAlias {{ w_cfg_base_domain_adapter | ansible.windows.quote(shell='powershell') }} -InterfaceMetric 10
+  when: w_cfg_base_two_adapters
+
+
+- name: Set a proxy for specific protocols
+  community.windows.win_http_proxy:
+    proxy:
+      http: "{{ w_cfg_base_http_proxy }}"
+      https: "{{ w_cfg_base_https_proxy }}"
+  when: w_cfg_base_enable_http_proxy
+
+- name: Configure IE to use a specific proxy per protocol
+  community.windows.win_inet_proxy:
+    proxy:
+      http: "{{ w_cfg_base_http_proxy }}"
+      https: "{{ w_cfg_base_https_proxy }}"
+  when: w_cfg_base_enable_http_proxy
+
+- name: Upgrade module PowerShellGet to fix accept license issue on last windows ansible version
+  ansible.windows.win_shell: |
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Install-PackageProvider -Name NuGet -Force
+    Install-Module PowerShellGet -Force
+
+- name: Windows | Check for ComputerManagementDsc Powershell module
+  community.windows.win_psmodule:
+    name: ComputerManagementDsc
+    state: present
+
+- name: Windows | Enable Remote Desktop
+  ansible.windows.win_dsc:
+    resource_name: RemoteDesktopAdmin
+    IsSingleInstance: 'yes'
+    Ensure: present
+    UserAuthentication: Secure
+
+- name: Windows | Check for xNetworking Powershell module
+  community.windows.win_psmodule:
+    name: xNetworking
+    state: present
+
+# https://github.com/dsccommunity/NetworkingDsc/wiki/Firewall
+- name: Firewall | Allow RDP for hosts
+  ansible.windows.win_dsc:
+    resource_name: xFirewall
+    Name: "rdp allow for {{ item }}"
+    Group: "Windows Remote Management"
+    Ensure: present
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    Localport: "3389"
+    Protocol: "TCP"
+    RemoteAddress: "{{ item }}"
+    Description: "Opens the listener port for RDP"
+  with_items: "{{ w_cfg_base_rdp_allow_ip }}"
+
+- name: Firewall | Allow WinRM for hosts
+  ansible.windows.win_dsc:
+    resource_name: xFirewall
+    Name: "allow winrm for {{ item }}"
+    Group: "Windows Remote Management"
+    Ensure: "Present"
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    Localport: ["5985", "5986"]
+    Protocol: "TCP"
+    RemoteAddress: "{{ item }}"
+  with_items: "{{ w_cfg_base_winrm_allow_ip }}"
+
+- name: Firewall | Allow Any port for hosts
+  ansible.windows.win_dsc:
+    resource_name: xFirewall
+    Name: "allow winrm for {{ item }}"
+    Group: "Windows Remote Management"
+    Ensure: "Present"
+    Enabled: true
+    Action: "Allow"
+    Profile: ["Domain", "Public", "Private"]
+    Direction: "Inbound"
+    Protocol: "TCP"
+    RemoteAddress: "{{ item }}"
+  with_items: "{{ w_cfg_base_any_allow_ip }}"
+
+- name: Set explorer show hidden files
+  ansible.windows.win_powershell:
+    script: |
+       Set-ItemProperty hkcu:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name Hidden -Value 1
+
+- name: Set explorer show file extension
+  ansible.windows.win_powershell:
+    script: |
+       Set-ItemProperty hkcu:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced -Name HideFileExt -Value 0
+

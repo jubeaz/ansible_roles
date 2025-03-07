@@ -1,7 +1,12 @@
 - name: Add dns server zone
   community.windows.win_dns_zone:
-    name: "{{ zone_name }}"
+    name: "{{ wd_dns_forwarder_zone_name }}"
     type: forwarder
-    replication: "{{ replication }}"
+    replication: "{{ wd_dns_forwarder_replication }}"
     dns_servers:
-      - "{{ master_server }}"
+      - "{{ wd_dns_forwarder_master_server }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ wd_dns_forwarder_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_dns_forwarder_domain_password }}"

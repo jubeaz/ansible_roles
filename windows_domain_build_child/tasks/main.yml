@@ -1,0 +1,122 @@
+- name: "Disable the registration of the interface (PUB address) in DNS {{ wd_build_child_pub_adapter }}"
+  ansible.windows.win_shell: Get-NetAdapter {{ wd_build_child_pub_adapter }} | Set-DNSClient -RegisterThisConnectionsAddress $False
+  when: wd_build_child_two_adapters
+
+- name: "Set configure dns to {{ wd_build_child_parent_dc_ip }}"
+  ansible.windows.win_dns_client:
+    adapter_names: "{{ wd_build_child_domain_adapter }}"
+    ipv4_addresses:
+      - "{{ wd_build_child_parent_dc_ip }}"
+    log_path: C:\dns_log.txt
+
+- name: Install windows features - AD Domain Services
+  ansible.windows.win_feature:
+    name: AD-Domain-Services
+    state: present
+    include_management_tools: true
+    include_sub_features: true
+  register: features_adds
+
+
+- name: Install windows features - RSAT-ADDS
+  ansible.windows.win_feature:
+    name: RSAT-ADDS
+    state: present
+    include_management_tools: true
+  register: features_rsat
+
+- name: Features | Installing Windows DNS Server
+  ansible.windows.win_feature:
+    name: DNS
+    state: present
+    include_management_tools: true
+    include_sub_features: true
+  register: features_dns
+
+- name: Add child domain to parent domain
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $Password,
+
+          [String]
+          $DomainAdmin,
+
+          [String]
+          $ParentDomainName,
+
+          [String]
+          $NewDomainNetbiosName,
+
+          [String]
+          $ReplicationSourceDC,
+
+          [String]
+          $SiteName,
+
+          [String]
+          $NewDomainName,
+
+          [String]
+          $DomSafePassword
+      )
+
+      $domainExist=$false
+      try {
+          $child_domain = Get-ADDomain -Identity $NewDomainName
+          $domainExist=$true
+      } catch {
+          $domainExist=$false
+      }
+      if (-not $domainExist) {
+        $Ansible.Changed = $true
+        $pass = ConvertTo-SecureString $Password -AsPlainText -Force
+        $Cred = New-Object System.Management.Automation.PSCredential ($DomainAdmin, $pass)
+        $safePassword = ConvertTo-SecureString $DomSafePassword -AsPlainText -Force
+        Install-ADDSDomain `
+          -Credential $Cred `
+          -SkipPreChecks `
+          -NewDomainName $NewDomainName `
+          -NewDomainNetbiosName $NewDomainNetbiosName `
+          -ParentDomainName $ParentDomainName `
+          -ReplicationSourceDC $ReplicationSourceDC `
+          -DatabasePath "C:\Windows\NTDS" -SYSVOLPath "C:\Windows\SYSVOL" -LogPath "C:\Windows\Logs" `
+          -SafeModeAdministratorPassword $safePassword `
+          -Force -NoRebootOnCompletion
+          -SiteName $SiteName
+      } else {
+        $Ansible.Changed = $false
+      }
+    parameters:
+      Password: "{{ wd_build_child_parent_domain_password }}"
+      DomSafePassword: "{{ wd_build_child_domain_password }}"
+      DomainAdmin: "Administrator@{{ wd_build_child_parent_domain_name }}"
+      ParentDomainName: "{{ wd_build_child_parent_domain_name }}"
+      ReplicationSourceDC: "{{ wd_build_child_parent_dc_name }}.{{ wd_build_child_parent_domain_name }}"
+      NewDomainNetbiosName: "{{ wd_build_child_netbios_name }}"
+      NewDomainName: "{{ wd_build_child_netbios_name | lower }}"
+      SiteName: "{{ wd_build_child_site_name }}"
+  register: child_result
+  notify:
+    Reboot
+
+
+- name: Flush reboot handlers
+  ansible.builtin.meta:
+    flush_handlers
+
+- name: Show powershell child result
+  ansible.builtin.debug:
+    var: child_result.stdout_lines
+  when: child_result.stdout_lines is defined
+
+- name: Enable the local interface for DNS client requests "{{ wd_build_child_domain_adapter }}"
+  ansible.windows.win_shell: Get-NetAdapter {{ wd_build_child_domain_adapter }} | Set-DNSClient -RegisterThisConnectionsAddress $True
+  when: wd_build_child_two_adapters
+
+- name: Install XactiveDirectory
+  community.windows.win_psmodule:
+    name: ActiveDirectoryDSC
+    state: present

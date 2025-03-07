@@ -1,0 +1,23 @@
+---
+- name: "Prioritize the local interface as the default for routing {{ wd_join_wks_domain_adapter }}"
+  ansible.windows.win_shell:
+    Set-NetIPInterface -InterfaceAlias "{{ wd_join_wks_domain_adapter }}" -InterfaceMetric 10
+  when: wd_join_wks_two_adapters
+
+- name: "Set configure dns to {{ wd_join_wks_domain_dc_ip }}"
+  ansible.windows.win_dns_client:
+    adapter_names: "{{ wd_join_wks_domain_adapter }}"
+    ipv4_addresses:
+      - "{{ wd_join_wks_domain_dc_ip }}"
+    log_path: C:\dns_log.txt
+
+- name: "Add server to {{ wd_join_wks_domain_name }}"
+  microsoft.ad.membership:
+    hostname: "{{ wd_join_wks_hostname }}"
+    dns_domain_name: "{{ wd_join_wks_domain_name }}"
+    domain_admin_user: "Administrator@{{ wd_join_wks_domain_name }}"
+    domain_admin_password: "{{ wd_join_wks_domain_password }}"
+    domain_ou_path: "{{ wd_join_wks_path }}"
+    state: domain
+    reboot: true
+  register: domain_state

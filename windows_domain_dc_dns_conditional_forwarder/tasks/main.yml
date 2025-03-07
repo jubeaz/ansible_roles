@@ -20,7 +20,7 @@
   community.windows.win_dns_zone:
     name: "{{ item[1] }}"
     type: forwarder
-    replication: "{{ replication }}"
+    replication: "{{ wd_dns_dc_forwarder_replication }}"
     dns_servers:
       - "{{ item[0] }}"
-  loop: "{{ forward_info }}"
+  loop: "{{ wd_dns_dc_forwarder_forward_info }}"

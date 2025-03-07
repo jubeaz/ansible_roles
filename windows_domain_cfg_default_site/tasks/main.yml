@@ -1,0 +1,24 @@
+- name: Rename default site
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $Name
+      )
+      Import-Module ActiveDirectory
+      $Ansible.Changed = $true
+      $Ansible.Failed = $false
+      $c = $false
+      $domain = Get-ADDomain
+      $SearchBase = (Get-ADRootDSE).ConfigurationNamingContext
+      $o =Get-ADObject -SearchBase $SearchBase -filter "objectclass -eq 'site'"
+      Set-ADObject -Identity $o.ObjectGUID -DisplayName $Name
+      Rename-ADObject -Identity $o.ObjectGUID -NewName $Name
+    parameters:
+      Name: "{{ wd_cfg_site_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ wd_cfg_site_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_cfg_site_domain_password }}"

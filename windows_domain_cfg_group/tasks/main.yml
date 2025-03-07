@@ -1,0 +1,83 @@
+---
+# https://clintboessen.blogspot.com/2010/04/group-scopes.html
+# https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2003/cc755692(v=ws.10)
+
+- name: Create domain groups
+  microsoft.ad.group:
+    name: "{{ item.key }}"
+    scope: "{{ item.value.scope | default('domainlocal') }}"
+    path: "{{ item.value.path }}"
+    managed_by: "{{ item.value.managed_by | default('') }}"
+    state: present
+    domain_username: "{{ wd_cfg_group_domain_name }}\\Administrator"
+    domain_password: "{{ wd_cfg_group_domain_password }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  when: wd_cfg_group_action == "create"
+
+- name: Synchronizes all domains before adding members to groups
+  ansible.windows.win_shell: repadmin /syncall /Ade
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ wd_cfg_group_domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ wd_cfg_group_domain_password }}"
+  when: wd_cfg_group_action == "add_members" and wd_cfg_group_add_foreign is true
+
+- name: "Add members to domain groups"
+  microsoft.ad.group:
+    domain_username: "{{ wd_cfg_group_domain_name }}\\Administrator"
+    domain_password: "{{ wd_cfg_group_domain_password }}"
+    name: "{{ item.key }}"
+    path: "{{ item.value.path }}"
+    members:
+      add: "{{ item.value.members }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  when: wd_cfg_group_action == "add_members"
+  register: group_membership
+  until: "group_membership is not failed"
+  retries: 3
+  delay: 60
+
+- name: "Add foreign users to domain group"
+  ansible.builtin.include_tasks: add_foreign.yml
+  vars:
+    local_group_name: "{{ group.key }}"
+    object_type: "user"
+    foreign_objects: "{{ group.value.foreign_users | default({}) }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  loop_control:
+    loop_var: group
+  when: wd_cfg_group_action == "add_members" and wd_cfg_group_add_foreign is true
+
+- name: "Add foreign GMSA to domain group"
+  ansible.builtin.include_tasks: add_foreign.yml
+  vars:
+    local_group_name: "{{ group.key }}"
+    object_type: "gmsa"
+    foreign_objects: "{{ group.value.foreign_gmsas | default({}) }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  loop_control:
+    loop_var: group
+  when: wd_cfg_group_action == "add_members" and wd_cfg_group_add_foreign is true
+
+- name: "Add foreign Computer to domain group"
+  ansible.builtin.include_tasks: add_foreign.yml
+  vars:
+    local_group_name: "{{ group.key }}"
+    object_type: "computer"
+    foreign_objects: "{{ group.value.foreign_computers | default({}) }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  loop_control:
+    loop_var: group
+  when: wd_cfg_group_action == "add_members" and wd_cfg_group_add_foreign is true
+
+- name: "Add foreign groups to domain group"
+  ansible.builtin.include_tasks: add_foreign.yml
+  vars:
+    local_group_name: "{{ group.key }}"
+    object_type: "group"
+    foreign_objects: "{{ group.value.foreign_groups | default({}) }}"
+  with_dict: "{{ wd_cfg_group_groups }}"
+  loop_control:
+    loop_var: group
+  when: wd_cfg_group_action == "add_members" and wd_cfg_group_add_foreign is true

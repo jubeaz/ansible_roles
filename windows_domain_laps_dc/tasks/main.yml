@@ -4,9 +4,9 @@
     name: "{{ item.value.name }}"
     path: "{{ item.value.path }}"
     state: present
-    domain_username: "{{ domain_name }}\\Administrator"
-    domain_password: "{{ domain_password }}"
-  with_dict: "{{ laps_path }}"
+    domain_username: "{{ wd_laps_dc_domain_name }}\\Administrator"
+    domain_password: "{{ wd_laps_dc_domain_password }}"
+  with_dict: "{{ wd_laps_dc_laps_path }}"
 
 - name: Install LAPS Package on Servers
   ansible.windows.win_package:
@@ -32,9 +32,9 @@
   register: sync_summary
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ domain_name }}\\Administrator"
+  become_user: "{{ wd_laps_dc_domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{ domain_password }}"
+    ansible_become_pass: "{{ wd_laps_dc_domain_password }}"
 
 #  debug: var=sync_summary.stdout_lines
 
@@ -43,9 +43,9 @@
   register: sync_queue
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ domain_name }}\\Administrator"
+  become_user: "{{ wd_laps_dc_domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{ domain_password }}"
+    ansible_become_pass: "{{ wd_laps_dc_domain_password }}"
 
 # - debug: var=sync_queue.stdout_lines
 
@@ -54,24 +54,24 @@
 #   register: sync_status
 #   become: yes
 #   become_method: runas
-#   become_user: "{{domain_name}}\\Administrator"
+#   become_user: "{{wd_laps_dc_domain_name}}\\Administrator"
 #   vars:
-#     ansible_become_pass: "{{domain_password}}"
+#     ansible_become_pass: "{{wd_laps_dc_domain_password}}"
 #
 # - debug: var=sync_status.stdout_lines
 
-#- name: Pause for 20 minutes due to dc_weyland replication problem
-#  ansible.builtin.pause:
-#    minutes: "{{ replication_wait_in_minutes }}"
+# - name: Pause for 20 minutes due to dc_weyland replication problem
+#   ansible.builtin.pause:
+#     minutes: "{{ replication_wait_in_minutes }}"
 #
 # - name: "Get Sync status"
 #   win_shell: repadmin  /replsummary
 #   register: sync_summary
 #   become: yes
 #   become_method: runas
-#   become_user: "{{domain_name}}\\Administrator"
+#   become_user: "{{wd_laps_dc_domain_name}}\\Administrator"
 #   vars:
-#     ansible_become_pass: "{{domain_password}}"
+#     ansible_become_pass: "{{wd_laps_dc_domain_password}}"
 #
 # - debug: var=sync_summary.stdout_lines
 #
@@ -80,9 +80,9 @@
 #   register: sync_queue
 #   become: yes
 #   become_method: runas
-#   become_user: "{{domain_name}}\\Administrator"
+#   become_user: "{{wd_laps_dc_domain_name}}\\Administrator"
 #   vars:
-#     ansible_become_pass: "{{domain_password}}"
+#     ansible_become_pass: "{{wd_laps_dc_domain_password}}"
 #
 # - debug: var=sync_queue.stdout_lines
 #
@@ -91,9 +91,9 @@
 # #  register: sync_status
 # #  become: yes
 # #  become_method: runas
-# #  become_user: "{{domain_name}}\\Administrator"
+# #  become_user: "{{wd_laps_dc_domain_name}}\\Administrator"
 # #  vars:
-# #    ansible_become_pass: "{{domain_password}}"
+# #    ansible_become_pass: "{{wd_laps_dc_domain_password}}"
 # #
 # #- debug: var=sync_status.stdout_lines
 
@@ -123,7 +123,7 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: dc_level == 0
+  when: wd_laps_dc_dc_level == 0
 
 - name: Configure Password Expiry Time
   win_ad_object:
@@ -150,7 +150,7 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: dc_level == 0
+  when: wd_laps_dc_dc_level == 0
 
 - name: Add LAPS attributes to the Computer Attribute
   win_ad_object:
@@ -167,16 +167,16 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: dc_level == 0
+  when: wd_laps_dc_dc_level == 0
 
 
 - name: Synchronizes all domains
   ansible.windows.win_shell: repadmin /syncall /AdeP
   become: true
   become_method: ansible.builtin.runas
-  become_user: "{{ domain_name }}\\Administrator"
+  become_user: "{{ wd_laps_dc_domain_name }}\\Administrator"
   vars:
-    ansible_become_pass: "{{ domain_password }}"
+    ansible_become_pass: "{{ wd_laps_dc_domain_password }}"
 
 - name: Apply DACL to OU Containers
   win_ad_dacl:
@@ -198,7 +198,7 @@
         object_type: ms-Mcs-AdmPwd
         access: allow
         account: S-1-5-10
-  with_dict: "{{ laps_path }}"
+  with_dict: "{{ wd_laps_dc_laps_path }}"
 
 - name: Install GPO feature
   ansible.windows.win_feature:
@@ -285,4 +285,4 @@
     state: present
     enforced: true
     enabled: true
-  with_dict: "{{ laps_path }}"
+  with_dict: "{{ wd_laps_dc_laps_path }}"

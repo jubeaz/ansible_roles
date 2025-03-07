@@ -1,0 +1,12 @@
+- name: "Enable interface '{{w_cfg_net_adapter_adapter }}'"
+  ansible.windows.win_shell: netsh interface set interface "{{ w_cfg_net_adapter_adapter }}" enable
+  register: enable_adpter_interface
+  until: "enable_adpter_interface is not failed"
+  retries: 3
+  delay: 120
+  when: w_cfg_net_adapter_two_adapters and w_cfg_net_adapter_action | default('enable') == 'enable'
+
+
+- name: "Disable interface '{{ w_cfg_net_adapter_adapter }}'"
+  ansible.windows.win_shell: netsh interface set interface "{{ w_cfg_net_adapter_adapter }}" disable
+  when: w_cfg_net_adapter_two_adapters and w_cfg_net_adapter_action | default('enable') == 'disable'

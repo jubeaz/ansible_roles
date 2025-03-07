@@ -1,0 +1,93 @@
+# DNSCHANGE
+# - name: "disable interface {{pub_adapter}} before join domain"
+#   win_shell: netsh interface set interface "{{pub_adapter}}" disable
+
+- name: Disable the registration in DNS of the interface (NAT address) {{ wd_build_root_pub_adapter }}
+  ansible.windows.win_shell:
+    Get-NetAdapter {{ wd_build_root_pub_adapter | ansible.windows.quote(shell='powershell') }} | Set-DNSClient -RegisterThisConnectionsAddress $False
+  when: wd_build_root_two_adapters
+
+- name: Ensure that domain exists
+  microsoft.ad.domain:
+    domain_netbios_name: "{{ wd_build_root_domain_netbios_name }}"
+    dns_domain_name: "{{ wd_build_root_domain_name }}"
+    safe_mode_password: "{{ wd_build_root_domain_password }}"
+    reboot: true
+  register: check_domain
+
+- name: Ensure the server is a domain controller
+  microsoft.ad.domain_controller:
+    dns_domain_name: "{{ wd_build_root_domain_name }}"
+    domain_admin_user: "Administrator@{{ wd_build_root_domain_name }}"
+    domain_admin_password: "{{ wd_build_root_domain_password }}"
+    safe_mode_password: "{{ wd_build_root_domain_password }}"
+    install_dns: true
+    reboot: true
+    state: domain_controller
+  register: check_domain_controller
+
+
+- name: Check for xDnsServer Powershell module
+  community.windows.win_psmodule:
+    name: xDnsServer
+    state: present
+
+- name: Enable  for DNS client requests only the  interface (local) {{ wd_build_root_domain_ip }}
+  ansible.windows.win_shell: dnscmd . /resetlistenaddresses {{ wd_build_root_domain_ip }}
+  when: wd_build_root_two_adapters
+
+
+- name: Configure DNS Forwarders
+  ansible.windows.win_dsc:
+    resource_name: xDnsServerForwarder
+    IsSingleInstance: "yes"
+    UseRootHint: false
+    IPAddresses:
+      - "1.1.1.1"
+      - "9.9.9.9"
+
+
+- name: Install XactiveDirectory
+  community.windows.win_psmodule:
+    name: ActiveDirectoryDSC
+    state: present
+
+- name: Ensure Administrator is part of Enterprise Admins
+  microsoft.ad.group:
+    name: "Enterprise Admins"
+    members:
+      add:
+        - Administrator
+    state: present
+
+- name: Ensure Administrator is part of Domain Admins
+  microsoft.ad.group:
+    name: "Domain Admins"
+    members:
+      add:
+        - Administrator
+    state: present
+
+- name: Create KDS root keys
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+      )
+      Import-Module ActiveDirectory
+      try {
+          Add-KDSRootKey -EffectiveTime (Get-Date).AddHours(-10)
+          $Ansible.Failed = $false
+      }
+      catch {
+          $Ansible.Failed = $true
+          $message = $_
+          Write-Warning "Something happened! $message"
+      }
+    error_action: stop
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ wd_build_root_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_build_root_domain_password }}"
+  register: kds_roo_key_account_result

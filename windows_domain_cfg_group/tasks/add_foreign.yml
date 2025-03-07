@@ -1,0 +1,59 @@
+- name: Add foreign to "{{ local_group_name }}"
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $GroupName,
+
+          [String]
+          $Identity,
+
+          [String]
+          $Type
+      )
+
+      Import-Module ActiveDirectory
+      Set-Location AD:
+
+      try {
+        Write-Warning "Tryed to add $Identity ($Type) from $DomainName to $GroupName"
+        $extra_args = @{}
+        if ($Identity -match "\\") {
+          $extra_args.Server = $Identity.Split("\")[0]
+          $Identity = $Identity.Split("\")[1]
+        }
+        write-output $Identity
+        write-output $extra_args.Server
+
+        if ($Type -eq "group") {
+          $Obj = Get-ADGroup -Identity $Identity @extra_args
+        }
+        if ($Type -eq "user") {
+          $Obj = Get-ADUser -Identity $Identity @extra_args
+        }
+        if ($Type -eq "gmsa") {
+          $Obj = Get-ADServiceAccount -Identity $Identity @extra_args
+        }
+        if ($Type -eq "computer") {
+          $Obj = Get-ADComputer -Identity $Identity @extra_args
+        }
+        Add-ADGroupMember -Identity $GroupName -Members $Obj
+        $Ansible.Failed = $false
+      } catch {
+          $Ansible.Failed = $true
+          $message = $_
+          Write-Warning "Something happened! $message"
+      }
+    error_action: stop
+    parameters:
+      GroupName: "{{ local_group_name }}"
+      Identity: "{{ item }}"
+      Type: "{{ object_type }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ wd_cfg_group_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_cfg_group_domain_password }}"
+  with_items: "{{ foreign_objects }}"
+  when: foreign_objects | length > 0

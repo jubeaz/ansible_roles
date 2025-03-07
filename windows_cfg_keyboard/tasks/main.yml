@@ -1,0 +1,2 @@
+- name: Windows | Add the fr keyboard layout
+  ansible.windows.win_shell: $langList = Get-WinUserLanguageList; $langList.Add("{{ w_cfg_kbd_layout }}"); Set-WinUserLanguageList -LanguageList $langList -Force

@@ -24,18 +24,18 @@
   ansible.windows.win_copy:
     src: "files/{{ item }}.json"
     dest: "C:\\setup\\{{ item }}.json"
-  with_items: "{{ cert_templates }}"
+  with_items: "{{ wd_adcs_template_cert_templates }}"
 
 - name: Install templates
   ansible.windows.win_shell: |
     if (-not(Get-ADCSTemplate -DisplayName "{{ item }}")) { New-ADCSTemplate -DisplayName "{{ item }}" `
-     -JSON (Get-Content c:\setup\{{ item }}.json -Raw) -Identity "{{ domain_name }}\Domain Users" -Publish }
+     -JSON (Get-Content c:\setup\{{ item }}.json -Raw) -Identity "{{ wd_adcs_template_domain_name }}\Domain Users" -Publish }
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
-  with_items: "{{ cert_templates }}"
+    ansible_become_user: "{{ wd_adcs_template_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_adcs_template_domain_password }}"
+  with_items: "{{ wd_adcs_template_cert_templates }}"
 
 - name: "Configure ATTRIBUTESUBJECTALTNAME2 on CA - ESC6"
   ansible.windows.win_shell: |
@@ -44,10 +44,10 @@
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
-    cauthority_server: "{{ hostname }}"
-    cauthority_common_name: "{{ ca_common_name }}"
+    ansible_become_user: "{{ wd_adcs_template_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_adcs_template_domain_password }}"
+    cauthority_server: "{{ wd_adcs_template_hostname }}"
+    cauthority_common_name: "{{ wd_adcs_template_ca_common_name }}"
 
 - name: Refresh
   ansible.windows.win_command: gpupdate /force
