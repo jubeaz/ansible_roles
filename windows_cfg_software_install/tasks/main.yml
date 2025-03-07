@@ -1,0 +1,18 @@
+- name: Ensure chocolatey is installed
+  chocolatey.chocolatey.win_chocolatey:
+    name:
+      - chocolatey
+      - chocolatey-core.extension
+    state: latest
+
+- name: Disable enhanced exit codes
+  chocolatey.chocolatey.win_chocolatey_feature:
+    name: useEnhancedExitCodes
+    state: disabled
+
+- name: Install multiple packages sequentially
+  chocolatey.chocolatey.win_chocolatey:
+    name: '{{ windows_cfg_software_install_softwares }}'
+    state: present
+  ignore_errors: true
+  register: ignore_errors_register

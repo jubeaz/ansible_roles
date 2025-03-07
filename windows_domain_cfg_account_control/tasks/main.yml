@@ -1,0 +1,66 @@
+- name: Set AD Account Control
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $Id,
+          [bool]
+          $AccountNotDelegated = $false,
+          [bool]
+          $AllowReversiblePasswordEncryption = $false,
+          [bool]
+          $CannotChangePassword = $false,
+          [bool]
+          $PasswordNeverExpires = $false,
+          [bool]
+          $PasswordNotRequired = $false,
+          [bool]
+          $DoesNotRequirePreAuth = $false
+      )
+      Import-Module ActiveDirectory
+      Set-Location AD:
+      try {
+        $obj = ActiveDirectory\Get-ADObject -Identity $Id
+        Write-Output "Object Found: $obj"
+        # object UAC
+        Set-ADAccountControl $obj `
+          -AccountNotDelegated $AccountNotDelegated `
+          -AllowReversiblePasswordEncryption $AllowReversiblePasswordEncryption `
+          -CannotChangePassword $CannotChangePassword `
+          -PasswordNeverExpires $PasswordNeverExpires `
+          -PasswordNotRequired $PasswordNotRequired
+
+        $obj = ActiveDirectory\Get-ADObject -Identity $Id -Properties UserAccountControl
+        Write-Output "Object Found: $obj with $($obj.UserAccountControl)"
+        if ($DoesNotRequirePreAuth){
+          $obj.UserAccountControl = $obj.UserAccountControl -bor 0x00400000
+        }
+        else {
+          $obj.UserAccountControl = $obj.UserAccountControl -bxor 0x00400000
+        }
+        Write-Output "Modified: $($obj.UserAccountControl)"
+        Set-AdObject -Instance $obj
+        $Ansible.Failed = $false
+      } catch {
+        $Ansible.Failed = $true
+        $message = $_
+        Write-Warning "Something happened! $message"
+      }
+    error_action: stop
+    parameters:
+      Id: "CN={{ item.key }},{{ item.value.path }}"
+      AccountNotDelegated: "{{ item.value.ADAC.AccountNotDelegated | default(false) }}"
+      AllowReversiblePasswordEncryption: "{{ item.value.ADAC.AllowReversiblePasswordEncryption | default(false) }}"
+      CannotChangePassword: "{{ item.value.ADAC.CannotChangePassword | default(false) }}"
+      PasswordNeverExpires: "{{ item.value.ADAC.PasswordNeverExpires | default(false) }}"
+      PasswordNotRequired: "{{ item.value.ADAC.PasswordNotRequired | default(false) }}"
+      DoesNotRequirePreAuth: "{{ item.value.ADAC.DoesNotRequirePreAuth | default(false) }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ wd_cfg_uac_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_cfg_uac_domain_password }}"
+  when: item.value.ADAC | default({}) | length > 0
+  with_dict: "{{ wd_cfg_uac_objects | default({}) }}"
+  register: ad_accountcontrol

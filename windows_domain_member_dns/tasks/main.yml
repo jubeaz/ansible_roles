@@ -1,12 +1,12 @@
-- name: Prioritize the interface (local) as the default for routing '{{ domain_adapter }}'
+- name: Prioritize the interface (local) as the default for routing '{{ wd_mbr_dns_domain_adapter }}'
   ansible.windows.win_shell:
-    Set-NetIPInterface -InterfaceAlias "{{ domain_adapter }}" -InterfaceMetric 10
-  when: two_adapters
+    Set-NetIPInterface -InterfaceAlias "{{ wd_mbr_dns_domain_adapter }}" -InterfaceMetric 10
+  when: wd_mbr_dns_two_adapters
 
 
 - name: Set configure dns to domain_dc_ip
   ansible.windows.win_dns_client:
-    adapter_names: "{{ domain_adapter }}"
+    adapter_names: "{{ wd_mbr_dns_domain_adapter }}"
     ipv4_addresses:
-      - "{{ domain_dc_ip }}"
+      - "{{ wd_mbr_dns_domain_dc_ip }}"
     log_path: C:\dns_log.txt

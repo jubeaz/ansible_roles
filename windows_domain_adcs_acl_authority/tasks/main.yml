@@ -28,9 +28,9 @@
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
-  with_dict: "{{ authority_acls }}"
+    ansible_become_user: "{{ wd_adcs_acl_ca_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_adcs_acl_ca_domain_password }}"
+  with_dict: "{{ wd_adcs_acl_ca_acls }}"
   register: adcs_acl_authority_result
 
 - name: Restart CA
@@ -50,12 +50,12 @@
 
     error_action: stop
     parameters:
-      CAName: "{{ authority_ca_name }}"
+      CAName: "{{ wd_adcs_acl_ca_name }}"
   vars:
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
+    ansible_become_user: "{{ wd_adcs_acl_ca_domain_name }}\\Administrator"
+    ansible_become_password: "{{ wd_adcs_acl_ca_domain_password }}"
 
 # - debug:
 #     var: adcs_acl_authority_result

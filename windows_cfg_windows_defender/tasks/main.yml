@@ -1,0 +1,48 @@
+# https://answers.microsoft.com/en-us/protect/forum/protect_defender-protect_start-windows_10/how-do-i-stop-sending-antivirus-samples-to/a2e7b280-a8ba-43f5-b391-0a12c109f990
+- name: Manage windows defender on server
+  when: w_cfg_defender_is_server_os
+  block:
+    - name: Install windows defender
+      ansible.windows.win_feature:
+        name: Windows-Defender
+        state: "{{  'present' if w_cfg_defender == true else 'absent' }}"
+      register: win_defender_install
+      when: w_cfg_defender is defined
+
+    - name: Reboot if needed
+      ansible.windows.win_reboot:
+        reboot_timeout: 600
+        post_reboot_delay: 30
+      when: w_cfg_defender is defined and win_defender_install.reboot_required
+    - name: Get info for a single feature
+      community.windows.win_feature_info:
+        name: Windows-Defender
+      register: win_defender_install
+
+
+- name: Enable real-time protection
+  ansible.windows.win_shell: |
+    Set-MpPreference -DisableRealtimeMonitoring 0
+  when: (not w_cfg_defender_is_server_os) and w_cfg_defender is true
+  become: true
+  become_user: SYSTEM
+  become_method: ansible.builtin.runas
+
+# Tamper protection :(
+- name: Disable real-time protection
+  ansible.windows.win_shell: |
+    Set-MpPreference -DisableRealtimeMonitoring 1
+  when: (not w_cfg_defender_is_server_os) and w_cfg_defender is false
+  become: true
+  become_user: SYSTEM
+  become_method: ansible.builtin.runas
+# - debug:
+#     var: win_defender_install
+
+- name: Disable windows defender sending sample (MAPSReporting)
+  ansible.windows.win_shell: Set-MpPreference -MAPSReporting 0
+  when: (not w_cfg_defender_is_server_os) or win_defender_install.features[0].installed
+
+- name: Disable windows defender sending sample (SubmitSamplesConsent)
+  ansible.windows.win_shell: Set-MpPreference -SubmitSamplesConsent 2
+  when: (not w_cfg_defender_is_server_os) or win_defender_install.features[0].installed

@@ -1,0 +1,21 @@
+---
+# https://github.com/dsccommunity/NetworkingDsc/wiki/FirewallProfile
+- name: Update Firewall profiles
+  ansible.windows.win_dsc:
+    resource_name: xFirewallProfile
+    Name: "{{ profile.key }}"
+    Enabled: "{{ profile.value.enabled }}"
+    DefaultInboundAction: "{{ profile.value.inbound }}"
+    DefaultOutboundAction: "{{ profile.value.outbound }}"
+#    AllowInboundRules       : 'True'
+#    AllowLocalFirewallRules : 'False'
+#    AllowLocalIPsecRules    : 'False'
+#    NotifyOnListen          : 'True'
+#    LogFileName             : '%systemroot%\system32\LogFiles\Firewall\pfirewall.log'
+#    LogMaxSizeKilobytes     : 16384
+#    LogAllowed              : 'False'
+#    LogBlocked              : 'True'
+#    LogIgnored              : 'NotConfigured'
+  with_dict: "{{ w_cfg_firewall_profiles | default({}) }}"
+  loop_control:
+    loop_var: profile

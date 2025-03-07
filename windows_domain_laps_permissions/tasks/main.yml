@@ -1,5 +1,0 @@
-- name: Process Read LAPS permssions
-  ansible.builtin.include_tasks: permission.yml
-  with_items: "{{ laps_readers }}"
-  loop_control:
-     loop_var: principal

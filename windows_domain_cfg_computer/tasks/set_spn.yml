@@ -13,6 +13,6 @@
     spn:
       add:
         - "{{ item }}"
-    domain_username: "{{ domain_name }}\\Administrator"
-    domain_password: "{{ domain_password }}"
+    domain_username: "{{ wd_cfg_computer_domain_name }}\\Administrator"
+    domain_password: "{{ wd_cfg_computer_domain_password }}"
   loop: "{{ outer_item.value.spns }}"
