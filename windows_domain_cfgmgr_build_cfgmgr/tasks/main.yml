@@ -1,0 +1,82 @@
+- name: Create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: directory
+
+- name: Download Visual C++ 2017 Redistributable
+  chocolatey.chocolatey.win_chocolatey:
+    name: "{{ cfgmgr_installation_cpp_redist }}"
+    state: present
+
+- name: Download MS SQL ODBC Driver 18
+  chocolatey.chocolatey.win_chocolatey:
+    name: "{{ cfgmgr_installation_sqlserver_odbcdriver }}"
+    state: present
+  notify: Reboot after installing ODBC if required
+#  ansible.windows.win_get_url:
+#    url: https://go.microsoft.com/fwlink/?linkid=2280794
+#    dest: C:\setup\msodbcsql.msi
+#  notify: Install MS SQL ODBC Driver 18
+
+- name: Force Reboot After Install MS SQL ODBC Driver 18
+  ansible.builtin.meta: flush_handlers
+
+# - name: Install MS SQL ODBC Driver 18
+#   ansible.windows.win_package:
+#     path: C:\setup\msodbcsql.msi
+#     # product_id: '{566C6178-4AE9-40FF-A84F-4A021FF39816}'
+#     state: present
+#     arguments:
+#       - /passive  IACCEPTMSODBCSQLLICENSETERMS=YES /lv+ C:\setup\msodbcsql-install.log
+#   register: odbc_install
+#   when: download_odbc.changed
+
+# - name: Install ODBC Mssql 18 driver
+#   ansible.windows.win_package:
+#     arguments: "IACCEPTMSODBCSQLLICENSETERMS=YES ALLUSERS=1"
+#     #path: https://go.microsoft.com/fwlink/?linkid=2266640&clcid=0x409&culture=en-us&country=us
+#     path: https://go.microsoft.com/fwlink/?linkid=2280794
+#     state: present
+#     creates_path: "%ProgramFiles%\\Microsoft SQL Server\\Client SDK\\ODBC"
+#   register: odbc_install
+#   until: odbc_install is success
+#   retries: 3  # Try 3 times just in case it failed to download the URL
+#   delay: 1
+
+
+- name: Configuration Manager installation media exists
+  ansible.windows.win_stat:
+    path: "C:\\setup\\{{ cfgmgr_installation_media_name }}"
+  register: cfgmgr_installer_file
+
+- name: Download cfgmgr installation media
+  ansible.windows.win_get_url:
+    url: "{{ cfgmgr_installation_media_url }}"
+    dest: "C:\\setup\\{{ cfgmgr_installation_media_name }}"
+  when: not cfgmgr_installer_file.stat.exists
+
+- name: Remove directory cd.retail.LN if exist
+  ansible.windows.win_file:
+    path: C:\setup\cd.retail.LN
+    state: absent
+#  ignore_errors: true
+
+- name: Extract cfgmgr installation media
+  ansible.windows.win_shell: .\{{ cfgmgr_installation_media_name }} -s
+  args:
+    chdir: C:\setup\
+
+- name: Install Console
+  ansible.builtin.include_tasks: install_console.yml
+  when: install_type == "console"
+
+- name: Install Server
+  ansible.builtin.include_tasks: install_server.yml
+  when: install_type == "server"
+
+- name: Set an environment SMS_ADMIN_UI_PATH for all users
+  ansible.windows.win_environment:
+    state: present
+    name: SMS_ADMIN_UI_PATH
+    value: "C:\\Program Files (x86)\\Microsoft Configuration Manager\\AdminConsole\\bin\\i386"
+    level: machine

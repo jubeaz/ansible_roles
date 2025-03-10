@@ -1,0 +1,46 @@
+- name: Validate AD Prepared
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $DefaultObjectVersion,
+          [String]
+          $ConfigObjectVersion,
+          [String]
+          $CorpName
+      )
+      Import-Module ActiveDirectory
+      $Ansible.Changed = $false
+      $Ansible.Failed = $false
+      $c = $false
+      $domain = Get-ADDomain
+      try {
+        $c = Get-ADObject -Identity "CN=Microsoft Exchange System Objects,$($domain.DistinguishedName)" -Property ObjectVersion | select ObjectVersion
+      }
+      Catch {
+        $c=$false
+      }
+      if ($c -eq $false -or $c.ObjectVersion -ne $DefaultObjectVersion) {
+        $Ansible.Failed = $true
+      }
+      try {
+        $c = Get-ADObject -Identity "CN=$CorpName,CN=Microsoft Exchange,CN=Services,CN=Configuration,$($domain.DistinguishedName)" -Property ObjectVersion | select ObjectVersion
+      }
+      Catch {
+        $c=$false
+      }
+      if ($c -eq $false -or $c.ObjectVersion -ne $ConfigObjectVersion) {
+        $Ansible.Failed = $true
+      }
+    parameters:
+      DefaultObjectVersion: "{{ xchg_default_objectVersion }}"
+      ConfigObjectVersion: "{{ xchg_config_objectVersion }}"
+      CorpName: "{{ xchg_corp_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ xchg_domain_name }}\\Administrator"
+    ansible_become_password: "{{ xchg_domain_password }}"
+  register: validate_ad_prepared
+  ignore_errors: true

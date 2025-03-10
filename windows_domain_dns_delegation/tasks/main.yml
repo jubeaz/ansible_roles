@@ -1,0 +1,15 @@
+# https://rdr-it.com/en/active-directory-how-to-set-up-a-child-domain/#dns
+
+# domain = parent_fqdn
+# zone = child dc netbios
+# fqdn = child dc fqdn
+# ip= child dc ip
+
+- name: "Add DNS delegation to child domain {{ windows_domain_dns_delegation_zone }}"
+  ansible.windows.win_shell: |
+    Add-DnsServerZoneDelegation -Name "{{ domain }}" -ChildZoneName "{{ zone }}" -NameServer "{{ fqdn }}" -IPAddress "{{ ip }}" -PassThru -Verbose
+  vars:
+    domain: "{{ windows_domain_dns_delegation_domain | lower }}"
+    fqdn: "{{ windows_domain_dns_delegation_server_fqdn | lower }}"
+    ip: "{{ windows_domain_dns_delegation_server_ip }}"
+    zone: "{{ windows_domain_dns_delegation_zone | lower }}"

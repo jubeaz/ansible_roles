@@ -16,7 +16,7 @@
     state: present
     include_management_tools: true
 
-- name: "Add server to {{ wd_join_srv_domain_name }}"
+- name: "Add server to domain"
   microsoft.ad.membership:
     hostname: "{{ wd_join_srv_hostname }}"
     dns_domain_name: "{{ wd_join_srv_domain_name }}"

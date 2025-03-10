@@ -1,0 +1,171 @@
+- name: Create the System Management Container in forest domains
+  ansible.windows.win_powershell:
+    script: |
+      $domains = Get-ADForest | Select-Object -ExpandProperty Domains
+      foreach ($domain in $domains) {
+          $Ansible.Failed = $false
+          $d = (Get-ADDomain -Identity $domain)
+          $systemDN = "CN=System," + $d.DistinguishedName
+          try{
+              Get-ADObject -Identity "CN=System Management,$systemDN" -Server $d.DNSRoot
+          }
+          catch {
+              $Ansible.Changed = $true
+              New-ADObject -Type container -Name "System Management" -Path $systemDN -Server $d.DNSRoot
+          }
+          try{
+              Get-ADObject -Identity "CN=System Management,$systemDN" -Server $d.DNSRoot
+          }
+          catch {
+              $Ansible.Failed = $true
+          }
+      }
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+
+
+- name: Synchronizes all domains
+  ansible.windows.win_shell: repadmin /syncall /AdeP
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ cfgmgr_domain_password }}"
+
+- name: Grant GenericAll on the System Management Container to "{{ cfgmgr_server_cn }}"
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $CMServer
+      )
+      $Ansible.Failed = $false
+      $parts = $CMServer.Split('\')
+      $s = (Get-ADDomain $parts[0]).DNSRoot
+      $CMIdentity = Get-ADComputer -Identity $parts[1] -Server $s
+      $inheritanceType = [System.DirectoryServices.ActiveDirectorySecurityInheritance] "All"
+      $ace = New-Object System.DirectoryServices.ActiveDirectoryAccessRule $CMIdentity.SID, "GenericAll", "Allow", $inheritanceType
+
+      $domains = Get-ADForest | Select-Object -ExpandProperty Domains
+      foreach ($domain in $domains) {
+          $d = (Get-ADDomain -Identity $domain)
+          New-PSDrive -Name AD2 -PSProvider ActiveDirectory -Server $d.DNSRoot -root "//RootDSE/"
+          $systemMgmtDN = "CN=System Management,CN=System," + $d.DistinguishedName
+          write-host $systemMgmtDN
+          $acl = Get-ACL -Path "AD2:\$systemMgmtDN"
+          $acl.AddAccessRule($ace)
+          try{
+              Set-ACL -Path "AD2:\$systemMgmtDN" -AclObject $acl
+          }
+          catch {
+            $Ansible.Failed = $true
+          }
+          Remove-PSDrive -Name AD2
+      }
+    parameters:
+      CMServer: "{{ cfgmgr_domain_name }}\\{{ cfgmgr_server_cn }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+
+- name: Create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: directory
+
+- name: Check Configuration Manager installation media exists
+  ansible.windows.win_stat:
+    path: "C:\\setup\\{{ cfgmgr_installation_media_name }}"
+  register: cfgmgr_installer_file
+
+- name: Download Configuration Manager installation media
+  ansible.windows.win_get_url:
+    url: "{{ cfgmgr_installation_media_url }}"
+    dest: "C:\\setup\\{{ cfgmgr_installation_media_name }}"
+  when: not cfgmgr_installer_file.stat.exists
+
+- name: Remove directory if exist
+  ansible.windows.win_file:
+    path: C:\setup\cd.retail.LN
+    state: absent
+
+- name: Extract Configuration Manager installation media
+  ansible.windows.win_shell: .\{{ cfgmgr_installation_media_name }} -s
+  args:
+    chdir: C:\setup
+
+- name: Synchronizes all domains
+  ansible.windows.win_shell: repadmin /syncall /AdeP
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ cfgmgr_domain_password }}"
+
+
+# Get-ADReplicationPartnerMetadata -Target rsc01.research.haas.local
+# Get-ADReplicationQueueOperation -Server rsc01.research.haas.local
+
+
+- name: Launching the Active Directory schema extension
+  ansible.windows.win_shell: .\extadsch.exe
+  args:
+    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+  register: extadsch_result
+
+# - debug: var=extadsch_result.stdout_lines
+
+# https://activedirectorypro.com/repadmin-how-to-check-active-directory-replication/
+
+- name: Replication partner and status
+  ansible.windows.win_shell: repadmin  /showrepl
+  register: sync_status
+  become: true
+  become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ cfgmgr_domain_password }}"
+  when: extadsch_result.failed
+
+# - debug: var=sync_status.stdout_lines
+
+- name: Show replication Queue
+  ansible.windows.win_shell: repadmin  /Queue
+  register: sync_queue
+  become: true
+  become_method: ansible.builtin.runas
+  become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+  vars:
+    ansible_become_pass: "{{ cfgmgr_domain_password }}"
+  when: extadsch_result.failed
+
+# - debug: var=sync_queue.stdout_lines
+
+
+# - name: Replication status summary (overall health)
+#   ansible.windows.win_shell: repadmin  /replsummary
+#   register: sync_summary
+#   become: true
+#   become_method: ansible.builtin.runas
+#   become_user: "{{ domain_name }}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{ domain_password }}"
+#   when: extadsch_result.failed
+
+#  debug: var=sync_summary.stdout_lines
+
+- name: Remove directory storing prerequisite files
+  ansible.windows.win_file:
+    path: C:\setup
+    state: absent
+  when: extadsch_result is succeeded

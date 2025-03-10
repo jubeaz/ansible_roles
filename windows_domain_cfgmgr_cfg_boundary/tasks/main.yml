@@ -1,0 +1,63 @@
+- name: Create boundary
+  cfgmgr_boundary:
+    name: "ADSiteBoundary01"
+    type: "ADSite"
+    value: "{{ cfgmgr_boundary_site_name }}"
+    site_code: "{{ cfgmgr_site_code }}"
+    server: "{{ cfgmgr_server_fqdn }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+- name: Create boundary group
+  cfgmgr_boundary_group:
+    name: "BoundaryGroup01"
+    server: "{{ cfgmgr_server_fqdn }}"
+    site_code: "{{ cfgmgr_site_code }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+- name: Add boundary to boundary group
+  cfgmgr_boundary_to_boundarygroup:
+    boundary_name: "ADSiteBoundary01"
+    boundary_group: "BoundaryGroup01"
+    site_code: "{{ cfgmgr_site_code }}"
+    server: "{{ cfgmgr_server_fqdn }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+
+- name: Create Subnets boundary group
+  cfgmgr_boundary_group:
+    name: "BGSubnets"
+    server: "{{ cfgmgr_server_fqdn }}"
+    site_code: "{{ cfgmgr_site_code }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+- name: Add subnet boundaries to Subnets boundary group
+  cfgmgr_subnets_to_boundarygroup:
+    boundary_group: "BGSubnets"
+    site_code: "{{ cfgmgr_site_code }}"
+    server: "{{ cfgmgr_server_fqdn }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+    ansible_become_flags: logon_flags=

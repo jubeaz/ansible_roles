@@ -1,4 +1,4 @@
-- name: "Enable interface '{{w_cfg_net_adapter_adapter }}'"
+- name: "Enable interface '{{ w_cfg_net_adapter_adapter }}'"
   ansible.windows.win_shell: netsh interface set interface "{{ w_cfg_net_adapter_adapter }}" enable
   register: enable_adpter_interface
   until: "enable_adpter_interface is not failed"

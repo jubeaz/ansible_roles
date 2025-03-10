@@ -1,3 +1,0 @@
- 
-- name: security configuration
-  ansible.builtin.include_tasks: "{{ wd_xchg_cfg_action }}.yml"

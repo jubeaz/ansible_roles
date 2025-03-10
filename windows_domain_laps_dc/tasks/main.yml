@@ -8,6 +8,8 @@
     domain_password: "{{ wd_laps_dc_domain_password }}"
   with_dict: "{{ wd_laps_dc_laps_path }}"
 
+
+
 - name: Install LAPS Package on Servers
   ansible.windows.win_package:
     arguments: "ADDLOCAL=Management.PS,Management.ADMX ALLUSERS=1 /qn"
@@ -26,8 +28,12 @@
   when: pri_laps_install.reboot_required
 
 
+# Get-ADReplicationPartnerMetadata -Target rsc01.research.haas.local
+# Get-ADReplicationQueueOperation -Server rsc01.research.haas.local
+
+
 # https://activedirectorypro.com/repadmin-how-to-check-active-directory-replication/
-- name: "Get Sync status"
+- name: "Get Sync Summary"
   ansible.windows.win_shell: repadmin  /replsummary
   register: sync_summary
   become: true
@@ -38,7 +44,7 @@
 
 #  debug: var=sync_summary.stdout_lines
 
-- name: Get Sync status
+- name: Get Sync Queue
   ansible.windows.win_shell: repadmin  /Queue
   register: sync_queue
   become: true
@@ -123,7 +129,7 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: wd_laps_dc_dc_level == 0
+  when: wd_laps_dc_is_root
 
 - name: Configure Password Expiry Time
   win_ad_object:
@@ -150,7 +156,7 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: wd_laps_dc_dc_level == 0
+  when: wd_laps_dc_is_root
 
 - name: Add LAPS attributes to the Computer Attribute
   win_ad_object:
@@ -167,7 +173,7 @@
   become: true
   become_method: ansible.builtin.runas
   become_user: SYSTEM
-  when: wd_laps_dc_dc_level == 0
+  when: wd_laps_dc_is_root
 
 
 - name: Synchronizes all domains
@@ -177,6 +183,28 @@
   become_user: "{{ wd_laps_dc_domain_name }}\\Administrator"
   vars:
     ansible_become_pass: "{{ wd_laps_dc_domain_password }}"
+
+
+# # https://activedirectorypro.com/repadmin-how-to-check-active-directory-replication/
+# - name: "Get Sync status"
+#   ansible.windows.win_shell: repadmin  /replsummary
+#   register: sync_summary
+#   become: true
+#   become_method: ansible.builtin.runas
+#   become_user: "{{ domain_name }}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{ domain_password }}"
+# 
+# #  debug: var=sync_summary.stdout_lines
+# 
+# - name: Get Sync status Get-ADReplicationQueueOperation
+#   ansible.windows.win_shell: repadmin  /Queue
+#   register: sync_queue
+#   become: true
+#   become_method: ansible.builtin.runas
+#   become_user: "{{ domain_name }}\\Administrator"
+#   vars:
+#     ansible_become_pass: "{{ domain_password }}"  
 
 - name: Apply DACL to OU Containers
   win_ad_dacl:

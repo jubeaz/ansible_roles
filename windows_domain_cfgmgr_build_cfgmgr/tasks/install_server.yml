@@ -1,0 +1,50 @@
+- name: Create directory to store the downloaded prerequisite files
+  ansible.windows.win_file:
+    path: C:\updates
+    state: directory
+  notify: Download cfgmgr prerequisite files
+
+- name: Force Download cfgmgr prerequisite files
+  ansible.builtin.meta: flush_handlers
+
+- name: Copy the configuration file
+  ansible.windows.win_template:
+    src: files/ConfigMgrAutoSave.ini
+    dest: C:\setup\ConfigMgrAutoSave.ini
+
+- name: Fix MSSQL generate certificate issue (change crypto rsa permissions)
+  ansible.windows.win_acl:
+    path: C:\ProgramData\Microsoft\Crypto\RSA
+    user: Administrators
+    rights: FullControl
+    type: allow
+    state: present
+    inherit: ContainerInherit, ObjectInherit
+    propagation: 'InheritOnly'
+
+
+- name: Install Configuration Manager (this one take an eternity ~ 1 hour  )
+  ansible.windows.win_shell: .\setup.exe /HIDDEN /SCRIPT "C:\setup\ConfigMgrAutoSave.ini"
+  args:
+    chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
+    ansible_become_password: "{{ cfgmgr_domain_password }}"
+  register: cfgmgr_setup_result
+
+# - ansible.builtin.debug: var=cfgmgr_setup_result
+
+# - name: Remove directory storing prerequisite files
+#   ansible.windows.win_file:
+#     path: C:\updates
+#     state: absent
+#   when: cfgmgr_setup_result is succeeded
+
+
+#- name: Reboot After Installing cfgmgr on Servers
+#  ansible.windows.win_reboot:
+#    reboot_timeout: 900
+#    post_reboot_delay: 100
+#  when: cfgmgr_setup_result is succeeded
