@@ -111,7 +111,7 @@
     ansible_become_password: "{{ xchg_domain_password }}"
   when: not echange_installer_file.stat.exists
 
-- name: Reboot after installing ODBC if required
+- name: Reboot
   ansible.windows.win_reboot:
 
 - name: Install Exchange mailbox role
@@ -136,7 +136,7 @@
         if($exchangeServer.ServerRole -ne "Mailbox") {
           $Ansible.Changed = $true
         }
-      } 
+      }
       catch {
         $Ansible.Changed = $true
       }

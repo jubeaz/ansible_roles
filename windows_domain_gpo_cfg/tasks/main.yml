@@ -4,9 +4,9 @@
     name: "{{ item.value.name }}"
     path: "{{ item.value.path }}"
     state: present
-    domain_username: "{{ windows_domain_cfg_gpo_domain_name }}\\Administrator"
-    domain_password: "{{ windows_domain_cfg_gpo_domain_password }}"
-  with_dict: "{{ windows_domain_cfg_gpo_ous }}"
+    domain_username: "{{ windows_domain_gpo_cfg_domain_name }}\\Administrator"
+    domain_password: "{{ windows_domain_gpo_cfg_domain_password }}"
+  with_dict: "{{ windows_domain_gpo_cfg_ous }}"
 
 - name: Install GPO feature
   ansible.windows.win_feature:
@@ -18,8 +18,8 @@
 
 - name: Create GPO
   win_gpo:
-    name: '{{ windows_domain_cfg_gpo_name }}'
-    description: '{{ windows_domain_cfg_gpo_desc }}'
+    name: '{{ windows_domain_gpo_cfg_name }}'
+    description: '{{ windows_domain_gpo_cfg_desc }}'
     state: present
   register: pri_gpo
 
@@ -34,13 +34,13 @@
 
 - name: CConfigure GPO with registry
   win_gpo_reg:
-    gpo: '{{ windows_domain_cfg_gpo_name }}'
+    gpo: '{{ windows_domain_gpo_cfg_name }}'
     name: '{{ reg.key }}'
     path: "{{ reg.value.path }}"
     state: "{{ reg.value.state }}"
     type: "{{ reg.value.type }}"
     value: "{{ reg.value.value }}"
-  loop: "{{ windows_domain_cfg_gpo_registry | dict2items }}"
+  loop: "{{ windows_domain_gpo_cfg_registry | dict2items }}"
   loop_control:
     loop_var: reg
 
@@ -52,18 +52,18 @@
 
 - name: Ensure GPO is Linked on OU
   win_gpo_link:
-    name: '{{ windows_domain_cfg_gpo_name }}'
+    name: '{{ windows_domain_gpo_cfg_name }}'
     target: "OU={{ item.value.name }},{{ item.value.path }}"
     state: '{{ item.value.state }}'
     enforced: '{{ item.value.enforced }}'
     enabled: '{{ item.value.enabled }}'
-  with_dict: "{{ windows_domain_cfg_gpo_ous }}"
+  with_dict: "{{ windows_domain_gpo_cfg_ous }}"
 
 - name: Ensure GPO is Linked on Domain
   win_gpo_link:
-    name: '{{ windows_domain_cfg_gpo_name }}'
-    target: "{{ windows_domain_cfg_gpo_domain_ldap_name }}"
-    state: '{{ windows_domain_cfg_gpo_domain_state }}'
-    enforced: '{{ windows_domain_cfg_gpo_domain_enforced }}'
-    enabled: '{{ windows_domain_cfg_gpo_domain_enabled }}'
-  when: windows_domain_cfg_gpo_domain
+    name: '{{ windows_domain_gpo_cfg_name }}'
+    target: "{{ windows_domain_gpo_cfg_domain_ldap_name }}"
+    state: '{{ windows_domain_gpo_cfg_domain_state }}'
+    enforced: '{{ windows_domain_gpo_cfg_domain_enforced }}'
+    enabled: '{{ windows_domain_gpo_cfg_domain_enabled }}'
+  when: windows_domain_gpo_cfg_domain

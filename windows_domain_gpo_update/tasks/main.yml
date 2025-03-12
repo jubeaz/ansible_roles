@@ -1,0 +1,9 @@
+---
+- name: GPO update
+  ansible.windows.win_shell: |
+    gpupdate.exe /force
+  register: gpupdate
+
+- name: Display the command output
+  ansible.builtin.debug:
+    msg: "{{ gpupdate.stdout }}"

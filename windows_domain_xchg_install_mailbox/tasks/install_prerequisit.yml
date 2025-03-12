@@ -1,4 +1,4 @@
-
+---
 - name: "Install {{ requiered_app_name }}"
   ansible.windows.win_powershell:
     script: |

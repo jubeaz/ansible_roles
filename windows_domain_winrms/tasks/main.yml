@@ -1,0 +1,49 @@
+- name: Set HTTPS listener
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $TemplateOID
+      )
+      $Ansible.Failed = $false
+      $Ansible.Changed = $false
+      $Ansible.Result = $null | ConvertTo-Json
+
+      # Get-CATemplate | ft
+      $domain = (Get-WmiObject win32_ComputerSystem).Domain
+      $hostname = $env:computername
+      $fqdn = "$($hostname).$($domain)"
+
+      $certs = Get-ChildItem -Path Cert:\LocalMachine\My
+      $LatestThumb = $certs |
+        Where-Object{ $_.Extensions | Where-Object{ ($_.Oid.FriendlyName -eq 'Certificate Template Information') -and ($_.Format(0) -match $TemplateOID) }} |
+        Sort-Object -Property NotAfter |
+        Select-Object -Last 1 -ExpandProperty Thumbprint
+      $valueset = @{
+          CertificateThumbprint = $LatestThumb
+          Hostname = $fqdn
+      }
+
+      $selectorset = @{
+          Address = "*"
+          Transport = "HTTPS"
+      }
+      # Delete the listener for SSL
+      Remove-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset
+      # Add new Listener with new SSL cert
+      New-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset -ValueSet $valueset
+    parameters:
+      TemplateOID: "{{ windows_domain_winrms_template_oid }}"
+  register: winrms_result
+#  error_action: silently_continue  # ignore any errors and exceptions raised.
+#  error_action: continue (default) # errors are present in the error return value but only terminating exceptions will stop the script from continuing and set it as failed.
+#  error_action: stop               # treat errors like exceptions, will stop the script and set it as failed
+#  vars:
+#    ansible_become: true
+#    ansible_become_method: runas
+#    ansible_become_user: "{{ xchg_domain_name }}\\Administrator"
+#    ansible_become_password: "{{ xchg_domain_password }}"
+
+- name: Reboot
+  ansible.windows.win_reboot:
