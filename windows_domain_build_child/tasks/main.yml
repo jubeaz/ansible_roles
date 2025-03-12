@@ -37,12 +37,12 @@
   microsoft.ad.domain_child:
     create_dns_delegation: true
     dns_domain_name: "{{ plbr_domain_name }}"
-    parent_domain_name: "{{ wd_build_child_parent_domain_name }}"
+#    parent_domain_name: "{{ wd_build_child_parent_domain_name }}"
     domain_type: child
     domain_admin_user: "Administrator@{{ wd_build_child_parent_domain_name }}"
     domain_admin_password: "{{ wd_build_child_parent_domain_password }}"
     install_dns: true
-    local_admin_password: "{{ wd_build_child_domain_password }}"
+    safe_mode_password: "{{ wd_build_child_domain_password }}"
     reboot: true
     reboot_timeout: 900
     replication_source_dc: "{{ wd_build_child_parent_dc_name }}.{{ wd_build_child_parent_domain_name }}"

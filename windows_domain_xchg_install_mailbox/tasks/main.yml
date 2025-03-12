@@ -111,6 +111,9 @@
     ansible_become_password: "{{ xchg_domain_password }}"
   when: not echange_installer_file.stat.exists
 
+- name: Reboot after installing ODBC if required
+  ansible.windows.win_reboot:
+
 - name: Install Exchange mailbox role
   ansible.windows.win_powershell:
     script: |
@@ -154,6 +157,45 @@
     ansible_become_user: "{{ xchg_domain_name }}\\Administrator"
     ansible_become_password: "{{ xchg_domain_password }}"
   register: install_mailbox_role
+
+- name: Reboot after installing ODBC if required
+  ansible.windows.win_reboot:
+
+- name: Verify Exchange mailbox role
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $ModulePath,
+          [String]
+          $ISOName,
+          [String]
+          $CorpName
+      )
+      $Ansible.Changed = $false
+      try {
+        Import-Module $ModulePath
+        Connect-ExchangeServer -auto -ClientApplication:ManagementShell
+        $serverName = $env:COMPUTERNAME
+        $exchangeServer = Get-ExchangeServer -Identity $serverName
+        if($exchangeServer.ServerRole -ne "Mailbox") {
+          $Ansible.Failed = $true
+        }
+      }
+      catch {
+        $Ansible.Failed = $false
+      }
+    parameters:
+      ModulePath: "{{ xchg_powershell_module }}"
+      CorpName: "{{ xchg_corp_name }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ xchg_domain_name }}\\Administrator"
+    ansible_become_password: "{{ xchg_domain_password }}"
+  register: install_mailbox_role
+
 
 - name: Set an environment ExchangeInstallPath for all users
   ansible.windows.win_environment:
