@@ -1,14 +1,16 @@
 ---
-- include_tasks: asserts.yml
+- name: Include asserts.yml
+  ansible.builtin.include_tasks: asserts.yml
+
 - name: AUR | get metadata from AurJson api for {{ aur_pkg_name }}
-  uri: >
+  ansible.builtin.uri: >
     url=https://aur.archlinux.org/rpc.php?v=5&type=info&arg={{ aur_pkg_name | mandatory }}
     return_content=yes
     timeout=6
   register: __api_info
 
 - name: AUR | assert proper answer
-  assert:
+  ansible.builtin.assert:
     that:
       - __api_info.status == 200
       - __api_info.json is defined
@@ -17,7 +19,7 @@
       - __api_info.json.results is defined
 
 - name: AUR | {{ aur_pkg_name }} | download tarball
-  get_url: >
+  ansible.builtin.get_url: >
     url='https://aur.archlinux.org{{ __api_info.json.results[0].URLPath }}'
     dest='{{ aur_directory }}'
   register: __aur_tarball
@@ -41,14 +43,18 @@
   register: __aur_makepkg_result
 
 # Shameless variable declaration hack
-- shell: ls -1 {{ aur_directory }}/{{ aur_pkg_name | quote }} | grep pkg.tar
+- name: AUR | {{ aur_pkg_name }} | get compiled packages from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
+  shell: ls -1 {{ aur_directory }}/{{ aur_pkg_name | quote }} | grep pkg.tar
   register: __compiled_package_name
   changed_when: false
 
-- name: AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman
-  #when: __aur_makepkg_result.changed == true
-  shell: >
-    pacman --noconfirm --noprogressbar --needed -U {{ __compiled_package_name.stdout | quote }}
-    chdir={{ aur_directory }}/{{ aur_pkg_name }}
+- name: AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
+  ansible.builtin.shell: pacman --noconfirm --noprogressbar --needed -U {{ aur_compiled_package | quote }}
+  args:
+    chdir: "{{ aur_directory }}/{{ aur_pkg_name | quote }}/"
+  with_items: "{{ __compiled_package_name.stdout_lines }}"
+  loop_control:
+    loop_var: aur_compiled_package
   register: __pacman_install_result
   changed_when: __pacman_install_result.stdout is defined and __pacman_install_result.stdout.find('there is nothing to do') == -1
+  ignore_errors: true

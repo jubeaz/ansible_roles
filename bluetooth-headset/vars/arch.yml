@@ -6,4 +6,5 @@ bluetoot_headset_pkgs:
   - bluez
   - bluez-utils
   - blueman
+  - bluetui
   #   cp /etc/pulse ~/.config/pulse
