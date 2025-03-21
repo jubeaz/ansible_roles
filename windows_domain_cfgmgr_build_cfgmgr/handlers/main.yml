@@ -7,7 +7,7 @@
 #      - /passive  IACCEPTMSODBCSQLLICENSETERMS=YES /lv+ C:\setup\msodbcsql-install.log
 #  register: odbc_install
 
-- name: Download MECM prerequisite files
+- name: Download cfgmgr prerequisite files
   ansible.windows.win_shell: .\setupdl.exe /NoUI C:\updates
   args:
     chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\X64

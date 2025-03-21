@@ -10,19 +10,19 @@
   register: iso_file
 
 - name: Check wim file exists
-  win_stat:
+  ansible.windows.win_stat:
     path: c:\share_iso\install.wim
   register: wim_file
 
 - name: Download win10 iso file (~ 5.4GB )
-  debug:
+  ansible.builtin.debug:
     msg: "neither wmi nor iso exist"
   when: not (iso_file.stat.exists or wim_file.stat.exists)
 
 - name: Download win10 iso file (~ 5.4GB )
-  win_get_url:
-      url: "{{ win10_iso_url }}"
-      dest: 'c:\setup\win_10_22h2.iso'
+  ansible.windows.win_get_url:
+    url: "{{ win10_iso_url }}"
+    dest: 'c:\setup\win_10_22h2.iso'
   when: not (iso_file.stat.exists or wim_file.stat.exists)
 
 - name: Create share folder
@@ -188,7 +188,7 @@
       adminPass: "{{ cfgmgr_pxe_admin_pass }}"
       domainName: "{{ cfgmgr_domain_name }}"
       ou: "{{ cfgmgr_pxe_location }}"
-      domainAccount: "{{ cfgmgr_naa_user }}"
+      domainAccount: "{{ cfgmgr_domain_name }}\\{{ cfgmgr_naa_user }}"
       domainPassword: "{{ cfgmgr_naa_user_pass }}"
       sccmFQDN: "{{ cfgmgr_server_fqdn }}"
   vars:
@@ -213,6 +213,8 @@
           [String]
           $distributionPoint
       )
+
+      $Ansible.Changed = $false
       Import-Module $env:SMS_ADMIN_UI_PATH.Replace("\bin\i386","\bin\configurationmanager.psd1") -force
       $sc = Get-PSDrive -PSProvider CMSITE
       if ($null -eq $sc) {
@@ -221,18 +223,39 @@
       Set-Location ($siteCode +":")
 
       # distribute operating system image
-      Start-CMContentDistribution -BootImageName "Boot image (x64)" -DistributionPointName $distributionPoint
-      Start-CMContentDistribution -BootImageName "Boot image (x86)" -DistributionPointName $distributionPoint
-      # distribute boot image
-      Start-CMContentDistribution -OperatingSystemImageName "Windows_10_22h2" -DistributionPointName $distributionPoint
+      $PackageId = $null
+      $PackageId = (Get-CMBootImage -name "Boot image (x64)").PackageID
+      if ($null -eq (Get-CMDistributionStatus -Id $packageID)){
+        Start-CMContentDistribution -BootImageID $packageID -DistributionPointName $distributionPoint
+        $Ansible.Changed = $true
+      }
 
+      $PackageId = $null
+      $PackageId = (Get-CMBootImage -name "Boot image (x86)").PackageID
+      if ($null -eq (Get-CMDistributionStatus -Id $packageID)){
+        Start-CMContentDistribution -BootImageID $packageID -DistributionPointName $distributionPoint
+        $Ansible.Changed = $true
+      }
+
+      # distribute boot image
+      $PackageId = $null
+      $PackageId = (Get-CMOperatingSystemImage -name 'Windows_10_22h2').PackageID
+      if ($null -eq (Get-CMDistributionStatus -Id $packageID)){
+        Start-CMContentDistribution -OperatingSystemImageId $packageID -DistributionPointName $distributionPoint
+        $Ansible.Changed = $true
+      }
       # distribute Configuration manager client package
       $package = Get-CMDeploymentPackage -DeploymentPackageName "Configuration Manager Client Package" -DistributionPointName $distributionPoint
       if ($null -eq $package) {
         # package not found sleep waiting the Configuration Manager Client Package presence
         Start-Sleep -seconds 300
       }
-      Start-CMContentDistribution -DeploymentPackageName "Configuration Manager Client Package" -DistributionPointName $distributionPoint
+      $PackageId = $null
+      $packageID = (Get-CMDeploymentPackage -DeploymentPackageName "Configuration Manager Client Package" -DistributionPointName $distributionPoint).PackageID
+      if ($null -eq (Get-CMDistributionStatus -Id $packageID)) {
+        Start-CMContentDistribution -DeploymentPackageId $packageID -DistributionPointName $distributionPoint
+        $Ansible.Changed = $true
+      }
     parameters:
       siteCode: "{{ cfgmgr_site_code }}"
       distributionPoint: "{{ cfgmgr_server_fqdn }}"
@@ -294,11 +317,11 @@
         New-PSDrive -Name $siteCode -PSProvider "CMSite" -Root $sccmFQDN -Description "primary site"
       }
       Set-Location ($siteCode +":")
-      $ts_name = "Install_win10_OS_image"
-      $ts_deploy = Get-CMTaskSequenceDeployment -name "deploy_pxe"
 
+      $ts_name = "Install_win10_OS_image"
       $ts = Get-CMTaskSequence -name $ts_name
       $collection = Get-CMCollection -name "All Unknown Computers"
+      $ts_deploy= Get-CMTaskSequenceDeployment -CollectionId $collection.CollectionID | where-Object {$_.PackageID -eq $ts.PackageID}
       if ($null -eq $ts_deploy){
         # New-CMTaskSequenceDeployment
         $parameters = @{

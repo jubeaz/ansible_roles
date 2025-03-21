@@ -1,5 +1,5 @@
 - name: Install MECM console
-  ansible.windows.win_shell: .\consolesetup.exe  /q "TargetDir=C:\Program Files\ConfigMgr Console" DefaultSiteServerName="{{ cfgmgr_server_cn }}.{{ cfgmgr_domain_name }}"
+  ansible.windows.win_shell: .\consolesetup.exe  /q "TargetDir=C:\Program Files\ConfigMgr Console" DefaultSiteServerName="{{ cfgmgr_server_cn }}.{{ cfgmgr_server_domain }}"
   args:
     chdir: C:\setup\cd.retail.LN\SMSSETUP\BIN\I386\
   vars:
