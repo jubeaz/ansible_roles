@@ -7,6 +7,7 @@ lxde_pkgs:
   - lightdm
   - lightdm-gtk-greeter
   - i3-wm
+  - nerd-fonts
   - rofi
   #- light
   - ttf-font-awesome
