@@ -1,0 +1,7 @@
+---
+wifi_ap_packages:
+  - linux-firmware
+  - iwd
+  - wireless_tools
+  - wireless-regdb
+  - usbutils

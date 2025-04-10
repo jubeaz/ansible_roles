@@ -1,12 +1,23 @@
 ---
+- name: Install pacman packages
+  community.general.pacman:
+    name: "{{ item }}"
+    update_cache: true
+  register: __pacman
+  changed_when: (__pacman.packages | default([])) | length >0
+  loop:
+    - debugedit
+    - fakeroot
+    - base-devel
+
 - name: Include asserts.yml
   ansible.builtin.include_tasks: asserts.yml
 
 - name: AUR | get metadata from AurJson api for {{ aur_pkg_name }}
-  ansible.builtin.uri: >
-    url=https://aur.archlinux.org/rpc.php?v=5&type=info&arg={{ aur_pkg_name | mandatory }}
-    return_content=yes
-    timeout=6
+  ansible.builtin.uri:
+    url: "https://aur.archlinux.org/rpc.php?v=5&type=info&arg={{ aur_pkg_name | mandatory }}"
+    return_content: true
+    timeout: 6
   register: __api_info
 
 - name: AUR | assert proper answer
@@ -18,37 +29,38 @@
       - __api_info.json.resultcount == 1
       - __api_info.json.results is defined
 
-- name: AUR | {{ aur_pkg_name }} | download tarball
-  ansible.builtin.get_url: >
-    url='https://aur.archlinux.org{{ __api_info.json.results[0].URLPath }}'
-    dest='{{ aur_directory }}'
+- name: AUR |  download tarball {{ aur_pkg_name }}
+  ansible.builtin.get_url:
+    url: "https://aur.archlinux.org{{ __api_info.json.results[0].URLPath }}"
+    dest: "{{ aur_directory }}"
   register: __aur_tarball
-
-- name: AUR | {{ aur_pkg_name }} | unarchive tarball
-  when: __aur_tarball.changed == true
   become: false
-  unarchive: >
-    src={{ __aur_tarball.dest }}
-    dest={{ aur_directory }}
-    remote_src=yes
+
+- name: AUR | unarchive tarball {{ aur_pkg_name }}
+  when: __aur_tarball.changed
+  become: false
+  ansible.builtin.unarchive:
+    src: "{{ __aur_tarball.dest }}"
+    dest: "{{ aur_directory }}"
+    remote_src: true
   register: __extracted_pkg
 
 # This will break if run as root. Set user to use with makepkg with 'makepkg_user' var
-- name: AUR | {{ aur_pkg_name }} | build package, including missing dependencies
-  when: __extracted_pkg.changed == true
+- name: AUR | build package, including missing dependencies | {{ aur_pkg_name }}
+  when: __extracted_pkg.changed
   become: false
-  command: >
+  ansible.builtin.command: >
     makepkg --noconfirm --noprogressbar -mfs
     chdir={{ aur_directory }}/{{ aur_pkg_name }}
   register: __aur_makepkg_result
 
 # Shameless variable declaration hack
-- name: AUR | {{ aur_pkg_name }} | get compiled packages from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
-  shell: ls -1 {{ aur_directory }}/{{ aur_pkg_name | quote }} | grep pkg.tar
+- name: AUR | get compiled packages from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
+  ansible.builtin.shell: ls -1 {{ aur_directory }}/{{ aur_pkg_name | quote }} | grep pkg.tar
   register: __compiled_package_name
   changed_when: false
 
-- name: AUR | {{ aur_pkg_name }} | install newly-built aur package with pacman from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
+- name: AUR | install newly-built aur package with pacman from  {{ aur_directory }}/{{ aur_pkg_name | quote }}
   ansible.builtin.shell: pacman --noconfirm --noprogressbar --needed -U {{ aur_compiled_package | quote }}
   args:
     chdir: "{{ aur_directory }}/{{ aur_pkg_name | quote }}/"
@@ -58,3 +70,4 @@
   register: __pacman_install_result
   changed_when: __pacman_install_result.stdout is defined and __pacman_install_result.stdout.find('there is nothing to do') == -1
   ignore_errors: true
+  become: true
