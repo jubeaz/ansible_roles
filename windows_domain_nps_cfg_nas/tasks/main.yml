@@ -1,0 +1,38 @@
+# https://www.faqforge.com/windows/configure-dhcp-powershell/
+
+- name: Add NPS Radius client
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $ClientAddress,
+
+          [String]
+          $ClientName,
+
+          [String]
+          $ClientPSK,
+
+          [bool]
+          $ClientAuthAttrubuteRequired
+      )
+      $Ansible.Failed = $false
+      $Client = New-NpsRadiusClient -Name $ClientName -Address $ClientAddress -SharedSecret $ClientPSK -AuthAttributeRequired $ClientAuthAttrubuteRequired
+      if ($null -eq $Client){
+        $Ansible.Failed = $true
+      } else {
+        $Ansible.Changed = $true
+      }
+    parameters:
+      ClientAddress: "{{ item.value.address }}"
+      ClientName: "{{ item.value.name }}"
+      ClientPSK: "{{ item.value.psk }}"
+      ClientAuthAttrubuteRequired: "{{ item.value.auth_requiered }}"
+  with_dict: "{{ nps_clients }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ nps_domain_name }}\\Administrator"
+    ansible_become_password: "{{ nps_domain_password }}"
+    ansible_become_flags: logon_flags=

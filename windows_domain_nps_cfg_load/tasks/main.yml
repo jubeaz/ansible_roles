@@ -1,0 +1,93 @@
+- name: Create a directory for config file
+  ansible.windows.win_file:
+    path: c:\setup
+    state: directory
+
+- name: Create the configuration file
+  ansible.windows.win_template:
+    src: files/nps-config.xml.j2
+    dest: c:\setup\nps-config.xml
+
+
+- name: Set Network Policies AD groups SID
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $GroupName,
+
+          [String]
+          $Pattern,
+
+          [String]
+          $TemplateOID
+      )
+      $Ansible.Changed = $true
+      $xmlString = Get-Content -Path "c:\setup\nps-config.xml" -Raw
+      $SID = Get-ADGroup -Identity $GroupName | Select SID
+
+      if ($null -eq $SID){
+        $Ansible.Failed = $true
+      } else {
+        $xmlString = $xmlString.Replace($Pattern, $SID.SID.Value)
+        $xmlString | Out-File   "c:\setup\nps-config.xml"
+        $Ansible.Failed = $false
+      }
+    parameters:
+      GroupName: "{{ item.value }}"
+      Pattern: "{{ item.key }}"
+  with_dict: "{{ nps_config_replace }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ nps_domain_name }}\\Administrator"
+    ansible_become_password: "{{ nps_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+
+- name: Set Certificate ThumbPrint
+  ansible.windows.win_powershell:
+    script: |
+      [CmdletBinding()]
+      param (
+          [String]
+          $TemplateOID
+      )
+      $Ansible.Changed = $true
+      $LatestThumb = $null
+
+      $xmlString = Get-Content -Path "c:\setup\nps-config.xml" -Raw
+      $certs = Get-ChildItem -Path Cert:\LocalMachine\My
+      $LatestThumb = $certs |
+        Where-Object{ $_.Extensions | Where-Object{ ($_.Oid.FriendlyName -eq 'Certificate Template Information') -and ($_.Format(0) -match $TemplateOID) }} |
+        Sort-Object -Property NotAfter |
+        Select-Object -Last 1 -ExpandProperty Thumbprint
+      if ($null -eq $LatestThumb){
+        $Ansible.Failed = $true
+      }
+      else {
+        $xmlString = $xmlString.Replace("_certificate_thumbprint_", $LatestThumb)
+        $xmlString | Out-File -FilePath "c:\setup\nps-config.xml"
+        $Ansible.Failed = $false
+      }
+    parameters:
+      TemplateOID: "{{ nps_certificate_template_oid }}"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ nps_domain_name }}\\Administrator"
+    ansible_become_password: "{{ nps_domain_password }}"
+    ansible_become_flags: logon_flags=
+
+- name: Import NPS Config
+  ansible.windows.win_powershell:
+    script: |
+      $Ansible.Changed = $true
+      Import-NpsConfiguration -Path "C:\setup\nps-config.xml"
+  vars:
+    ansible_become: true
+    ansible_become_method: runas
+    ansible_become_user: "{{ nps_domain_name }}\\Administrator"
+    ansible_become_password: "{{ nps_domain_password }}"
+    ansible_become_flags: logon_flags=
