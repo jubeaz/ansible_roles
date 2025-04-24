@@ -1,6 +1,6 @@
 ---
-- name: restart lightdm
-  service:
+- name: Restart lightdm
+  ansible.builtin.service:
     name: lightdm
     state: restarted
     enabled: true

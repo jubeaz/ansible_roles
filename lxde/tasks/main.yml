@@ -1,47 +1,47 @@
 ---
-- name: assert proper distribution
-  assert:
+- name: Assert proper distribution
+  ansible.builtin.assert:
     that:
       - ansible_distribution in ['Archlinux']
     quiet: true
 
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
 
 - name: Include common variables
-  include_vars: "common.yml"
+  ansible.builtin.include_vars: "common.yml"
 
-- include_tasks: asserts.yml
+- ansible.builtin.include_tasks: asserts.yml
 
-- include_tasks: "{{ ansible_distribution }}.yml"
+- ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
 
-#- name: Config x11 monitors
-#  template:
-#    src: x11_monitors.conf.j2
-#    dest: /etc/X11/xorg.conf.d/x11_monitors.conf
-#    owner: root
-#    group: root
-#    mode: 06344
-#  notify: restart lightdm
+# - name: Config x11 monitors
+#   template:
+#     src: x11_monitors.conf.j2
+#     dest: /etc/X11/xorg.conf.d/x11_monitors.conf
+#     owner: root
+#     group: root
+#     mode: 06344
+#   notify: restart lightdm
 - name: Get localectl
-  command: localectl status
+  ansible.builtin.command: localectl status
   register: __locale_status
   changed_when: false
 
-- name: Parse 'X11 Layout' from current locale
-  set_fact:
+- name: Set fact current_x11_layout
+  ansible.builtin.set_fact:
     current_x11_layout: "{{ __locale_status.stdout | regex_search('X11 Layout: ([^\n]+)', '\\1') | first }}"
 
 - name: Set keyboard map
-  command: localectl set-x11-keymap "{{ x11_keymap_layout }}"
+  ansible.builtin.command: localectl set-x11-keymap "{{ x11_keymap_layout }}"
   changed_when: current_x11_layout != x11_keymap_layout
   notify: restart lightdm
 
 - name: Add users to light
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     groups: "{{ _light_group }}"
-    append: yes
+    append: true
   with_items: "{{ light_users }}"
 
 - name: Create wallpaper folder
@@ -53,18 +53,18 @@
     mode: '0755'
 
 - name: Copy greeter bg images
-  copy:
+  ansible.builtin.copy:
     dest: "/usr/share/wallpaper/greeter-bg.png"
     src: "files/greeter-bg.png"
     owner: root
     group: root
-    mode: 0655
+    mode: '0655'
 
 - name: Copy greeter config
-  copy:
+  ansible.builtin.copy:
     dest: "/etc/lightdm/lightdm-gtk-greeter.conf"
     src: "files/lightdm-gtk-greeter.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
 

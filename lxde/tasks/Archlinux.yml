@@ -1,8 +1,8 @@
 ---
 - name: Install packages
-  pacman:
+  community.general.pacman:
     name: "{{ item }}"
     update_cache: true
   register: __pacman
-  changed_when: (__pacman.packages | default([]))| length >0 
+  changed_when: (__pacman.packages | default([]))| length >0
   loop: "{{ lxde_pkgs }}"
