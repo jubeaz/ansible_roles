@@ -5,6 +5,9 @@
       - ansible_distribution in ['Archlinux']
     quiet: true
 
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+
 - name: Create directory for docker service drop-in
   ansible.builtin.file:
     dest: /etc/systemd/system/docker.service.d

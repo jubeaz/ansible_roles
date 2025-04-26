@@ -2,6 +2,12 @@
 - name: Verify prerequisits
   ansible.builtin.include_tasks: asserts.yml
 
+- name: Upgrade packages
+  community.general.pacman:
+    upgrade: true
+    update_cache: true
+    upgrade_extra_args: "--ignore {{ pacman_upgrade_ingore_list_str }}"
+
 - name: Install packages
   community.general.pacman:
     name: "{{ _pacman_packages }}"

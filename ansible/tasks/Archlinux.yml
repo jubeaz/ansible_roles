@@ -2,5 +2,5 @@
 - name: Install packages
   community.general.pacman:
     name: "{{ ansible_pkgs }}"
-    state: present
+    state: latest
     update_cache: true

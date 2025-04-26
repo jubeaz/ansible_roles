@@ -1,0 +1,9 @@
+---
+- name: Assert proper distribution
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
+
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"

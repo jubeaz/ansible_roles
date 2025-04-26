@@ -1,9 +1,0 @@
----
-- name: assert proper distribution
-  assert:
-    that:
-      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
-    quiet: true
-
-- include_tasks: "{{ ansible_distribution }}.yml"
-
