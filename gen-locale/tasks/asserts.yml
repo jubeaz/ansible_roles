@@ -1,30 +1,34 @@
 ---
-- name: assert proper distribution
-  assert:
+- name: Assert proper distribution
+  ansible.builtin.assert:
     that:
       - ansible_distribution in ['Ubuntu', 'Archlinux', 'Kali']
-    quiet: yes
-- name: assert locales_gen is well defined
-  assert:
+    quiet: true
+
+- name: Assert locales_gen is well defined
+  ansible.builtin.assert:
     that:
       - locales_gen is defined
       - locales_gen is sequence
-    quiet: yes
-- name: assert every locales_gen is well defined
-  assert:
+    quiet: true
+
+- name: Assert every locales_gen is well defined
+  ansible.builtin.assert:
     that:
       - item is string
-    quiet: yes
+    quiet: true
   with_items: "{{ locales_gen }}"
-- name: assert local_lang is well defined
-  assert:
+
+- name: Assert local_lang is well defined
+  ansible.builtin.assert:
     that:
       - locale_lang is defined
       - locale_lang is string
-    quiet: yes
-- name: assert vconsole_content is well defined
-  assert: 
+    quiet: true
+
+- name: Assert vconsole_content is well defined
+  ansible.builtin.assert: 
     that:
       - vconsole_content is defined
       - vconsole_content is string
-    quiet: yes
+    quiet: true
