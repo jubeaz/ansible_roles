@@ -1,7 +1,0 @@
----
-- name: Converge
-  hosts: all
-  tasks:
-    - name: "Include gen-locale"
-      include_role:
-        name: "gen-locale"
