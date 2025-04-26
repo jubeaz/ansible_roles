@@ -1,19 +1,25 @@
 ---
-- include_tasks: variables.yml
-- include_tasks: asserts.yml
+- name: Assert proper distribution
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
 
-- include_tasks: arch.yml
-  when: ansible_distribution == "Archlinux"
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
 
-- name: config bluetooth autoEnable
-  lineinfile:
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+
+- name: Config bluetooth autoEnable
+  ansible.builtin.lineinfile:
     path: /etc/bluetooth/main.conf
     regexp: '^AutoEnable'
     insertafter: '^#AutoEnable'
     line: 'AutoEnable=true'
   notify: restart bluetooth
-- name: add pulseaudio switch on connect
-  lineinfile:
+- name: Add pulseaudio switch on connect
+  ansible.builtin.lineinfile:
     path: /etc/pulse/default.pa
     regexp: '^load-module module-switch-on-connect'
     insertafter: '^#load-module module-switch-on-connect'

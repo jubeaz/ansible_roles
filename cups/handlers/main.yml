@@ -1,7 +1,4 @@
 ---
-#- name: cups-genppdupdate
-#  command: 
-
 - name: Restart cups
   ansible.builtin.service:
     name: cups

@@ -1,8 +1,0 @@
----
-- name: Install cups
-  apt:
-    name: "{{ item }}"
-    state: present
-    update_cache: true
-    update_valid_time: 3600
-  loop: "{{ cups_pkgs }}"
