@@ -1,6 +1,6 @@
 ---
-- name: restart bluetooth
-  service:
+- name: Restart bluetooth
+  ansible.builtin.service:
     name: bluetooth
     state: restarted
     enabled: true

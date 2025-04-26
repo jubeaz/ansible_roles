@@ -1,6 +1,6 @@
 ---
-- name: restart pgsql
-  service:
+- name: Restart pgsql
+  ansible.builtin.service:
     name: "{{ _pgsql_daemon }}"
     state: restarted
     enabled: true

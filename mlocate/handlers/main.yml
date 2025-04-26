@@ -1,11 +1,12 @@
 ---
-- name: restart updatedb
-  service:
+- name: Restart updatedb
+  ansible.builtin.service:
     name: updatedb
     state: restarted
     enabled: true
-- name: restart updatedb timer
-  systemd:
+
+- name: Restart updatedb timer
+  ansible.builtin.systemd:
     name: updatedb.timer
     state: restarted
     enabled: true

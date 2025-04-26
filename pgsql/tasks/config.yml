@@ -29,7 +29,7 @@
   with_items: "{{ _pgsql_unix_socket_directories }}"
 
 - name: Ensure PostgreSQL is started and enabled on boot.
-  service:
+  ansible.builtin.service:
     name: "{{ _pgsql_daemon }}"
     state: restarted
     enabled: true

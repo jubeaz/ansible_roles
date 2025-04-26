@@ -1,11 +1,11 @@
 ---
-- name: restart timer_full
-  service:
+- name: Restart timer_full
+  ansible.builtin.service:
     name: "sslbackup-full.timer"
     state: restarted
     enabled: true
-- name: restart timer_diff
-  service:
+- name: Restart timer_diff
+  ansible.builtin.service:
     name: "sslbackup-diff.timer"
     state: restarted
     enabled: true

@@ -1,6 +1,6 @@
 ---
-#- name: restart xxx
-#  service:
-#    name: xxx
-#    state: restarted
-#    enabled: true
+# - name: restart xxx
+#   ansible.builtin.service:
+#     name: xxx
+#     state: restarted
+#     enabled: true

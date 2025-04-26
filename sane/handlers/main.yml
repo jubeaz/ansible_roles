@@ -1,6 +1,6 @@
 ---
-- name: restart ipp-usb
-  service:
+- name: Restart ipp-usb
+  ansible.builtin.service:
     name: ipp-usb
     state: restarted
     enabled: true

@@ -1,6 +1,6 @@
 ---
-- name: restart timer
-  service:
+- name: Restart timer
+  ansible.builtin.service:
     name: rclone-backup.timer
     state: restarted
     enabled: true

@@ -1,13 +1,12 @@
 ---
-- name: restart rsyncd
-  service:
+- name: Restart rsyncd
+  ansible.builtin.service:
     name: "{{ rsyncd_service_name }}"
     state: restarted
     enabled: true
 
-- name: restart timer
-  service:
+- name: Restart timer
+  ansible.builtin.service:
     name: "rsyncd-clean.timer"
     state: restarted
     enabled: true
-

@@ -1,7 +1,7 @@
 ---
 # handlers file for dns-server
 - name: Restart bind
-  service:
+  ansible.builtin.service:
     name: named
     state: restarted
     enabled: true

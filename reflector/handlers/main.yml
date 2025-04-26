@@ -1,11 +1,11 @@
 ---
-- name: restart reflector
-  service:
+- name: Restart reflector
+  ansible.builtin.service:
     name: reflector
     state: restarted
     enabled: true
-- name: restart reflector timer
-  systemd:
+- name: Restart reflector timer
+  ansible.builtin.systemd:
     name: reflector.timer
     state: restarted
     enabled: true

@@ -1,6 +1,6 @@
 ---
 - name: Restart xrdp
-  service:
+  ansible.builtin.service:
     name: xrdp
     state: restarted
     enabled: true
