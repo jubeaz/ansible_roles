@@ -1,6 +1,1 @@
 ---
-- name: Restart xxx
-  service:
-    name: xxx
-    state: restarted
-    enabled: true

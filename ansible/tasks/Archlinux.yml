@@ -4,4 +4,3 @@
     name: "{{ ansible_pkgs }}"
     state: present
     update_cache: true
-

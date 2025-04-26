@@ -1,26 +1,27 @@
 ---
-- name: assert proper distribution
-  assert:
+- name: Assert proper distribution
+  ansible.builtin.assert:
     that:
       - ansible_distribution in ['Archlinux']
     quiet: true
+
 - name: Include OS-specific variables
-  include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
 
 - name: Include common variables
-  include_vars: "common.yml"
+  ansible.builtin.include_vars: "common.yml"
 
-- include_tasks: asserts.yml
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
 
-- include_tasks: "{{ ansible_distribution }}.yml" 
 - name: Get installed packages
   ansible.builtin.package_facts:
     manager: "auto"
 
-- name: Install batify rule 
-  template:
+- name: Install batify rule
+  ansible.builtin.template:
     src: templates/99-batify.rules.j2
     dest: /etc/udev/rules.d/99-batify.rules
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'

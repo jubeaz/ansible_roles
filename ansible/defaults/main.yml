@@ -1,6 +1,6 @@
 ---
-ans_exchange_dir: /var/lib/ansible/exchange
-ans_users:
+ansible_exchange_dir: /var/lib/ansible/exchange
+ansible_users:
   - login: root
     group: root
     home_dir: /root

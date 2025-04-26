@@ -49,8 +49,8 @@
 
 - name: Create AUR directory
   ansible.builtin.file:
-    path: "{{ aur_directory }}"
-    owner: "{{ aur_owner }}"
-    group: "{{ aur_group }}"
+    path: "{{ pacman_aur_directory }}"
+    owner: "{{ pacman_aur_owner }}"
+    group: "{{ pacman_aur_group }}"
     mode: '0750'
     state: directory

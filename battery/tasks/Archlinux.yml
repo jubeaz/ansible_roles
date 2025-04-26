@@ -6,6 +6,7 @@
   loop:
     - xpub
     - batify
+
 - name: Install pacman packages
   community.general.pacman:
     name: dunst
