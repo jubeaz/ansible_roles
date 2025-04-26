@@ -1,45 +1,44 @@
 ---
-# tasks file for docker
-- include_tasks: ubuntu.yml
-  when: ansible_distribution == "Ubuntu"
+- name: Assert proper distribution
+  ansible.builtin.assert:
+    that:
+      - ansible_distribution in ['Archlinux']
+    quiet: true
 
-- include_tasks: arch.yml
-  when: ansible_distribution == "Archlinux"
-
-- name: create directory for docker service drop-in
-  file:
+- name: Create directory for docker service drop-in
+  ansible.builtin.file:
     dest: /etc/systemd/system/docker.service.d
     state: directory
-    mode: 0744
+    mode: '0744'
     owner: root
     group: root
 - name: Install socket service
-  template:
+  ansible.builtin.template:
     src: templates/execstart.conf.j2
     dest: /etc/systemd/system/docker.service.d/execstart.conf
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
 - name: Create /etc/docker
-  file:
+  ansible.builtin.file:
     path: /etc/docker
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: '0755'
 - name: Install daemon template
-  template:
+  ansible.builtin.template:
     src: templates/daemon.json.j2
     dest: /etc/docker/daemon.json
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify:
     - Reload systemd
     - Start and enable docker
     - Start and enable containerd
 - name: Add users to docker group
-  user:
+  ansible.builtin.user:
     name: "{{ item }}"
     append: true
     groups: docker
