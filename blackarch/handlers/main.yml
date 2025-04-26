@@ -1,6 +1,5 @@
 ---
-- name: update packages
-  pacman: 
-    update_cache: yes
-    upgrade: yes
-    
+- name: Upgrade packages
+  community.general.pacman: 
+    update_cache: true
+    upgrade: true

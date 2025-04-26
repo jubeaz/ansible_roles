@@ -7,10 +7,6 @@
     - xpub
     - batify
 - name: Install pacman packages
-  pacman:
-    name: "{{ item }}"
+  community.general.pacman:
+    name: dunst
     update_cache: true
-  register: __pacman
-  changed_when: (__pacman.packages | default([]))| length >0 
-  loop:
-    - dunst

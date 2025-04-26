@@ -1,12 +1,10 @@
 ---
 - name: Install dependencies
-  pacman:
-    name: "{{ item }}"
+  community.general.pacman:
+    name: "{{ vmware_dependencies }}"
     state: present
     update_cache: true
-  register: __pacman
-  changed_when: (__pacman.packages | default([])) | length > 0
-  loop: "{{ vmware_dependencies }}"
+
 # need to uncomment _remove_vmware_keymaps_dependency=y in PKGBUILD
 - name: Install AUR
   include_role:

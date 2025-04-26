@@ -1,7 +1,5 @@
 ---
 - name: install docker
-  pacman:
+  community.general.pacman:
     name: docker
     state: present
-  register: __pacman
-  changed_when: (__pacman.packages | default([]))| length >0 

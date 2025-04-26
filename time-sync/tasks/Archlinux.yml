@@ -1,8 +1,6 @@
 ---
 - name: Uninstall ntp
-  pacman:
+  community.general.pacman:
     name: ntp
     state: absent
-  register: __pacman
-  changed_when: __pacman.packages is defined
 

@@ -20,16 +20,16 @@
 #  with_items: "{{ vbox_extra_repos }}"
 
 - name: Install virtualbox
-  pacman:
-    name: "{{ item }}"
+  community.general.pacman:
+    name:
+      - linux-lts-headers
+      - virtualbox
+      - virtualbox-host-dkms
     state: present
     update_cache: true
   register: __pacman
   changed_when: (__pacman.packages | default([]))| length >0 
   loop:
-    - linux-lts-headers
-    - virtualbox
-    - virtualbox-host-dkms
 
 - name: Install virtualbox-ext-oracle
   include_role:

@@ -1,8 +1,7 @@
 ---
 - name: install openssl
-  pacman:
+  community.general.pacman:
     name: openssl
     state: present
-  register: __pacman
-  changed_when: __pacman.packages is defined
+
 

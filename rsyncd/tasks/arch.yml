@@ -1,8 +1,6 @@
 ---
 - name: Install Rsync
-  pacman:
+  community.general.pacman:
     name: rsync
     state: present
     update_cache: true
-  register: __pacman
-  changed_when: (__pacman.packages | default([]))| length >0 

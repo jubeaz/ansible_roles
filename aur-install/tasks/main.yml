@@ -1,14 +1,14 @@
 ---
 - name: Install pacman packages
   community.general.pacman:
-    name: "{{ item }}"
+    name:
+      - debugedit
+      - fakeroot
+      - base-devel
     update_cache: true
   register: __pacman
   changed_when: (__pacman.packages | default([])) | length >0
   loop:
-    - debugedit
-    - fakeroot
-    - base-devel
 
 - name: Include asserts.yml
   ansible.builtin.include_tasks: asserts.yml

@@ -1,7 +1,7 @@
 ---
 - name: Upgrade all packages on servers
   register: __pacman_upgrade
-  pacman:
+  community.general.pacman:
     update_cache: true
     upgrade: true
   changed_when: __pacman.upgrade.packages is defined

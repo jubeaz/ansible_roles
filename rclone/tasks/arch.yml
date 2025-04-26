@@ -1,8 +1,6 @@
 ---
 - name: Install rclone
-  pacman:
+  community.general.pacman:
     name: rclone
     state: present
     update_cache: true
-  register: __pacman
-  changed_when: (__pacman.packages | default([]))| length >0 
