@@ -6,7 +6,7 @@
 # sccm_boundary:
 #   name: "boundary name"
 #   type: IPSubNet/ADSite/IPv6Prefix/IPRange/VPN
-#   value: "value" (ex: "172.16.50.0/24" / "Default-First-Site-Name" / "10.255.255.0-10.255.255.255")
+#   value: "value" (ex: "172.17.50.0/24" / "Default-First-Site-Name" / "10.255.255.0-10.255.255.255")
 #   site_code: "code"
 #   state: "present" (absent/present)
 
