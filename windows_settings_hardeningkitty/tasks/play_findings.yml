@@ -1,9 +1,8 @@
-
 - name: HardenKitty psm1 exists
   ansible.windows.win_stat:
     path: C:\Hardenkitty\HardeningKitty.psm1
   register: hardeningkitty_psm1_file
-  
+
 - name: Download HardenKitty psm1
   ansible.windows.win_get_url:
     url: https://github.com/scipag/HardeningKitty/raw/refs/heads/master/HardeningKitty.psm1
@@ -18,7 +17,7 @@
            [String]$FileFindingList
       )
       Import-Module C:\Hardenkitty\HardeningKitty.psm1 -Force
-      Invoke-HardeningKitty -Mode HailMary -Log -Report -SkipRestorePoint -FileFindingList $FileFindingList
+      Invoke-HardeningKitty -Mode HailMary -Log -LogFile "$($FileFindingList).log" -Report -SkipRestorePoint -FileFindingList $FileFindingList
 
     error_action: silently_continue
     parameters:
@@ -27,8 +26,9 @@
     chdir: "C:\\Hardenkitty"
     ansible_become: true
     ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
+    become_user: SYSTEM
+#    ansible_become_user: "{{ domain_name }}\\Administrator"
+#    ansible_become_password: "{{ domain_password }}"
   register:
     hardeningkitty_play_result
   with_dict: "{{ HardeningKitty }}"

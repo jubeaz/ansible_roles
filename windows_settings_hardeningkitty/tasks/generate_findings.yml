@@ -6,7 +6,7 @@
 
 - name: copy requiered FileCriteria
   ansible.windows.win_copy:
-    src: "{{ item.value.FileCriteria }}"
+    src: "files/{{ item.value.FileCriteria }}"
     dest: "C:\\Hardenkitty\\critera\\{{ item.value.FileCriteria }}"
   with_dict: "{{ HardeningKitty }}"
 
@@ -129,11 +129,6 @@
       FileFindingList: "{{ item.value.FileFindingList }}"
       FileCriteria: "C:\\Hardenkitty\\critera\\{{ item.value.FileCriteria }}"
       FileOut: "C:\\Hardenkitty\\{{ item.value.FileOut }}"
-  vars:
-    ansible_become: true
-    ansible_become_method: runas
-    ansible_become_user: "{{ domain_name }}\\Administrator"
-    ansible_become_password: "{{ domain_password }}"
   with_dict: "{{ HardeningKitty }}"
   register:
     hardeningkitty_generate_result
