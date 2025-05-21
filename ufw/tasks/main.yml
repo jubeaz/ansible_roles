@@ -49,8 +49,8 @@
     to_port: 22
   loop: "{{ ufw_in_ssh_ip }}"
   notify:
-    - enable ufw service
-    - enable ufw
+    - Enable ufw service
+    - Enable ufw
 
 
 - name: Check NAT is enabled

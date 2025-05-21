@@ -3,4 +3,3 @@
   community.general.pacman:
     name: "{{ lxde_pkgs }}"
     update_cache: true
-

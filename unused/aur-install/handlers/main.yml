@@ -1,6 +1,0 @@
----
-#- name: restart xxx
-#  service:
-#    name: xxx
-#    state: restarted
-#    enabled: true

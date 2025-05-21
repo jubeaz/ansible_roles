@@ -36,5 +36,5 @@
     - name: Run strap
       ansible.builtin.command: /tmp/strap.sh
       register: __strap
-      notify: update packages
+      notify: Upgrade packages
   when: __blackarch_repo.msg == 'line added'

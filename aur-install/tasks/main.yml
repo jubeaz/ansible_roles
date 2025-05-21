@@ -1,4 +1,3 @@
----
 - name: Install pacman packages
   community.general.pacman:
     name:
@@ -50,7 +49,7 @@
   when: __extracted_pkg.changed
   become: false
   ansible.builtin.command: >
-    makepkg --noconfirm --noprogressbar -mfs
+    makepkg --skippgpcheck --noconfirm --noprogressbar -mfs
     chdir={{ aur_directory }}/{{ aur_pkg_name }}
   register: __aur_makepkg_result
 

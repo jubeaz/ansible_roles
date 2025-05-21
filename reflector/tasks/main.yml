@@ -16,5 +16,5 @@
     group: root
     mode: '0640'
   notify:
-    - restart reflector
-    - restart reflector timer
+    - Restart reflector
+    - Restart reflector timer

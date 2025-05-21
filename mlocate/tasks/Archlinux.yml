@@ -1,6 +1,0 @@
----
-- name: Install mlocate
-  community.general.pacman: 
-    name: plocate
-    state: present
-    update_cache: true

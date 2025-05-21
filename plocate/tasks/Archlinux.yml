@@ -1,0 +1,8 @@
+---
+- name: Install plocate
+  community.general.pacman: 
+    name: plocate
+    state: latest
+    update_cache: true
+  notify:
+    - Restart updatedb timer

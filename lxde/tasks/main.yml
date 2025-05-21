@@ -35,7 +35,7 @@
 - name: Set keyboard map
   ansible.builtin.command: localectl set-x11-keymap "{{ x11_keymap_layout }}"
   changed_when: current_x11_layout != x11_keymap_layout
-  notify: restart lightdm
+  notify: Restart lightdm
 
 - name: Add users to light
   ansible.builtin.user:

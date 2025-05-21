@@ -13,17 +13,3 @@
 
 - name: Include OS-specific tasks
   ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
-
-- name: Restart updatedb
-  ansible.builtin.service:
-    name: plocate-updatedb
-    state: restarted
-    enabled: true
-  when: ansible_distribution == "Archlinux" and __pacman.changed
-
-- name: Restart updatedb timer
-  ansible.builtin.systemd:
-    name: plocate-updatedb.timer
-    state: restarted
-    enabled: true
-  when: ansible_distribution == "Archlinux" and __pacman.changed

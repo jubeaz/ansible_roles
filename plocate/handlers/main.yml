@@ -1,0 +1,6 @@
+---
+- name: Restart updatedb timer
+  ansible.builtin.systemd:
+    name: plocate-updatedb.timer
+    state: restarted
+    enabled: true
