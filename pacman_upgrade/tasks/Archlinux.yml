@@ -1,13 +1,6 @@
 ---
-- name: Upgrade packages with ignore list
+- name: Upgrade packages 
   community.general.pacman:
     upgrade: true
     update_cache: true
-    upgrade_extra_args: "--ignore {{ pacman_upgrade_ingore_list_str }}"
-  when: pacman_upgrade_ingore_list_str is defined and pacman_upgrade_ingore_list_str | length > 0
-- name: Upgrade packages
-  community.general.pacman:
-    upgrade: true
-    update_cache: true
-    upgrade_extra_args: ""
-  when: pacman_upgrade_ingore_list_str is not defined or (pacman_upgrade_ingore_list_str | trim) == ''
+    upgrade_extra_args: "{{ pacman_extra_args }}"

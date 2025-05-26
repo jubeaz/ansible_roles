@@ -1,7 +1,7 @@
 ---
 # defaults file for gen-locale
 locales_gen: ["en_US.UTF-8 UTF-8", "fr_FR.UTF-8 UTF-8"]
-vconsole_content: "KEYMAP=fr-latin1"
+vconsole_content: ["KEYMAP=fr-latin1", "XKBLAYOUT=fr"]
 
 locale_lang: en_US.UTF-8
 locale_language: "{{ locale_lang }}"

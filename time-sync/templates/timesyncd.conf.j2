@@ -2,8 +2,8 @@
 # See timesyncd.conf(5) for details.
 
 [Time]
-NTP={{ tz_ntp_servers }}
-#FallbackNTP=ntp.ubuntu.com
-#RootDistanceMaxSec=5
+#NTP={{ tz_ntp_servers }}
+FallbackNTP={{ tz_ntp_servers }}
+RootDistanceMaxSec={{ tz_ntp_distance_max }}
 #PollIntervalMinSec=32
 #PollIntervalMaxSec=2048

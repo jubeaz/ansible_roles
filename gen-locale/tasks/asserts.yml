@@ -27,8 +27,8 @@
     quiet: true
 
 - name: Assert vconsole_content is well defined
-  ansible.builtin.assert: 
+  ansible.builtin.assert:
     that:
       - vconsole_content is defined
-      - vconsole_content is string
+      - vconsole_content is sequence
     quiet: true
