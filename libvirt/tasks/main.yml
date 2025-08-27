@@ -1,0 +1,60 @@
+---
+- name: Verify prerequisits
+  ansible.builtin.include_tasks: asserts.yml
+
+- name: Include OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Include common variables
+  ansible.builtin.include_vars: "common.yml"
+
+- name: Include OS-specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+
+
+- name: Include tls
+  ansible.builtin.include_tasks: tls.yml
+  when: libvirt_tls
+
+- name: Create /etc/conf.d/libvirtd
+  ansible.builtin.template:
+    dest: "/etc/conf.d/libvirtd"
+    src: "templates/conf.d-libvirtd.j2"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  when: libvirt_tls
+
+- name: Create /etc/conf.d/libvirtd
+  ansible.builtin.template:
+    dest: "/etc/libvirt/libvirtd.conf"
+    src: "templates/libvirtd.conf.j2"
+    owner: root
+    group: root
+    mode: "0644"
+    backup: true
+  when: libvirt_tls
+- name: Add users to group
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: present
+    groups: "{{ _libvirt_group }}"
+    append: true
+  loop: "{{ libvirt_group_members }}"
+
+#
+#- name: Include config
+#  include_tasks: config.yml
+#  when: ansible_distribution != "Ubuntu"
+#
+#
+#- include_tasks: dir_pool.yml
+#  loop: "{{ libvirt_storage_pools }}"
+#  loop_control:
+#    loop_var: pool
+
+#- include_tasks: network.yml
+#  loop: "{{ libvirt_networks }}"
+#  loop_control:
+#    loop_var: network

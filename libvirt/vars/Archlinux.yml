@@ -1,0 +1,25 @@
+---
+_libvirt_packages:
+  - qemu-full 
+    #- qemu-arch-extra #usermode
+    #- qemu-headless-arch-extra
+    #- qemu-headless
+  - libvirt
+  - edk2-ovmf # UEFI for QEMU
+  - lvm2 # Logical Volume Manager support [installed]
+  - dmidecode # DMI system info support
+  - dnsmasq # required for default NAT/DHCP for guests
+#  - iptables-nft # required for default NAT networking
+  - openbsd-netcat # for remote management over ssh
+  - gettext # required for libvirt-guests.service
+  - bridge-utils
+    #  - iptables-nft
+  - python-cryptography # for virt-qemu-sev-validate command
+  - python-lxml # for virt-qemu-sev-validate command
+  - libvirt-python # for virt-qemu-qmp-proxy and virt-qemu-sev-validate commands
+#  - swtpm # TPM emulator support
+#  - libvirt-storage-gluster # Gluster storage backend
+#  - libvirt-storage-iscsi-direct # iSCSI-direct storage backend
+#  - open-iscsi # iSCSI support via iscsiadm
+#  - radvd # IPv6 RAD support
+  - virt-manager # Graphically manage KVM, Xen, or LXC via libvirt.

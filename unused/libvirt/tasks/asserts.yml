@@ -1,6 +1,0 @@
----
-- name: assert proper distribution
-  assert:
-    that:
-      - ansible_distribution in ['Ubuntu', 'Archlinux']
-    quiet: yes

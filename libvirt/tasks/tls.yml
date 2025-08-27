@@ -5,7 +5,7 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Create TLS cert dir
   file:
@@ -13,15 +13,15 @@
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
-- name: Create TLS ca dir
+- name: Create TLS CA dir
   file:
     path: "{{ libvirt_ca_path }}"
     state: directory
     owner: root
     group: root
-    mode: 0755
+    mode: "0755"
 
 - name: Stat CA cert
   stat:
@@ -30,14 +30,14 @@
 
 - name: Generate CA
   block:
-    - name: create CA key
+    - name: Create CA key
       openssl_privatekey:
         path: "{{ libvirt_ca_path }}/{{ libvirt_ca_cert_file }}.key"
         size: 4096
         state: present
         owner: root
         group: root
-        mode: 0600
+        mode: "0600"
 
     - name: create CSR
       openssl_csr:
@@ -53,7 +53,7 @@
         subject_alt_name: "DNS:{{ inventory_hostname }}"
         owner: root
         group: root
-        mode: 0640
+        mode: "0640"
 
     - name: sign CSR
       openssl_certificate:
@@ -63,7 +63,7 @@
         provider: selfsigned
         owner: root
         group: root
-        mode: 0640
+        mode: "0640"
   when: not __cacert.stat.exists
 
 - name: Stat cert

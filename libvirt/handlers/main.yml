@@ -1,0 +1,12 @@
+---
+- name: Start libvirtd
+  ansible.builtin.service:
+    name: libvirtd
+    state: restarted
+    enabled: true
+
+- name: Start virtlogd
+  ansible.builtin.service:
+    name: virtlogd
+    state: restarted
+    enabled: true
