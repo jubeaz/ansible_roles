@@ -1,0 +1,22 @@
+- name: Create {{ libvirt_network.name }} network
+  community.libvirt.virt_net:
+    command: define
+    name: "{{ libvirt_network.name }}"
+    xml: '{{ lookup("template", "templates/network.xml.j2") }}'
+
+- name: Get {{ libvirt_network.name }} status
+  community.libvirt.virt_net:
+    command: status
+    name: "{{ libvirt_network.name }}"
+  register: __network_status
+
+- name: Start {{ libvirt_network.name }} network
+  community.libvirt.virt_net:
+    command: create
+    name: "{{ libvirt_network.name }}"
+  when:  __network_status.status != "active"
+
+- name: AutoStart {{ libvirt_network.name }}  network
+  community.libvirt.virt_net:
+    autostart: true
+    name: "{{ libvirt_network.name }}"

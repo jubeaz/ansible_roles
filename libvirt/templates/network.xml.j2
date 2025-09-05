@@ -1,0 +1,24 @@
+<network>
+    <name>{{ libvirt_network.name }}</name>
+    <bridge name="{{ libvirt_network.bridge_name }}"/>
+    <forward mode="{{ libvirt_network.forward_mode }}"/>
+    <dns>
+        <forwarder addr='8.8.8.8'/>
+    </dns>
+    <ip address="{{ libvirt_network.address }}" netmask="{{ libvirt_network.netmask }}">
+        {% if libvirt_network.has_dhcp is defined and libvirt_network.has_dhcp %}
+        <dhcp>
+            <range start="{{ libvirt_network.dhcp_start }}" end="{{ libvirt_network.dhcp_end }}"/>
+        </dhcp>
+        {% endif %}
+    </ip>
+    {% if libvirt_network.has_ip_v6 is defined and libvirt_network.has_ip_v6 %}
+    <ip family="ipv6" address="{{ libvirt_network.ip_6_address }}" prefix="{{ libvirt_network.ip_v6_prefix }}">
+        {% if libvirt_network.has_ip_6_dhcp is defined and libvirt_network.has_ip_6_dhcp %}
+        <dhcp>
+          <range start="{{ libvirt_network.ip_6_dhcp_start }}" end="{{ libvirt_network.ip_6_dhcp_end }}"/>
+        </dhcp>
+        {% endif %}
+    </ip>
+    {% endif %}
+</network>

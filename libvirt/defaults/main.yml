@@ -10,19 +10,27 @@ libvirt_ca_cert_file: cacert.pem
 libvirt_ca_crl_file: crl.pem
 
 #
-#libvirt_storage_pools:
-##  - name: 
-##    path:
-#    
-#libvirt_networks:
-##  - name:
-##    mode:
-##    ip:
-##    netmask:
-##    dhcp_start:
-##    dhcp_end:
+libvirt_storage_pools:
+#  - name:
+#    path:
 #
-#
+libvirt_networks:
+#  - name:
+#    bridge_name:
+#    forward_mode:
+#    address:
+#    netmask:
+#    has_dhcp:
+#    dhcp_start:
+#    dhcp_end:
+#    has_ip_v6:
+#    ip_6_address:
+#    ip_v6_prefix:
+#    has_ip_6_dhcp:
+#    ip_6_dhcp_start:
+#    ip_6_dhcp_end:
+
+
 #deployment_type: modular #modular or monolithic
 #libvirtd_cfg: {
 #  usocket: {

@@ -1,0 +1,30 @@
+- name: Create {{ libvirt_pool.name }} pool dir
+  ansible.builtin.file:
+    path: "{{ libvirt_pool.path }}"
+    state: directory
+    owner: root
+    group: "{{ _libvirt_group }}"
+    mode: "0775"
+
+- name: Create {{ libvirt_pool.name }} pool
+  community.libvirt.virt_pool:
+    command: define
+    name: "{{ libvirt_pool.name }}"
+    xml: '{{ lookup("template", "templates/storage.xml.j2") }}'
+
+- name: Get {{ libvirt_pool.name }} pool status
+  community.libvirt.virt_pool:
+    command: status
+    name: "{{ libvirt_pool.name }}"
+  register: __pool_status
+
+- name: Start {{ libvirt_pool.name }} pool
+  community.libvirt.virt_pool:
+    command: create
+    name: "{{ libvirt_pool.name }}"
+  when:  __pool_status.status != "active"
+
+- name: AutoStart {{ libvirt_pool.name }} pool
+  community.libvirt.virt_pool:
+    autostart: true
+    name: "{{ libvirt_pool.name }}"

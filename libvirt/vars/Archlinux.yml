@@ -5,6 +5,8 @@ _libvirt_packages:
     #- qemu-headless-arch-extra
     #- qemu-headless
   - libvirt
+  - iptables-nft # for NAT
+  - nftables
   - edk2-ovmf # UEFI for QEMU
   - lvm2 # Logical Volume Manager support [installed]
   - dmidecode # DMI system info support
@@ -15,11 +17,12 @@ _libvirt_packages:
   - bridge-utils
     #  - iptables-nft
   - python-cryptography # for virt-qemu-sev-validate command
-  - python-lxml # for virt-qemu-sev-validate command
-  - libvirt-python # for virt-qemu-qmp-proxy and virt-qemu-sev-validate commands
-#  - swtpm # TPM emulator support
+  - python-lxml # for virt-qemu-sev-validate command and ansible libvirt
+  - libvirt-python # for virt-qemu-qmp-proxy and virt-qemu-sev-validate commands and ansible libvirt
+  - swtpm # TPM emulator support
 #  - libvirt-storage-gluster # Gluster storage backend
 #  - libvirt-storage-iscsi-direct # iSCSI-direct storage backend
 #  - open-iscsi # iSCSI support via iscsiadm
 #  - radvd # IPv6 RAD support
   - virt-manager # Graphically manage KVM, Xen, or LXC via libvirt.
+  - virt-viewer # SPICE client 
