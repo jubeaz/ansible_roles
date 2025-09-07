@@ -29,10 +29,11 @@
           Address = "*"
           Transport = "HTTPS"
       }
+      Set-WSManInstance -ResourceURI winrm/config/Listener -SelectorSet @{Address="*"; Transport="HTTPS"} -ValueSet @{CertificateThumbprint=$LatestThumb}
       # Delete the listener for SSL
-      Remove-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset
+      # Remove-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset
       # Add new Listener with new SSL cert
-      New-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset -ValueSet $valueset
+      # New-WSManInstance -ResourceURI 'winrm/config/Listener' -SelectorSet $selectorset -ValueSet $valueset
     parameters:
       TemplateOID: "{{ windows_domain_winrms_template_oid }}"
   register: winrms_result

@@ -1,0 +1,26 @@
+---
+- name: "Creating devices"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_device_url }}/devices"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      Cookie: "wab_session_id={{ wallix_bastion_device_cookie.cookies['wab_session_id'] }}"
+    body: |
+      {
+        "device_name": "{{ item[1] }}",
+        "host": "{{ item[0] }}",
+        "local_domains": [
+            {
+                "domain_name": "local",
+                "description": "the first local domain",
+                "enable_password_change": true,
+                "password_change_policy": "default",
+                "password_change_plugin": "Windows"
+            }
+        ],
+      }
+  loop: "{{ wallix_bastion_device_devices }}"
