@@ -1,0 +1,26 @@
+{
+    "group_name": "{{ wallix_bastion_usergroup_name }}",
+    "description": "{{ wallix_bastion_usergroup_data.description }}",
+    "timeframes": [
+    {% for timeframe in wallix_bastion_usergroup_data.timeframes %}
+      "{{ timeframe }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "users": [
+    {% for user in wallix_bastion_usergroup_data.users %}
+      "{{ user }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "profile": "{{ wallix_bastion_usergroup_data.profile }}",
+    "language": "{{ wallix_bastion_usergroup_data.language }}",
+    "email_list": "{{ wallix_bastion_usergroup_data.email_list }}",
+    "restrictions": [
+    {% for restriction in wallix_bastion_usergroup_data.restrictions %}
+        {
+            "action": "{{ restriction.action }}",
+            "rules": "{{ restriction.rules }}",
+            "subprotocol": "{{ restriction.subprotocol }}",
+        }{% if not loop.last %},{% endif %}
+    {% endfor %}    
+    ]
+}

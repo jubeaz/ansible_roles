@@ -1,0 +1,36 @@
+- name: "Get devices id for {{ device.key }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_device_url }}/devices/?q=device_name={{ device.key }}"
+    method: GET
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 200
+    headers:
+      Cookie: "wab_session_id={{ wallix_bastion_device_cookie.cookies['wab_session_id'] }}"
+  register: wallix_response
+
+
+#- name: Display wallix_response
+#  ansible.builtin.debug:
+#    var: wallix_response
+
+
+- name: Extract ID from response and update device entry
+  ansible.builtin.set_fact:
+    wallix_bastion_device_plbr_devices: |
+      {{ wallix_bastion_device_plbr_devices | default([]) | 
+        combine({ 
+          device.key: {
+            'key': device.value.key, 
+            'ip': device.value.ip, 
+            'id': (wallix_response.json[0].id | default('UNKNOWN')),
+            'local_domains':  device.value.local_domains,
+            'services':  device.value.services
+          }
+        })
+      }}
+
+#- name: Display plbr_devices
+#  ansible.builtin.debug:
+#    var: wallix_bastion_device_plbr_devices

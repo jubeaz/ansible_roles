@@ -1,0 +1,22 @@
+- name: Render full JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_device_account_json: "{{ lookup('template', 'device_account.json.j2') }}"
+
+- name: print json
+  ansible.builtin.debug:
+    var: wallix_bastion_device_account_json
+
+- name: "Creating device account {{ wallix_bastion_device_account_name }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_device_account_url }}/devices/{{ wallix_bastion_device_account_data.device_id }}/localdomains/local/accounts"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      Cookie: "wab_session_id={{ wallix_bastion_device_account_cookie.cookies['wab_session_id'] }}"
+    body: "{{ wallix_bastion_device_account_json }}"
+
+
+

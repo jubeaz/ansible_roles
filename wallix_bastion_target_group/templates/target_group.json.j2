@@ -1,0 +1,18 @@
+{
+    "group_name": "{{ wallix_bastion_target_group_name }}",
+    "description": "{{ wallix_bastion_target_group_desc }}",
+    "session": {
+        "accounts": [
+          {% for key, value in wallix_bastion_target_group_accounts.items() %}
+            {
+                "account": "{{ key }}",
+                "domain": "local",
+                "domain_type": "local",
+                "device": "{{ value.device_name }}",
+                "service": "{{ value.sevice_name }}",
+                "application": "null"
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+    }
+ }

@@ -1,0 +1,22 @@
+- name: Render full JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_target_group_devices_json: "{{ lookup('template', 'target_group.json.j2') }}"
+
+- name: print json
+  ansible.builtin.debug:
+    var: wallix_bastion_target_group_devices_json
+
+- name: "Creating target group"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_target_group_url }}/targetgroups"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      Cookie: "wab_session_id={{ wallix_bastion_target_group_cookie.cookies['wab_session_id'] }}"
+    body: "{{ wallix_bastion_target_group_devices_json }}"
+
+
+

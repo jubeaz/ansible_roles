@@ -1,0 +1,97 @@
+{
+  "devices": [
+    {% for key, value in wallix_bastion_target_group_devices.items() %}
+    {
+      "device_name": "{{ key }}",
+      "ip": "{{ value.ip }}",
+      "id": "{{ value.id }}",
+      "inventory_key": "{{ value.key }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+
+{
+    "group_name": "my_target_group",
+    "description": "my new target group",
+    "session": {
+        "accounts": [
+          {% for key, value in wallix_bastion_target_group_accounts.items() %}
+            {
+                "account": "{{ key }}",
+                "domain": "local",
+                "domain_type": "local",
+                "device": "{{ value.device_name }}",
+                "service": "{{ value.device_name }}",
+                "application": "null
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        "scenario_accounts": [
+          {% for key, value in wallix_bastion_target_group_scenario_accounts.items() %}
+
+            {
+                "account": "user",
+                "domain": "global_domain",
+                "domain_type": "global",
+                "device": null,
+                "application": null
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+            {
+                "account": "root",
+                "domain": "local",
+                "domain_type": "local",
+                "device": "debian",
+                "application": null
+            }
+        ],
+        "account_mappings": [
+          {% for key, value in wallix_bastion_target_group_account_mappings.items() %}
+            {
+                "device": "debian",
+                "service": "SSH",
+                "application": null
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ],
+        "interactive_logins": [
+          {% for key, value in wallix_bastion_target_group_interactive_logins.items() %}
+            {
+                "device": "windows",
+                "service": "RDP",
+                "application": null
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+        ]
+    },
+    "password_retrieval": {
+        "accounts": [
+          {% for key, value in wallix_bastion_target_group_password_retrieval.items() %}
+            {
+                "account": "user",
+                "domain": "global_domain",
+                "domain_type": "global",
+                "device": null,
+                "application": null
+            }{% if not loop.last %},{% endif %}
+          {% endfor %}
+            {
+                "account": "root",
+                "domain": "local",
+                "domain_type": "local",
+                "device": "debian",
+                "application": null
+            }
+        ]
+    },
+    "restrictions": [
+      {% for key, value in wallix_bastion_target_group_restrictions.items() %}
+        {
+            "action": "kill",
+            "rules": "command",
+            "subprotocol": "SSH_SHELL_SESSION"
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+    ]
+ }
