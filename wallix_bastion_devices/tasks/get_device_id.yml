@@ -1,4 +1,4 @@
-- name: "Get devices id for {{ device.key }}"
+- name: "Get Wallix Bastion devices id for {{ device.key }}"
   ansible.builtin.uri:
     url: "{{ wallix_bastion_device_url }}/devices/?q=device_name={{ device.key }}"
     method: GET
@@ -24,8 +24,9 @@
           device.key: {
             'key': device.value.key, 
             'ip': device.value.ip, 
-            'id': (wallix_response.json[0].id | default('UNKNOWN')),
-            'local_domains':  device.value.local_domains,
+            'wallix_device_id': (wallix_response.json[0].id | default('UNKNOWN')),
+            'local_domain':  device.value.local_domain,
+            'wallix_local_domain_id': (wallix_response.json[0] | community.general.json_query('local_domains[0].id') | default('UNKNOWN')),
             'services':  device.value.services
           }
         })

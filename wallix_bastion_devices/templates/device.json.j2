@@ -1,38 +1,36 @@
 {
-    "device_name": "{{ device.key }}",
-    "description": "",
-    "alias": "",
-    "host": "{{ device.value.ip }}",
-    "local_domains": [
-    {% for local_domain in device.value.local_domains %}
-        {
-            "domain_name": "{{ local_domain.domain_name }}",
-            "description":  "{{ local_domain.domain_name }}",
-            "enable_password_change": {{ local_domain.enable_password_change }},
-            "password_change_policy": "{{ local_domain.password_change_policy }}",
-            "password_change_plugin": "{{ local_domain.password_change_plugin }}"
-        }{% if not loop.last %},{% endif %}
-    {% endfor %}
-    ],
-    "services": [
+  "device_name": "{{ device.key }}",
+  "description": "",
+  "alias": "",
+  "host": "{{ device.value.ip }}",
+  "local_domains": [
+    {
+      "domain_name": "{{ device.value.local_domain.domain_name }}",
+      "description": "{{ device.value.local_domain.domain_name }}",
+      "enable_password_change": {{ device.value.local_domain.enable_password_change | lower }},
+      "password_change_policy": "{{ device.value.local_domain.password_change_policy }}",
+      "password_change_plugin": "{{ device.value.local_domain.password_change_plugin }}"
+    }
+  ],
+  "services": [
     {% for service in device.value.services %}
-        {
-            "service_name": "{{ service.service_name }}",
-            "protocol": "{{ service.protocol }}",
-            "port": {{ service.port }},
-            "connection_policy":"{{ service.connection_policy }}",
-            "global_domains": [
-            {% for global_domain in service.global_domains %}
-                "{{ global_domain }}"{% if not loop.last %},{% endif %}
-            {% endfor %}
-            ],
-            "subprotocols": [
-            {% for subprotocol in service.subprotocols %}
-                "{{ subprotocol }}"{% if not loop.last %},{% endif %}
-            {% endfor %}
-            ]
-        }{% if not loop.last %},{% endif %}
+    {
+      "service_name": "{{ service.service_name }}",
+      "protocol": "{{ service.protocol }}",
+      "port": {{ service.port }},
+      "connection_policy": "{{ service.connection_policy }}",
+      "global_domains": [
+        {% for global_domain in service.global_domains %}
+        "{{ global_domain }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ],
+      "subprotocols": [
+        {% for subprotocol in service.subprotocols %}
+        "{{ subprotocol }}"{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    }{% if not loop.last %},{% endif %}
     {% endfor %}
-    ],
-    "tags": []
+  ],
+  "tags": []
 }

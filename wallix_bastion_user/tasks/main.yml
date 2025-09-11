@@ -1,12 +1,12 @@
-- name: Render full JSON payload
+- name: Render Wallix Bastion JSON payload
   ansible.builtin.set_fact:
     wallix_bastion_user_json: "{{ lookup('template', 'user.json.j2') }}"
 
-#- name: print json
+#- name: Debug Wallix Bastion JSON payload
 #  ansible.builtin.debug:
 #    var: wallix_bastion_user_json
 
-- name: "Creating user {{ wallix_bastion_user_name }}"
+- name: "Create Wallix Bastion user {{ wallix_bastion_user_name }}"
   ansible.builtin.uri:
     url: "{{ wallix_bastion_user_url }}/users"
     method: POST

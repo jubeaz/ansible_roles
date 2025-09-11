@@ -1,12 +1,12 @@
-- name: Render full JSON payload "{{ device.key }}"
+- name: Render Wallix Bastion JSON payload "{{ device.key }}"
   ansible.builtin.set_fact:
     wallix_bastion_device_json: "{{ lookup('template', 'device.json.j2') }}"
 
-- name: print json
+- name: Debug Wallix Bastion JSON payload "{{ device.key }}"
   ansible.builtin.debug:
     var: wallix_bastion_device_json
 
-- name: Creating devices "{{ device.key }}"
+- name: Create Wallix Bastion device "{{ device.key }}"
   ansible.builtin.uri:
     url: "{{ wallix_bastion_device_url }}/devices"
     method: POST

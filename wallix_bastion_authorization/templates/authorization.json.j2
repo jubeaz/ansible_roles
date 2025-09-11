@@ -1,0 +1,18 @@
+{
+    "user_group": "{{ wallix_bastion_authorization_data.user_group }}",
+    "target_group": "{{ wallix_bastion_authorization_data.target_group }}",
+    "authorization_name": "{{ wallix_bastion_authorization_name }}",
+    "description": "{{ wallix_bastion_authorization_data.description }}",
+    "subprotocols": [
+    {% for subprotocol in wallix_bastion_authorization_data.subprotocols %}
+        "{{ subprotocol }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "is_critical": {{ wallix_bastion_authorization_data.is_critical | lower }},
+    "is_recorded": {{ wallix_bastion_authorization_data.is_recorded | lower }},
+    "authorize_password_retrieval": {{ wallix_bastion_authorization_data.authorize_password_retrieval | lower }},
+    "authorize_sessions": {{ wallix_bastion_authorization_data.authorize_sessions | lower }},
+    "approval_required": {{ wallix_bastion_authorization_data.approval_required | lower }},
+    "authorize_session_sharing":{{ wallix_bastion_authorization_data.authorize_session_sharing | lower }},
+    "session_sharing_mode": "{{ wallix_bastion_authorization_data.session_sharing_mode | lower }}"
+}

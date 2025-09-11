@@ -1,18 +1,24 @@
 {
-    "group_name": "{{ wallix_bastion_target_group_name }}",
-    "description": "{{ wallix_bastion_target_group_desc }}",
-    "session": {
-        "accounts": [
-          {% for key, value in wallix_bastion_target_group_accounts.items() %}
-            {
-                "account": "{{ key }}",
-                "domain": "local",
-                "domain_type": "local",
-                "device": "{{ value.device_name }}",
-                "service": "{{ value.sevice_name }}",
-                "application": "null"
-            }{% if not loop.last %},{% endif %}
-          {% endfor %}
-        ]
-    }
- }
+  "group_name": "{{ wallix_bastion_target_group_name }}",
+  "description": "{{ wallix_bastion_target_group_data.description }}",
+  "session": {
+    "accounts": [
+    {%- set items = [] %}
+    {%- for key, value in wallix_bastion_target_group_data.accounts.items() %}
+      {%- for service in value.services %}
+        {%- set _ = items.append({
+          "account": key,
+          "domain": value.domain.domain_name,
+          "domain_type": "local",
+          "device": value.device_name,
+          "service": service.service_name,
+          "application": none
+        }) %}
+      {%- endfor %}
+    {%- endfor %}
+    {%- for item in items %}
+      {{ item | to_nice_json }}{% if not loop.last %},{% endif %}
+    {%- endfor %}
+    ]
+  }
+}

@@ -1,12 +1,13 @@
-- name: Render full JSON payload
+
+- name: Render Wallix Bastion JSON payload
   ansible.builtin.set_fact:
     wallix_bastion_target_group_devices_json: "{{ lookup('template', 'target_group.json.j2') }}"
 
-- name: print json
+- name: Debug Wallix Bastion JSON payload
   ansible.builtin.debug:
     var: wallix_bastion_target_group_devices_json
 
-- name: "Creating target group"
+- name: "Create target group"
   ansible.builtin.uri:
     url: "{{ wallix_bastion_target_group_url }}/targetgroups"
     method: POST

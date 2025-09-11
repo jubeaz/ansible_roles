@@ -1,0 +1,22 @@
+- name: Render Wallix Bastion JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_authorization_json: "{{ lookup('template', 'authorization.json.j2') }}"
+
+- name: Debug Wallix Bastion JSON payload
+  ansible.builtin.debug:
+    var: wallix_bastion_authorization_json
+
+- name: "Create Wallix Bastion authorization {{ wallix_bastion_authorization_name }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_authorization_url }}/authorizations"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      Cookie: "wab_session_id={{ wallix_bastion_authorization_cookie.cookies['wab_session_id'] }}"
+    body: "{{ wallix_bastion_authorization_json }}"
+
+
+
