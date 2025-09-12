@@ -1,0 +1,21 @@
+{
+    "authentication_name": "{{ wallix_bastion_external_authentication_name }}",
+    "type": "LDAP",
+    "description": "{{ wallix_bastion_external_authentication_data.description }}",
+    "port": {{ wallix_bastion_external_authentication_data.port }},
+    "host": "{{ wallix_bastion_external_authentication_data.host }}",
+    "timeout": {{ wallix_bastion_external_authentication_data.timeout }},
+    "is_anonymous_access": {{ wallix_bastion_external_authentication_data.is_anonymous_access | lower}},
+    "login_attribute": "{{ wallix_bastion_external_authentication_data.login_attribute }}",
+    "cn_attribute": "{{ wallix_bastion_external_authentication_data.cn_attribute }}",
+    "login": "{{ wallix_bastion_external_authentication_data.login }}",
+    "password": "{{ wallix_bastion_external_authentication_data.password }}",
+    "ldap_base": "{{ wallix_bastion_external_authentication_data.ldap_base }}",
+    "is_active_directory": {{ wallix_bastion_external_authentication_data.is_active_directory | lower}},
+    "is_ssl": {{ wallix_bastion_external_authentication_data.is_ssl | lower}},
+    "is_starttls": {{ wallix_bastion_external_authentication_data.is_starttls | lower}},
+    "certificate": "{{ wallix_bastion_external_authentication_data.certificate }}",
+    "private_key": "{{ wallix_bastion_external_authentication_data.private_key }}",
+    "ca_certificate": "{{ wallix_bastion_external_authentication_data.ca_certificate }}",
+    "use_primary_auth_domain": {{ wallix_bastion_external_authentication_data.use_primary_auth_domain | lower}}
+}

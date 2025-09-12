@@ -1,0 +1,30 @@
+{
+    "domain_name": "{{ wallix_bastion_authentication_domain_name }}",
+    "type": "AD",
+    "description": "{{ wallix_bastion_authentication_domain_data.description }}",
+    "is_default": {{ wallix_bastion_authentication_domain_data.is_default | lower}},
+    "auth_domain_name": "{{ wallix_bastion_authentication_domain_data.auth_domain_name }}",
+    "check_x509_san_email": {{ wallix_bastion_authentication_domain_data.check_x509_san_email | lower}},
+    "san_domain_name": "{{ wallix_bastion_authentication_domain_data.san_domain_name }}",
+    "x509_condition": "{{ wallix_bastion_authentication_domain_data.x509_condition }}",
+    "external_auths": [
+    {% for external_auth in wallix_bastion_authentication_domain_data.external_auths %}
+        "{{ external_auth }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "secondary_auth": [
+    {% for secondary_auth in wallix_bastion_authentication_domain_data.secondary_auths %}
+        "{{ secondary_auth }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+    ],
+    "group_attribute": "{{ wallix_bastion_authentication_domain_data.group_attribute }}",
+    "display_name_attribute": "{{ wallix_bastion_authentication_domain_data.display_name_attribute }}",
+    "email_attribute": "{{ wallix_bastion_authentication_domain_data.email_attribute }}",
+    "pubkey_attribute": "{{ wallix_bastion_authentication_domain_data.pubkey_attribute }}",
+    "language_attribute": "{{ wallix_bastion_authentication_domain_data.language_attribute }}",
+    "default_language": "{{ wallix_bastion_authentication_domain_data.default_language }}",
+    "default_email_domain": "{{ wallix_bastion_authentication_domain_data.default_email_domain }}",
+    "x509_search_filter": "{{ wallix_bastion_authentication_domain_data.x509_search_filter }}",
+    "certificate_authority": "{{ wallix_bastion_authentication_domain_data.certificate_authority }}",
+    "enable_ca": {{ wallix_bastion_authentication_domain_data.enable_ca | lower}}
+}
