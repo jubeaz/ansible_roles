@@ -1,0 +1,13 @@
+{
+    "password_change_policy_name": "{{ wallix_bastion_password_change_policy_name }}",
+    "description": "{{ wallix_bastion_password_change_policy_data.description }}",
+    "password_length": {{ wallix_bastion_password_change_policy_data.password_length }},
+    "special_chars": {{ wallix_bastion_password_change_policy_data.special_chars }},
+    "lower_chars": {{ wallix_bastion_password_change_policy_data.lower_chars }},
+    "upper_chars": {{ wallix_bastion_password_change_policy_data.upper_chars }},
+    "digit_chars": {{ wallix_bastion_password_change_policy_data.digit_chars }},
+    "exclude_chars": "{{ wallix_bastion_password_change_policy_data.exclude_chars }}",
+    "change_period": "{{ wallix_bastion_password_change_policy_data.change_period }}",
+    "ssh_key_type": "{{ wallix_bastion_password_change_policy_data.ssh_key_type }}",
+    "ssh_key_size": {{ wallix_bastion_password_change_policy_data.ssh_key_size if wallix_bastion_password_change_policy_data.ssh_key_size is number else 'null' }}
+}

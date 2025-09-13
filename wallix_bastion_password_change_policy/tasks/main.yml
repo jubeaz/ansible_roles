@@ -1,0 +1,20 @@
+- name: Render Wallix Bastion JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_password_change_policy_json: "{{ lookup('template', 'policy.json.j2') }}"
+
+- name: Debug Wallix Bastion JSON payload
+  ansible.builtin.debug:
+    var: wallix_bastion_password_change_policy_json
+
+- name: "Create Wallix Bastion password change policy {{ wallix_bastion_password_change_policy_name }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_password_change_policy_url }}/passwordchangepolicies"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      X-Auth-User: "{{ wallix_bastion_password_change_policy_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_password_change_policy_api_key.key }}"
+    body: "{{ wallix_bastion_password_change_policy_json }}"

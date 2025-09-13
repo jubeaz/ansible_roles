@@ -2,9 +2,9 @@
   ansible.builtin.set_fact:
     wallix_bastion_user_json: "{{ lookup('template', 'user.json.j2') }}"
 
-#- name: Debug Wallix Bastion JSON payload
-#  ansible.builtin.debug:
-#    var: wallix_bastion_user_json
+- name: Debug Wallix Bastion JSON payload
+  ansible.builtin.debug:
+    var: wallix_bastion_user_json
 
 - name: "Create Wallix Bastion user {{ wallix_bastion_user_name }}"
   ansible.builtin.uri:
@@ -15,8 +15,6 @@
     status_code:
       - 204
     headers:
-      Cookie: "wab_session_id={{ wallix_bastion_user_cookie.cookies['wab_session_id'] }}"
+      X-Auth-User: "{{ wallix_bastion_user_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_user_api_key.key }}"
     body: "{{ wallix_bastion_user_json }}"
-
-
-

@@ -1,7 +1,6 @@
-
-#- name: Compute template name
-#  ansible.builtin.set_fact:
-#   wallix_bastion_external_authentication_json: "{{ wallix_bastion_external_authentication_data.type | lower }}.json.j2"
+# - name: Compute template name
+#   ansible.builtin.set_fact:
+#    wallix_bastion_external_authentication_json: "{{ wallix_bastion_external_authentication_data.type | lower }}.json.j2"
 
 
 - name: Render Wallix Bastion JSON payload
@@ -12,7 +11,7 @@
   ansible.builtin.debug:
     var: wallix_bastion_external_authentication_json
 
-- name: "Create Wallix Bastion device account {{ wallix_bastion_external_authentication_name }}"
+- name: "Create Wallix Bastion external authentication {{ wallix_bastion_external_authentication_name }}"
   ansible.builtin.uri:
     url: "{{ wallix_bastion_external_authentication_url }}/externalauths"
     method: POST
@@ -21,8 +20,6 @@
     status_code:
       - 204
     headers:
-      Cookie: "wab_session_id={{ wallix_bastion_external_authentication_cookie.cookies['wab_session_id'] }}"
+      X-Auth-User: "{{ wallix_bastion_external_authentication_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_external_authentication_api_key.key }}"
     body: "{{ wallix_bastion_external_authentication_json }}"
-
-
-

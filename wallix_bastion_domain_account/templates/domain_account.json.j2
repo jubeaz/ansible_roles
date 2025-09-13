@@ -1,0 +1,20 @@
+{
+    "account_name": "{{ wallix_bastion_domain_account_name }}",
+    "account_login": "{{ wallix_bastion_domain_account_data.account_login }}",
+    "description": "{{ wallix_bastion_domain_account_data.description }}",
+    "credentials": [
+        {
+            "type": "password",
+            "password": "{{ wallix_bastion_domain_account_data.password }}"
+        }
+      {% if wallix_bastion_domain_account_data.private_key != "" %},
+        {
+            "type": "ssh_key",
+            "private_key": "{{ wallix_bastion_domain_account_data.private_key }}"
+        }
+      {% endif %}
+    ],
+    "auto_change_password": {{ wallix_bastion_domain_account_data.auto_change_password | lower }},
+    "auto_change_ssh_key": {{ wallix_bastion_domain_account_data.auto_change_ssh_key | lower }},
+    "checkout_policy": "{{ wallix_bastion_domain_account_data.checkout_policy }}"
+}

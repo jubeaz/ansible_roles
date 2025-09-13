@@ -7,7 +7,8 @@
     status_code:
       - 200
     headers:
-      Cookie: "wab_session_id={{ wallix_bastion_device_cookie.cookies['wab_session_id'] }}"
+      X-Auth-User: "{{ wallix_bastion_device_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_device_api_key.key }}"
   register: wallix_response
 
 
@@ -23,7 +24,7 @@
         combine({ 
           device.key: {
             'key': device.value.key, 
-            'host': device.value.ip, 
+            'host': device.value.host, 
             'wallix_device_id': (wallix_response.json[0].id | default('UNKNOWN')),
             'local_domain':  device.value.local_domain,
             'wallix_local_domain_id': (wallix_response.json[0] | community.general.json_query('local_domains[0].id') | default('UNKNOWN')),

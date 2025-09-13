@@ -15,7 +15,8 @@
     status_code:
       - 204
     headers:
-      Cookie: "wab_session_id={{ wallix_bastion_authorization_cookie.cookies['wab_session_id'] }}"
+      X-Auth-User: "{{ wallix_bastion_authorization_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_authorization_api_key.key }}"
     body: "{{ wallix_bastion_authorization_json }}"
 
 

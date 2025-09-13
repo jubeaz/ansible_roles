@@ -4,7 +4,7 @@
   "ip_source": "{{ wallix_bastion_user_data.ip_source }}",
   "preferred_language": "{{ wallix_bastion_user_data.preferred_language }}",
   "profile": "{{ wallix_bastion_user_data.profile }}",
-  "is_disabled": {{ wallix_bastion_user_data.is_disabled }},
+  "is_disabled": {{ wallix_bastion_user_data.is_disabled | lower }},
   "groups": [],
   "user_auths": [
   {% for user_auth in wallix_bastion_user_data.user_auths %}
@@ -12,8 +12,8 @@
   {% endfor %}
   ],
   "password": "{{ wallix_bastion_user_data.password }}",
-  "force_change_pwd": {{ wallix_bastion_user_data.force_change_pwd }},
+  "force_change_pwd": {{ wallix_bastion_user_data.force_change_pwd | lower }},
   "ssh_public_key": "{{ wallix_bastion_user_data.ssh_public_key }}",
   "gpg_public_key": "{{ wallix_bastion_user_data.gpg_public_key }}",
-  "certificate_dn": "{{ wallix_bastion_user_data.certificate_dn }}",
+  "certificate_dn": "{{ wallix_bastion_user_data.certificate_dn }}"
 }

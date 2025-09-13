@@ -1,0 +1,20 @@
+- name: Render Wallix Bastion JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_domain_account_json: "{{ lookup('template', 'domain_account.json.j2') }}"
+
+- name: Debug Wallix Bastion JSON payload
+  ansible.builtin.debug:
+    var: wallix_bastion_domain_account_json
+
+- name: "Create Wallix Bastion domain account {{ wallix_bastion_domain_account_name }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_domain_account_url }}/domains/{{ wallix_bastion_domain_account_data.wallix_domain_id }}/accounts"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      X-Auth-User: "{{ wallix_bastion_domain_account_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_domain_account_api_key.key }}"
+    body: "{{ wallix_bastion_domain_account_json }}"

@@ -19,7 +19,7 @@
         {
             "action": "{{ restriction.action }}",
             "rules": "{{ restriction.rules }}",
-            "subprotocol": "{{ restriction.subprotocol }}",
+            "subprotocol": "{{ restriction.subprotocol }}"
         }{% if not loop.last %},{% endif %}
     {% endfor %}    
     ]
