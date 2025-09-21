@@ -1,0 +1,67 @@
+- name: Create Wallix Bastion connection_policy
+  block:
+    - name: Render Wallix Bastion JSON payload
+      ansible.builtin.set_fact:
+        wallix_bastion_connection_policy_json: "{{ lookup('template', 'connection_policy_RDP.json.j2') }}"
+
+    - name: Debug Wallix Bastion JSON payload
+      ansible.builtin.debug:
+        var: wallix_bastion_connection_policy_json
+
+    - name: "Create Wallix Bastion connection_policy {{ wallix_bastion_connection_policy_name }}"
+      ansible.builtin.uri:
+        url: "{{ wallix_bastion_connection_policy_url }}/connectionpolicies"
+        method: POST
+        body_format: json
+        validate_certs: false
+        status_code:
+          - 204
+        headers:
+          X-Auth-User: "{{ wallix_bastion_connection_policy_api_key.user }}"
+          X-Auth-Key: "{{  wallix_bastion_connection_policy_api_key.key }}"
+        body: "{{ wallix_bastion_connection_policy_json }}"
+  when: wallix_bastion_connection_policy_action == "create"
+
+- name: Get Wallix Bastion connection_policy
+  block:
+    - name: "Get Wallix Bastion connection_policy id for {{ wallix_bastion_connection_policy_name }}"
+      ansible.builtin.uri:
+        url: "{{ wallix_bastion_connection_policy_url }}/connectionpolicies/?q=connection_policy_name={{ wallix_bastion_connection_policy_name }}"
+        method: GET
+        body_format: json
+        validate_certs: false
+        status_code:
+          - 200
+        headers:
+          X-Auth-User: "{{ wallix_bastion_connection_policy_api_key.user }}"
+          X-Auth-Key: "{{  wallix_bastion_connection_policy_api_key.key }}"
+      register: wallix_response
+
+    #- name: Display wallix_response
+    #  ansible.builtin.debug:
+    #    var: wallix_response
+
+    - name: Extract ID from response and update device entry
+      ansible.builtin.set_fact:
+        wallix_bastion_connection_policy_data_updated: {
+          'wallix_connection_policy_id': "{{ (wallix_response.json[0].id | default('UNKNOWN')) }}",
+          'connection_policy_name': "{{ wallix_bastion_connection_policy_name }}",
+          'connection_policy_real_name': "{{ wallix_bastion_connection_policy_data.connection_policy_real_name }}",
+          'description': "{{ wallix_bastion_connection_policy_data.description }}",
+          'admin_account': "{{ wallix_bastion_connection_policy_data.admin_account }}",
+          'enable_password_change': "{{ wallix_bastion_connection_policy_data.enable_password_change }}",
+          'password_change_policy': "{{ wallix_bastion_connection_policy_data.password_change_policy }}",
+          'password_change_plugin': "{{ wallix_bastion_connection_policy_data.password_change_plugin }}",
+          'password_change_plugin_parameters': "{{ wallix_bastion_connection_policy_data.password_change_plugin_parameters }}",
+          'ca_private_key': "{{ wallix_bastion_connection_policy_data.ca_private_key }}",
+          'passphrase': "{{ wallix_bastion_connection_policy_data.passphrase }}"
+        }
+
+    - name: Extract ID from response and update device entry
+      ansible.builtin.set_fact:
+        wallix_bastion_connection_policy_data: "{{ wallix_bastion_connection_policy_data_updated }}"
+
+    # - name: Display wallix_bastion_connection_policy_data
+    #   ansible.builtin.debug:
+    #     var: wallix_bastion_connection_policy_data
+  when: wallix_bastion_connection_policy_action == "get"

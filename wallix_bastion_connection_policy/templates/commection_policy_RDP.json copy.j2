@@ -1,0 +1,146 @@
+
+
+{
+    "id": "19943ee0bb8c9cb1525400c02f9b",
+    "connection_policy_name": "{{ wallix_bastion_connection_policy_name }}",
+    "type": "RDP",
+    "description": "{{ wallix_bastion_connection_policy_data.description }}",
+    "protocol": "RDP",
+    "authentication_methods": [
+        "PASSWORD_VAULT"
+    ],
+    "options": {
+        "general": {
+            "transformation_rule": "",
+            "vault_transformation_rule": "jubeaz@haas.local"
+        },
+        "session": {
+            "inactivity_timeout": 0
+        },
+        "all_target_mod": {
+            "tcp_user_timeout": 0
+        },
+        "rdp": {
+            "disabled_orders": "27",
+            "enable_nla": true,
+            "enable_kerberos": true,
+            "allow_nla_ntlm_fallback": false,
+            "allow_tls_only_fallback": false,
+            "allow_rdp_legacy_fallback": false,
+            "tls_min_level": 2,
+            "tls_max_level": 0,
+            "cipher_string": "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA256",
+            "tls_enable_legacy_server": false,
+            "tls_1_3_ciphersuites": "",
+            "tls_key_exchange_groups": "P-256:P-384:P-521:ffdhe3072:ffdhe4096:ffdhe6144:ffdhe8192",
+            "tls_signature_algorithms": "RSA+SHA256:RSA+SHA384:RSA+SHA512:RSA-PSS+SHA256:RSA-PSS+SHA384:RSA-PSS+SHA512:ECDSA+SHA256:ECDSA+SHA384:ECDSA+SHA512",
+            "show_common_cipher_list": false,
+            "allowed_dynamic_channels": "*",
+            "denied_dynamic_channels": "",
+            "disable_coreinput_dynamic_channel": true,
+            "server_redirection": false,
+            "load_balance_info": "",
+            "use_client_provided_alternate_shell": false,
+            "use_client_provided_remoteapp": false,
+            "use_native_remoteapp_capability": true,
+            "enable_rdpdr_data_analysis": true,
+            "wabam_uses_translated_remoteapp": false,
+            "enable_remotefx": false,
+            "enable_restricted_admin_mode": false,
+            "force_smartcard_authentication": false,
+            "enable_ipv6": true,
+            "mode_console": "allow",
+            "auto_reconnection_on_losing_target_link": false,
+            "allow_session_reconnection_by_shortcut": false,
+            "session_reconnection_delay": 0,
+            "forward_client_build_number": true,
+            "bogus_monitor_layout_treatment": false,
+            "krb_armoring_account": "",
+            "krb_armoring_realm": "",
+            "krb_armoring_fallback_user": "",
+            "krb_armoring_fallback_password": "",
+            "remote_programs_disconnect_message_delay": 3000,
+            "use_session_probe_to_launch_remote_program": true,
+            "replace_null_pointer_by_default_pointer": false
+        },
+        "protocol": {
+            "save_session_info_pdu": "1"
+        },
+        "session_probe": {
+            "enable_session_probe": true,
+            "use_smart_launcher": true,
+            "enable_launch_mask": true,
+            "on_launch_failure": "1",
+            "launch_timeout": 40000,
+            "launch_fallback_timeout": 40000,
+            "start_launch_timeout_timer_only_after_logon": true,
+            "keepalive_timeout": 5000,
+            "on_keepalive_timeout": "2",
+            "end_disconnected_session": false,
+            "enable_autodeployed_appdriver_affinity": true,
+            "enable_log": false,
+            "enable_log_rotation": false,
+            "log_level": "5",
+            "disconnected_application_limit": 0,
+            "disconnected_session_limit": 0,
+            "idle_session_limit": 0,
+            "smart_launcher_clipboard_initialization_delay": 2000,
+            "smart_launcher_start_delay": 0,
+            "smart_launcher_long_delay": 500,
+            "smart_launcher_short_delay": 50,
+            "smart_launcher_enable_wabam_affinity": true,
+            "launcher_abort_delay": 2000,
+            "enable_crash_dump": false,
+            "handle_usage_limit": 0,
+            "memory_usage_limit": 0,
+            "cpu_usage_alarm_threshold": 0,
+            "cpu_usage_alarm_action": "0",
+            "end_of_session_check_delay_time": 0,
+            "ignore_ui_less_processes_during_end_of_session_check": true,
+            "extra_system_processes": "",
+            "childless_window_as_unidentified_input_field": true,
+            "windows_of_these_applications_as_unidentified_input_field": "",
+            "update_disabled_features": true,
+            "disabled_features": "0x160",
+            "enable_bestsafe_interaction": false,
+            "on_account_manipulation": "0",
+            "alternate_directory_environment_variable": "",
+            "public_session": false,
+            "outbound_connection_monitoring_rules": "",
+            "process_monitoring_rules": "",
+            "process_command_line_retrieve_method": "2",
+            "periodic_task_run_interval": 500,
+            "pause_if_session_is_disconnected": false,
+            "monitor_own_resources_consumption": false
+        },
+        "server_cert": {
+            "server_cert_store": true,
+            "server_cert_check": "1",
+            "server_access_allowed_message": "0x0",
+            "server_cert_create_message": "0x1",
+            "server_cert_success_message": "0x0",
+            "server_cert_failure_message": "0x1"
+        },
+        "session_log": {
+            "keyboard_input_masking_level": "2"
+        },
+        "capture": {
+            "disable_keyboard_log": "0x0"
+        },
+        "file_verification": {
+            "enable_up": false,
+            "enable_down": false,
+            "clipboard_text_up": false,
+            "clipboard_text_down": false,
+            "block_invalid_file_up": false,
+            "block_invalid_file_down": false,
+            "log_if_accepted": true,
+            "max_file_size_rejected": 256
+        },
+        "file_storage": {
+            "store_file": "never"
+        }
+    },
+    "url": "https://172.17.2.30/api/connectionpolicies/19969a56e0eca851525400c02f9b",
+    "is_default": false
+}
