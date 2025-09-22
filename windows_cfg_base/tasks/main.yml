@@ -12,7 +12,7 @@
 
 
 - name: Set a proxy for specific protocols
-  community.windows.win_http_proxy:
+  ansible.windows.win_http_proxy:
     proxy:
       http: "{{ w_cfg_base_http_proxy }}"
       https: "{{ w_cfg_base_https_proxy }}"
