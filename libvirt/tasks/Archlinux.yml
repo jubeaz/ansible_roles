@@ -2,3 +2,4 @@
   community.general.pacman:
     name: "{{ _libvirt_packages }}"
     update_cache: true
+  become: true

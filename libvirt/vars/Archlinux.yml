@@ -5,14 +5,15 @@ _libvirt_packages:
     #- qemu-headless-arch-extra
     #- qemu-headless
   - libvirt
-  - iptables-nft # for NAT
+  #- iptables-nft # for NAT
   - nftables
   - edk2-ovmf # UEFI for QEMU
   - lvm2 # Logical Volume Manager support [installed]
   - dmidecode # DMI system info support
   - dnsmasq # required for default NAT/DHCP for guests
 #  - iptables-nft # required for default NAT networking
-  - openbsd-netcat # for remote management over ssh
+  #- openbsd-netcat # for remote management over ssh
+  
   - gettext # required for libvirt-guests.service
   - bridge-utils
     #  - iptables-nft
