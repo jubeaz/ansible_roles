@@ -1,2 +1,8 @@
+# - name: Windows | Add the fr keyboard layout
+#   ansible.windows.win_shell: $langList = Get-WinUserLanguageList; $langList.Add("{{ w_cfg_kbd_layout }}"); Set-WinUserLanguageList -LanguageList $langList -Force
+
 - name: Windows | Add the fr keyboard layout
-  ansible.windows.win_shell: $langList = Get-WinUserLanguageList; $langList.Add("{{ w_cfg_kbd_layout }}"); Set-WinUserLanguageList -LanguageList $langList -Force
+  ansible.windows.win_shell: Remove-Item -Path "Registry::HKEY_USERS\.DEFAULT\Keyboard Layout\Preload" -Recurse -Force
+
+- name: Windows | Add the fr keyboard layout
+  ansible.windows.win_shell: New-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "1" -Value "{{ w_cfg_kbd_layout }}" -Force ; New-ItemProperty -Path "HKCU:\Keyboard Layout\Preload" -Name "2" -Value "00000409" -Force 
