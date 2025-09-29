@@ -19,7 +19,7 @@
   when: w_cfg_base_enable_http_proxy
 
 - name: Configure IE to use a specific proxy per protocol
-  community.windows.win_inet_proxy:
+  ansible.windows.win_inet_proxy :
     proxy:
       http: "{{ w_cfg_base_http_proxy }}"
       https: "{{ w_cfg_base_https_proxy }}"

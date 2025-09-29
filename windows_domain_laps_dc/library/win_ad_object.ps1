@@ -99,7 +99,7 @@ if ($null -eq $existing_obj) {
 if ($null -ne $may_contain -and $null -ne $existing_obj) {
     foreach ($may_contain_entry in $may_contain) {
         if (-not $existing_obj.mayContain.Contains($may_contain_entry)) {
-            Set-ADObject -Identity $existing_obj.ObjectGuid -Add @{ mayContain = $may_contain_entry } @common_params > $null
+            Set-ADObject -Identity $existing_obj.ObjectGuid -Add @{ mayContain = $may_contain_entry.ToString() } @common_params > $null
             $result.changed = $true
         }
     }

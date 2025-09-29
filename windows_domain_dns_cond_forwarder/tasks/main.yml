@@ -1,5 +1,5 @@
 - name: "Add dns server zone ({{ windows_domain_dns_cond_forwarder_zone }})"
-  community.windows.win_dns_zone:
+  ansible.windows.win_dns_zone:
     name: "{{ windows_domain_dns_cond_forwarder_zone | lower }}"
     type: forwarder
     replication: "{{ windows_domain_dns_cond_forwarder_replication }}"

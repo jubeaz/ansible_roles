@@ -31,4 +31,3 @@
     ansible_become_method: runas
     ansible_become_user: "{{ wd_cfg_subnet_domain_name }}\\Administrator"
     ansible_become_password: "{{ wd_cfg_subnet_domain_password }}"
-    ansible_become_flags: logon_flags=

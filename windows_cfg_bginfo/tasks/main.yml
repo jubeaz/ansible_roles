@@ -1,0 +1,28 @@
+---
+- name: Create BGInfo install folder
+  ansible.windows.win_file:
+    path: "{{ windows_cfg_bginfo_install_path }}"
+    state: directory
+
+- name: Download BGInfo ZIP
+  ansible.windows.win_get_url:
+    url: "{{ windows_cfg_bginfo_url }}"
+    dest: "{{ windows_cfg_bginfo_install_path }}\\BGInfo.zip"
+
+- name: Unzip BGInfo
+  community.windows.win_unzip:
+    src: "{{ windows_cfg_bginfo_install_path }}\\BGInfo.zip"
+    dest: "{{ windows_cfg_bginfo_install_path }}"
+    remote_src: true
+
+- name: Copy BGInfo configuration (.bgi file)
+  ansible.windows.win_copy:
+    src: "{{ windows_cfg_bginfo_config }}"
+    dest: "{{ windows_cfg_bginfo_install_path }}\\{{ windows_cfg_bginfo_config }}"
+
+- name: Add BGInfo to registry for auto-run at logon
+  ansible.windows.win_regedit:
+    path: "{{ windows_cfg_bginfo_registry_key }}"
+    name: "BGInfo"
+    data: "{{ windows_cfg_bginfo_install_path }}\\{{ windows_cfg_bginfo_exe }} {{ windows_cfg_bginfo_install_path }}\\{{ windows_cfg_bginfo_config }} /timer:0 /nolicprompt"
+    type: string

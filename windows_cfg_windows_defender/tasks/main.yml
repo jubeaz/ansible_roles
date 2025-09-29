@@ -15,7 +15,7 @@
         post_reboot_delay: 30
       when: w_cfg_defender is defined and win_defender_install.reboot_required
     - name: Get info for a single feature
-      community.windows.win_feature_info:
+      ansible.windows.win_feature_info:
         name: Windows-Defender
       register: win_defender_install
 

@@ -1,0 +1,5 @@
+windows_cfg_bginfo_install_path: 'C:\BGInfo'
+windows_cfg_bginfo_url: 'https://download.sysinternals.com/files/BGInfo.zip'
+windows_cfg_bginfo_exe: 'BGInfo64.exe'
+windows_cfg_bginfo_config: 'logon.bgi'
+windows_cfg_bginfo_registry_key: 'HKLM:\Software\Microsoft\Windows\CurrentVersion\Run'
