@@ -1,0 +1,24 @@
+{
+  "domain_name": "{{ domain.key }}",
+  "domain_real_name": "{{ domain.value.domain_real_name }}",
+  "description":"{{ domain.value.description }}",
+  "enable_password_change": {{ domain.value.enable_password_change | lower}},
+  "password_change_policy": "{{ domain.value.password_change_policy }}",
+  "password_change_plugin": "{{ domain.value.password_change_plugin }}",
+  "password_change_plugin_parameters": {
+  {% for key, value in domain.value.password_change_plugin_parameters.items() %}
+    "{{ key }}": {% if value is boolean %}
+                  {{ value | lower }}
+                {% elif value is number %}
+                  {{ value }}
+                {% elif value is none %}
+                  null
+                {% else %}
+                  "{{ value }}"
+                {% endif %}{% if not loop.last %},{% endif %}
+  {%- endfor %}
+  },
+  "ca_private_key": "{{ domain.value.ca_private_key }}"{% if domain.value.passphrase is defined and domain.value.passphrase %},
+  "passphrase": "{{ domain.value.passphrase }}"
+  {% endif %}
+}

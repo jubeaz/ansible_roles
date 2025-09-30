@@ -1,14 +1,14 @@
 ---
 - name: Create Wallix Bastion devices
   include_tasks: create_device.yml
-  with_dict: "{{ wallix_bastion_device_devices }}"
+  with_dict: "{{ wallix_bastion_devices_devices }}"
   loop_control:
     loop_var: device
-  when: wallix_bastion_device_action == 'create'
+  when: wallix_bastion_devices_action == 'create'
 
 - name: Get Wallix Bastion devices ids
   include_tasks: get_device_id.yml
-  with_dict: "{{ wallix_bastion_device_devices }}"
+  with_dict: "{{ wallix_bastion_devices_devices }}"
   loop_control:
     loop_var: device
-  when: wallix_bastion_device_action == 'get'
+  when: wallix_bastion_devices_action == 'get'

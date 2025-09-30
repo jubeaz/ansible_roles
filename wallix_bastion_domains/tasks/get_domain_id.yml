@@ -1,0 +1,47 @@
+- name: "Get Wallix Bastion domain id for {{ domain.key }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_domains_url }}/domains/?q=domain_name={{ domain.key }}"
+    method: GET
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 200
+    headers:
+      X-Auth-User: "{{ wallix_bastion_domains_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_domains_api_key.key }}"
+  register: wallix_response
+
+
+- name: Display wallix_response
+  ansible.builtin.debug:
+    var: wallix_response
+
+
+- name: Extract ID from response and update domain entry
+  ansible.builtin.set_fact:
+    wallix_bastion_domains_plbr_domains: |
+      {{ wallix_bastion_domains_plbr_domains | default([]) | 
+        combine({ 
+          domain.key: {
+            'wallix_domain_id': (wallix_response.json[0].id | default('UNKNOWN')),
+            'domain_name': domain.value.domain_name,
+            'hostname': domain.value.hostname,
+            'domain_real_name': domain.value.domain_real_name,
+            'description': domain.value.description,
+            'admin_account': domain.value.admin_account,
+            'admin_account_login': domain.value.admin_account_login,
+            'admin_account_password': domain.value.admin_account_password,
+            'enable_password_change': domain.value.enable_password_change,
+            'password_change_policy': domain.value.password_change_policy,
+            'password_change_plugin': domain.value.password_change_plugin,
+            'ca_private_key': domain.value.ca_private_key,
+            'passphrase': domain.value.passphrase,
+            'password_change_plugin_parameters': domain.value.password_change_plugin_parameters
+          }
+        })
+      }}
+
+#- name: Display plbr_domains
+#  ansible.builtin.debug:
+#    var: wallix_bastion_domains_plbr_domains
+

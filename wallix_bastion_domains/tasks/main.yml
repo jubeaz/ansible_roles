@@ -1,0 +1,22 @@
+---
+- name: Create Wallix Bastion domains
+  include_tasks: create_domain.yml
+  with_dict: "{{ wallix_bastion_domains_domains }}"
+  loop_control:
+    loop_var: domain
+  when: wallix_bastion_domains_action == 'create'
+
+- name: Get Wallix Bastion domains ids
+  include_tasks: get_domain_id.yml
+  with_dict: "{{ wallix_bastion_domains_domains }}"
+  loop_control:
+    loop_var: domain
+  when: wallix_bastion_domains_action == 'get'
+
+- name: Set Wallix Bastion domains reconciliation acounts 
+  include_tasks: set_reconciliation.yml
+  with_dict: "{{ wallix_bastion_domains_domains }}"
+  loop_control:
+    loop_var: domain
+  when: wallix_bastion_domains_action == 'set_reconciliation'
+

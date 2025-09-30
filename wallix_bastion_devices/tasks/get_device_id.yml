@@ -1,14 +1,14 @@
 - name: "Get Wallix Bastion devices id for {{ device.key }}"
   ansible.builtin.uri:
-    url: "{{ wallix_bastion_device_url }}/devices/?q=device_name={{ device.key }}"
+    url: "{{ wallix_bastion_devices_url }}/devices/?q=device_name={{ device.key }}"
     method: GET
     body_format: json
     validate_certs: false
     status_code:
       - 200
     headers:
-      X-Auth-User: "{{ wallix_bastion_device_api_key.user }}"
-      X-Auth-Key: "{{  wallix_bastion_device_api_key.key }}"
+      X-Auth-User: "{{ wallix_bastion_devices_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_devices_api_key.key }}"
   register: wallix_response
 
 
@@ -19,8 +19,8 @@
 
 - name: Extract ID from response and update device entry
   ansible.builtin.set_fact:
-    wallix_bastion_device_plbr_devices: |
-      {{ wallix_bastion_device_plbr_devices | default([]) | 
+    wallix_bastion_devices_plbr_devices: |
+      {{ wallix_bastion_devices_plbr_devices | default([]) | 
         combine({ 
           device.key: {
             'key': device.value.key, 
@@ -35,4 +35,4 @@
 
 #- name: Display plbr_devices
 #  ansible.builtin.debug:
-#    var: wallix_bastion_device_plbr_devices
+#    var: wallix_bastion_devices_plbr_devices
