@@ -95,7 +95,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
 
 # Create task sequence
 - name: Create Task sequence
@@ -196,7 +195,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
 
 # start distribute content
 - name: Start distribute content
@@ -265,7 +263,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
 
 # update unknow computers
 - name: Update unknow computers collection
@@ -294,7 +291,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
 
 # Deploy sequence
 - name: Deploy Task sequence
@@ -351,4 +347,3 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=

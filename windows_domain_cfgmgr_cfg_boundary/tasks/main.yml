@@ -10,7 +10,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
+
 
 - name: Create boundary group
   cfgmgr_boundary_group:
@@ -22,7 +22,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
+
 
 - name: Add boundary to boundary group
   cfgmgr_boundary_to_boundarygroup:
@@ -35,7 +35,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
+
 
 
 - name: Create Subnets boundary group
@@ -48,7 +48,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
+
 
 - name: Add subnet boundaries to Subnets boundary group
   cfgmgr_subnets_to_boundarygroup:
@@ -60,4 +60,4 @@
     ansible_become_method: runas
     ansible_become_user: "{{ cfgmgr_domain_name }}\\Administrator"
     ansible_become_password: "{{ cfgmgr_domain_password }}"
-    ansible_become_flags: logon_flags=
+

@@ -1,11 +1,11 @@
-- name: Debug CM Accounts
-  ansible.builtin.debug:
-    var:
-      siteCode: "{{ cfgmgr_site_code }}"
-      sccmFQDN: "{{ cfgmgr_server_cn }}.{{ cfgmgr_domain_name }}"
-      username: "{{ cfgmgr_domain_name }}\\{{ item.value.name }}"
-      password: "{{ item.value.password }}"
-  with_dict: "{{ cfgmgr_accounts }}"
+# - name: Debug CM Accounts
+#   ansible.builtin.debug:
+#     var:
+#       siteCode: "{{ cfgmgr_site_code }}"
+#       sccmFQDN: "{{ cfgmgr_server_cn }}.{{ cfgmgr_domain_name }}"
+#       username: "{{ cfgmgr_domain_name }}\\{{ item.value.name }}"
+#       password: "{{ item.value.password }}"
+#   with_dict: "{{ cfgmgr_accounts }}"
 
 - name: Create CM Accounts
   ansible.windows.win_powershell:

@@ -43,7 +43,7 @@
     ansible_become_method: runas
     ansible_become_user: "{{ nps_domain_name }}\\Administrator"
     ansible_become_password: "{{ nps_domain_password }}"
-    ansible_become_flags: logon_flags=
+
 
 
 - name: Set Certificate ThumbPrint
@@ -78,7 +78,6 @@
     ansible_become_method: runas
     ansible_become_user: "{{ nps_domain_name }}\\Administrator"
     ansible_become_password: "{{ nps_domain_password }}"
-    ansible_become_flags: logon_flags=
 
 - name: Import NPS Config
   ansible.windows.win_powershell:
@@ -90,4 +89,3 @@
     ansible_become_method: runas
     ansible_become_user: "{{ nps_domain_name }}\\Administrator"
     ansible_become_password: "{{ nps_domain_password }}"
-    ansible_become_flags: logon_flags=
