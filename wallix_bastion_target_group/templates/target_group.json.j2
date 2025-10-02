@@ -19,6 +19,16 @@
     {%- for item in items %}
       {{ item | to_nice_json }}{% if not loop.last %},{% endif %}
     {%- endfor %}
-    ]
+    ],
+    "account_mappings": [
+      {%- for key, value in wallix_bastion_target_group_data.account_mappings.items() %}
+        {
+          "device": "{{ value.device_name }}",
+          "service": "{{ value.service_name }}",
+          "application": null
+
+        }{% if not loop.last %},{% endif %}
+      {% endfor %}
+      ]
   }
 }

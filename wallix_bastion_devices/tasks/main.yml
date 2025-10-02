@@ -12,3 +12,10 @@
   loop_control:
     loop_var: device
   when: wallix_bastion_devices_action == 'get'
+
+- name: Add Wallix Bastion devices services
+  include_tasks: add_services.yml
+  with_dict: "{{ wallix_bastion_devices_devices }}"
+  loop_control:
+    loop_var: device
+  when: wallix_bastion_devices_action == 'add-services'

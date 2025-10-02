@@ -1,0 +1,16 @@
+{
+  "service_name": "{{ wallix_bastion_device_service_data.service_name }}",
+  "protocol": "{{ wallix_bastion_device_service_data.protocol }}",
+  "port": {{ wallix_bastion_device_service_data.port }},
+  "connection_policy": "{{ wallix_bastion_device_service_data.connection_policy }}",
+  "global_domains": [
+    {% for global_domain in wallix_bastion_device_service_data.global_domains %}
+    "{{ global_domain }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ],
+  "subprotocols": [
+    {% for subprotocol in wallix_bastion_device_service_data.subprotocols %}
+    "{{ subprotocol }}"{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}

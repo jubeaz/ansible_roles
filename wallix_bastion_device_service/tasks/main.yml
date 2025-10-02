@@ -1,0 +1,20 @@
+- name: Render Wallix Bastion JSON payload
+  ansible.builtin.set_fact:
+    wallix_bastion_device_service_json: "{{ lookup('template', 'device_service.json.j2') }}"
+
+- name: Debug Wallix Bastion JSON payload
+  ansible.builtin.debug:
+    var: wallix_bastion_device_service_json
+
+- name: "Create Wallix Bastion device service {{ wallix_bastion_device_service_name }}"
+  ansible.builtin.uri:
+    url: "{{ wallix_bastion_device_service_url }}/devices/{{ wallix_bastion_device_service_data.wallix_device_id }}/services"
+    method: POST
+    body_format: json
+    validate_certs: false
+    status_code:
+      - 204
+    headers:
+      X-Auth-User: "{{ wallix_bastion_device_service_api_key.user }}"
+      X-Auth-Key: "{{  wallix_bastion_device_service_api_key.key }}"
+    body: "{{ wallix_bastion_device_service_json }}"

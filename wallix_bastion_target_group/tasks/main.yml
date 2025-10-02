@@ -1,3 +1,8 @@
+- name: Display data
+  ansible.builtin.debug:
+    var: wallix_bastion_target_group_data
+
+
 - name: Render Wallix Bastion JSON payload
   ansible.builtin.set_fact:
     wallix_bastion_target_group_json: "{{ lookup('template', 'target_group.json.j2') }}"

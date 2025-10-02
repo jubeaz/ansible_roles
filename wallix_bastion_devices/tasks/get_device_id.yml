@@ -28,7 +28,8 @@
             'wallix_device_id': (wallix_response.json[0].id | default('UNKNOWN')),
             'local_domain':  device.value.local_domain,
             'wallix_local_domain_id': (wallix_response.json[0] | community.general.json_query('local_domains[0].id') | default('UNKNOWN')),
-            'services':  device.value.services
+            'services':  device.value.services,
+            'domain_netbios_name': device.value.domain_netbios_name
           }
         })
       }}
