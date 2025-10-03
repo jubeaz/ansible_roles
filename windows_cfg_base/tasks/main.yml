@@ -1,3 +1,7 @@
+- name: Set timezime 
+  ansible.windows.win_timezone:
+    timezone: "{{ w_cfg_base_timezone }}"
+
 - name: Force a DNS on the adapter domain_adapter
   ansible.windows.win_dns_client:
     adapter_names: "{{ w_cfg_base_domain_adapter }}"

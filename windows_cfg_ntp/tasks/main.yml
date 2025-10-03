@@ -1,0 +1,14 @@
+- name: Add or update NTP source
+  ansible.windows.win_regedit:
+    path: HKLM:\System\CurrentControlSet\Services\W32Time\Parameters
+    name: Type
+    data: NTP
+    type: string
+
+- name: Add or update NTP NtpServer
+  ansible.windows.win_regedit:
+    path: HKLM:\System\CurrentControlSet\Services\W32Time\Parameters
+    name: NtpServer
+    data: "{{ w_cfg_ntp_servers | map('regex_replace', '(.*)', '\\1,0x8') | join(' ') }}"
+    type: string
+    
