@@ -1,0 +1,4 @@
+---
+w_cfg_deviceguard_vbs_dma: false
+w_cfg_deviceguard_cg: disabled # enabled, uefi_lock
+w_cfg_deviceguard_hvci: disabled

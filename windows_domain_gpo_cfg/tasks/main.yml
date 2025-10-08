@@ -53,11 +53,17 @@
 - name: Ensure GPO is Linked on OU
   win_gpo_link:
     name: '{{ windows_domain_gpo_cfg_name }}'
-    target: "OU={{ item.value.name }},{{ item.value.path }}"
+    target: >-
+      OU={{ item.value.name }},
+      {{
+        (item.value.path != "microsoft.ad.default_path")
+        | ternary(item.value.path, windows_domain_gpo_cfg_domain_ldap_name)
+      }}
     state: '{{ item.value.state }}'
     enforced: '{{ item.value.enforced }}'
     enabled: '{{ item.value.enabled }}'
   with_dict: "{{ windows_domain_gpo_cfg_ous }}"
+
 
 - name: Ensure GPO is Linked on Domain
   win_gpo_link:

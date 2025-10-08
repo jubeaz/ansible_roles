@@ -1,0 +1,56 @@
+- name: Assert w_cfg_deviceguard_cg
+  ansible.builtin.assert:
+    that:
+      - w_cfg_deviceguard_cg in ['enabled', 'disabled', 'uefi_lock']
+
+#- name: Assert w_cfg_deviceguard_cg
+#  ansible.builtin.assert:
+#    that:
+#      - w_cfg_deviceguard_hvci in ['disabled']
+
+
+- name: Set Hypervisor Launch Type to auto
+  win_shell: bcdedit /set hypervisorlaunchtype auto
+
+# https://learn.microsoft.com/en-us/windows/security/identity-protection/credential-guard/configure?tabs=reg
+- name: Set Virtualization-Based Security
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard
+    name: "EnableVirtualizationBasedSecurity"
+    data: "{{ 0 if w_cfg_deviceguard_cg == 'disabled' else 1 }}"
+    type: dword
+
+
+# 1 (to use Secure Boot)
+# 3 (to use Secure Boot and DMA protection)
+- name: Set DeviceGuard Platform Security Features
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\DeviceGuard
+    name: "RequirePlatformSecurityFeatures"
+    data: "{{ 3 if w_cfg_deviceguard_vbs_dma else 1 }}"
+    type: dword
+
+# 1 (to enable Credential Guard with UEFI lock)
+# 2 (to enable Credential Guard without lock)
+- name: Set LsaCfgFlags for Credential Guard
+  ansible.windows.win_regedit:
+    path: HKLM:\SYSTEM\CurrentControlSet\Control\Lsa
+    name: "LsaCfgFlags"
+    data: "{{ 1 if w_cfg_deviceguard_cg == 'uefi_lock' else 2 }}"
+    type: dword
+
+# https://learn.microsoft.com/en-us/windows/security/hardware-security/enable-virtualization-based-protection-of-code-integrity?tabs=reg
+
+- name: Reboot 
+  ansible.windows.win_reboot:
+    msg: "Rebooting to apply Credential Guard / Device Guard changes"
+
+- name: Get Device Guard status
+  win_shell: |
+    $result = Get-CimInstance -ClassName Win32_DeviceGuard -Namespace root\Microsoft\Windows\DeviceGuard
+    $result.SecurityServicesRunning
+  register: deviceguard_status
+
+- name: Display Device Guard SecurityServicesRunning
+  debug:
+    msg: "Security Services Running: {{ deviceguard_status.stdout_lines }}"
