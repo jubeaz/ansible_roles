@@ -3,4 +3,4 @@
   community.general.pacman:
     update_cache: true
     upgrade: true
-    upgrade_extra_args: "--ignore {{ pacman_upgrade_ingore_list_str }}"
+    upgrade_extra_args: "{{ pacman_extra_args }}"

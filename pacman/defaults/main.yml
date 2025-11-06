@@ -2,3 +2,4 @@
 pacman_aur_directory: /usr/src/aur
 pacman_aur_owner: nobody
 pacman_aur_group: root
+pacman_extra_args:
