@@ -14,7 +14,7 @@
 
 - name: AUR | get metadata from AurJson api for {{ aur_pkg_name }}
   ansible.builtin.uri:
-    url: "https://aur.archlinux.org/rpc.php?v=5&type=info&arg={{ aur_pkg_name | mandatory }}"
+    url: "https://aur.archlinux.org/rpc/v5/info/{{ aur_pkg_name | mandatory }}"
     return_content: true
     timeout: 6
   register: __api_info

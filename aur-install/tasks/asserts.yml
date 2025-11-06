@@ -1,5 +1,5 @@
 ---
-- name: assert aur_pkg is well defined
+- name: Assert aur_pkg is well defined
   ansible.builtin.assert:
     that:
       - aur_pkg_name is defined
