@@ -17,11 +17,11 @@ ExecStart=/bin/vault server -config=/etc/vault.hcl
 KillSignal=SIGINT
 Restart=on-failure
 TimeoutStopSec=30s
-{% if ansible_distribution == 'Archlinux' %}
+{% if ansible_facts["distribution"] == 'Archlinux' %}
 CapabilityBoundingSet=CAP_IPC_LOCK
 Environment=GOMAXPROCS=2
 {% endif %}
-{% if ansible_distribution == 'Ubuntu' %}
+{% if ansible_facts["distribution"] == 'Ubuntu' %}
 PrivateDevices=yes
 SecureBits=keep-caps
 AmbientCapabilities=CAP_IPC_LOCK

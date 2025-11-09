@@ -1,11 +1,11 @@
 ---
 - name: Include OS-specific variables (Ubuntu)
   include_vars: "ubuntu.yml"
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_facts["distribution"] == "Ubuntu"
 
 - name: Include OS-specific variables (Archlinux)
   include_vars: "arch.yml"
-  when: ansible_distribution == "Archlinux"
+  when: ansible_facts["distribution"] == "Archlinux"
 
 - name: Include common variables
   include_vars: "common.yml"

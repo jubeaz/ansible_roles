@@ -14,11 +14,11 @@
 
 - name: Include ubuntu
   include_tasks: ubuntu.yml
-  when: (ansible_distribution == "Ubuntu") and (inventory_hostname in groups[pki_group])
+  when: (ansible_facts["distribution"] == "Ubuntu") and (inventory_hostname in groups[pki_group])
 
 - name: Include arch
   include_tasks: arch.yml
-  when: (ansible_distribution == "Archlinux") and (inventory_hostname in groups[pki_group])
+  when: (ansible_facts["distribution"] == "Archlinux") and (inventory_hostname in groups[pki_group])
 
 - name: Include create-structure
   include_tasks: create-structure.yml

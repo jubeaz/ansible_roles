@@ -2,10 +2,10 @@
 - name: assert proper distribution
   ansible.builtin.assert:
     that:
-      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+      - ansible_facts["distribution"] in ['Kali', 'Ubuntu', 'Archlinux']
     quiet: true
 
-- include_tasks: "{{ ansible_distribution }}.yml" 
+- include_tasks: "{{ ansible_facts.distribution }}.yml" 
 
 - name: Install timesyncd config
   ansible.builtin.template:

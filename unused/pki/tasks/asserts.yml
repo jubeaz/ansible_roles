@@ -2,7 +2,7 @@
 - name: Assert proper distribution
   assert:
     that:
-      - ansible_distribution in ['Ubuntu', 'Archlinux']
+      - ansible_facts["distribution"] in ['Ubuntu', 'Archlinux']
     quiet: true
 - name:
   debug: var=ca_templates

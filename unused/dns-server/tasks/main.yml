@@ -2,11 +2,11 @@
 # tasks file for dns-server
 - name: Include OS-specific variables (Ubuntu)
   include_vars: "ubuntu.yml"
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_facts["distribution"] == "Ubuntu"
 
 - name: Include OS-specific variables (Archlinux)
   include_vars: "arch.yml"
-  when: ansible_distribution == "Archlinux"
+  when: ansible_facts["distribution"] == "Archlinux"
 
 - name: Include common variables 
   include_vars: "common.yml"
@@ -14,9 +14,9 @@
 - include_tasks: asserts.yml
 
 - include_tasks: ubuntu.yml
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_facts["distribution"] == "Ubuntu"
 - include_tasks: arch.yml
-  when: ansible_distribution == "Archlinux"
+  when: ansible_facts["distribution"] == "Archlinux"
 
 - name: Get installed packages
   package_facts:

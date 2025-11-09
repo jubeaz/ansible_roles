@@ -16,7 +16,7 @@
     group: root
     mode: 0644
     remote_src: true
-  when: ansible_distribution == 'Archlinux'
+  when: ansible_facts["distribution"] == 'Archlinux'
   notify: Trust root ca Archlinux
 
 
@@ -28,5 +28,5 @@
     group: root
     mode: 0644
     remote_src: true
-  when: ansible_distribution == 'Ubuntu'
+  when: ansible_facts["distribution"] == 'Ubuntu'
   notify: Trust root ca Ubuntu 

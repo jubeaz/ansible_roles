@@ -2,7 +2,7 @@
 - name: assert proper distribution
   assert:
     that:
-      - ansible_distribution in ['Ubuntu', 'Archlinux']
+      - ansible_facts["distribution"] in ['Ubuntu', 'Archlinux']
     quiet: true
 
 - name: Get installed packages
@@ -14,11 +14,11 @@
     that:
       - "'grub-common' in ansible_facts.packages"
     quiet: true
-  when: ansible_distribution == "Ubuntu"
+  when: ansible_facts["distribution"] == "Ubuntu"
 
 - name: assert grub installed for Archlinux
   assert:
     that:
       - "'grub' in ansible_facts.packages"
     quiet: true
-  when: ansible_distribution == "Archlinux"
+  when: ansible_facts["distribution"] == "Archlinux"

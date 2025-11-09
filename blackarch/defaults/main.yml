@@ -1,2 +1,5 @@
 ---
 pacman_extra_args:
+blackarch_countries:
+  - France
+  - Germany

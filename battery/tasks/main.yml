@@ -2,17 +2,17 @@
 - name: Assert proper distribution
   ansible.builtin.assert:
     that:
-      - ansible_distribution in ['Archlinux']
+      - ansible_facts["distribution"] in ['Archlinux']
     quiet: true
 
 - name: Include OS-specific variables
-  ansible.builtin.include_vars: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
 
 - name: Include common variables
   ansible.builtin.include_vars: "common.yml"
 
 - name: Include OS-specific tasks
-  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_facts.distribution }}.yml"
 
 - name: Get installed packages
   ansible.builtin.package_facts:

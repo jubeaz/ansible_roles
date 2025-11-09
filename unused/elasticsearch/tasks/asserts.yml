@@ -2,7 +2,7 @@
 - name: assert proper distribution
   assert:
     that:
-      - ansible_distribution in ['Ubuntu', 'Archlinux']
+      - ansible_facts["distribution"] in ['Ubuntu', 'Archlinux']
     quiet: yes
 - name: assert es_deployment_type is well set
   assert:

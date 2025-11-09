@@ -3,11 +3,11 @@
 - name: Assert proper distribution
   ansible.builtin.assert:
     that:
-      - ansible_distribution in ['Kali', 'Ubuntu', 'Archlinux']
+      - ansible_facts["distribution"] in ['Kali', 'Ubuntu', 'Archlinux']
     quiet: true
 
 - name: Include Distribution specific tasks
-  ansible.builtin.include_tasks: "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_facts.distribution }}.yml"
 
 - name: Enable ipv4 forward
   ansible.builtin.lineinfile:

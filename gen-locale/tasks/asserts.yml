@@ -2,7 +2,7 @@
 - name: Assert proper distribution
   ansible.builtin.assert:
     that:
-      - ansible_distribution in ['Ubuntu', 'Archlinux', 'Kali']
+      - ansible_facts["distribution"] in ['Ubuntu', 'Archlinux', 'Kali']
     quiet: true
 
 - name: Assert locales_gen is well defined

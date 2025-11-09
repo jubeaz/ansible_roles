@@ -2,7 +2,7 @@
 - name: Assert proper distribution
   assert:
     that:
-      - ansible_distribution in ['Archlinux']
+      - ansible_facts["distribution"] in ['Archlinux']
     quiet: true
 
 
@@ -17,6 +17,7 @@
   changed_when: false
 
 - name: Install BlackArch
+  when: __blackarch_repo.msg == 'line added'
   block:
     - name: Get strap
       ansible.builtin.get_url:
@@ -32,9 +33,21 @@
         path: /tmp/strap.sh
         regexp: 'verify_keyring$'
         state: absent
-  
+
     - name: Run strap
       ansible.builtin.command: /tmp/strap.sh
       register: __strap
       notify: Upgrade packages
-  when: __blackarch_repo.msg == 'line added'
+
+- name: Comment all active Server lines
+  become: true
+  ansible.builtin.replace:
+    path: /etc/pacman.d/blackarch-mirrorlist
+    regexp: '^Server ='
+    replace: '#Server ='
+
+- name: Set BlackArch mirrors for countries
+  become: true
+  ansible.builtin.shell: |
+    sed -i '/^# {{ item }}/,/^# [A-Z]/ { /^#Server/s/^#// }' /etc/pacman.d/blackarch-mirrorlist
+  with_items:  "{{ blackarch_countries }}"
