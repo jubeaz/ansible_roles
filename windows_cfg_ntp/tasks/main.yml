@@ -11,4 +11,3 @@
     name: NtpServer
     data: "{{ w_cfg_ntp_servers | map('regex_replace', '(.*)', '\\1,0x8') | join(' ') }}"
     type: string
-    
