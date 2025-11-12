@@ -1,0 +1,5 @@
+---
+- name: Install nfs-utils
+  community.general.pacman: 
+    name: nfs-utils
+    state: latest

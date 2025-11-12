@@ -1,0 +1,38 @@
+- name: Set AnonymousUID
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default
+    name: AnonymousUID
+    data: "{{ w_cfg_nfs_client_anonymous_uid }}"
+    type: dword
+
+- name: Set AnonymousGID
+  ansible.windows.win_regedit:
+    path: HKLM:\SOFTWARE\Microsoft\ClientForNFS\CurrentVersion\Default
+    name: AnonymousGID
+    data: "{{ w_cfg_nfs_client_anonymous_uid }}"
+    type: dword
+
+
+- name: Enable NFS Client feature on Windows
+  ansible.windows.win_feature:
+    name: NFS-Client
+    state: present
+
+# for windows 10/11
+# Enable-WindowsOptionalFeature -FeatureName ServicesForNFS-ClientOnly, ClientForNFS-Infrastructure -Online -NoRestart
+
+- name: Map NFS drives
+  ansible.windows.win_powershell:
+    script: |
+      param([string]$Drive, [string]$Path)
+      New-PSdrive -PSProvider FileSystem -Name $Drive -Root $Path -Persist
+    error_action: stop
+    parameters:
+      Drive: "{{ item.key }}"
+      Path: "{{ item.value }}"
+  loop: "{{ w_cfg_nfs_client_mounts | dict2items }}"
+
+#- name: Make mount persistent
+#  ansible.windows.win_shell: |
+#    C:\Windows\System32\mount.exe -o anon {{ item.value }} {{ item.key }}: 
+#  loop: "{{ w_cfg_nfs_client_mounts | dict2items }}"

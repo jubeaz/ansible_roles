@@ -1,0 +1,15 @@
+nfs_exports: []
+#  - path: /path
+#    acl: *
+#    options:
+#      - rw
+#      - sync
+#      - no_subtree_check
+
+
+nfs_mounts: []
+#  - src: "192.168.10.2:/srv/nfs/jubeaz"
+#    dest: "/mnt/nfs/jubeaz"
+#    fstype: "nfs4"
+#    opts: "defaults,_netdev"
+#    state: "mounted"

@@ -1,0 +1,16 @@
+
+- name: Ensure the mount directory exists
+  ansible.builtin.file:
+    path: "{{ item.dest }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ nfs_mounts }}"
+
+- name: Mount NFS shares
+  ansible.builtin.mount:
+    path: "{{ item.dest }}"
+    src: "{{ item.src }}"
+    fstype: "{{ item.fstype }}"
+    opts: "{{ item.opts }}"
+    state: "{{ item.state }}"
+  loop: "{{ nfs_mounts }}"

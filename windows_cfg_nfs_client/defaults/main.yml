@@ -1,0 +1,5 @@
+w_cfg_nfs_client_mounts: {}
+#  {Z: \\domain\appdata\accounting}
+
+w_cfg_nfs_client_anonymous_uid: 0
+w_cfg_nfs_client_anonymous_gid: 0
