@@ -1,0 +1,36 @@
+---
+- name: Install haproxy
+  community.general.pacman:
+    name: haproxy
+    state: present
+    update_cache: true
+
+#- name: Ensure build dependencies are installed
+#  pacman:
+#    name:
+#      - base-devel
+#      - openssl
+#      - zlib
+#      - pcre2
+#      - lua
+#      - git
+#    state: present
+#    update_cache: true
+#
+#- name: Clone HAProxy repository
+#  git:
+#    repo: "https://github.com/haproxy/haproxy.git"
+#    dest: "/usr/src/haproxy"
+#    version: "v3.2.0"
+#    force: yes
+#
+#- name: Build HAProxy from source
+#  command: >
+#    make TARGET=linux-glibc OPTIONS = USE_GETADDRINFO=1 USE_OPENSSL=1 USE_LUA=0 USE_ZLIB=1 USE_QUIC=1 USE_PROMEX=0 USE_PCRE2=1 USE_PCRE2_JIT=1
+#  args:
+#    chdir: "/opt/haproxy"
+#
+#- name: Install HAProxy
+#  command: make install
+#  args:
+#    chdir: "/opt/haproxy"

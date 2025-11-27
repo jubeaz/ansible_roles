@@ -1,0 +1,9 @@
+[Unit]
+Requires=systemd-journald.service
+Description=/Expose Systemd Log for HAProxy
+
+[Mount]
+What=/dev/log
+Where={{ haproxy_unit_mount_name }}
+Type=none
+Options=bind

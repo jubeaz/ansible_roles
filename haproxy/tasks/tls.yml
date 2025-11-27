@@ -1,38 +1,39 @@
 
-- name: Create cert directory form "{{ cert.name }}"
-  file:
+- name: Create certificate key directory for "{{ cert.name }}"
+  ansible.builtin.file:
     path: "{{ cert.key_path }}"
     state: directory
     owner: root
     group: root
-    mode: 0700
-- name: Create key directory form "{{ cert.name }}"
-  file:
+    mode: "0700"
+
+- name: Create certificate directory for "{{ cert.name }}"
+  ansible.builtin.file:
     path: "{{ cert.cert_path }}"
     state: directory
     owner: root
     group: root
-    mode: 0700
-- name: Create key+file directory form "{{ cert.name }}"
-  file:
-    path: "{{ cert.path }}"
+    mode: "0700"
+
+- name: Create bundle output directory for "{{ cert.name }}"
+  ansible.builtin.file:
+    path: "{{ cert.bundle_path }}"
     state: directory
     owner: root
     group: root
-    mode: 0700
+    mode: "0700"
 
 - name: Generate private key for "{{ cert.name }}"
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ cert.key_path }}/{{ cert.key_name }}"
     size: "4096"
     type: RSA
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
 
-- name: Generate csr for "{{ cert.name }}"
-  openssl_csr:
-    path: "haproxy.csr"
+- name: Generate CSR for "{{ cert.name }}"
+  community.crypto.openssl_csr:
     path: "{{ cert.cert_path }}/csr_{{ cert.cert_name }}"
     privatekey_path: "{{ cert.key_path }}/{{ cert.key_name }}"
     common_name: "{{ cert.cn }}"
@@ -44,34 +45,34 @@
       - serverAuth
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
 
-- name: Sign csr for "{{ cert.name }}"
-  openssl_certificate:
+- name: Sign CSR for "{{ cert.name }}"
+  community.crypto.x509_certificate:
     path: "{{ cert.cert_path }}/{{ cert.cert_name }}"
     privatekey_path: "{{ cert.key_path }}/{{ cert.key_name }}"
     csr_path: "{{ cert.cert_path }}/csr_{{ cert.cert_name }}"
     provider: selfsigned
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
 
-- name: Check if intermediate certificate file exist
-  stat:
-    path: "{{ cert.path }}/{{ cert.name }}"
+- name: Check if certificate bundle exists for "{{ cert.name }}"
+  ansible.builtin.stat:
+    path: "{{ cert.bundle_path }}/{{ cert.bundle_name }}"
   register: __cert
 
-- name: read key and certificate for "{{ cert.name }}"
-  command: awk 1 "{{ cert.key_path }}/{{ cert.key_name }}" "{{ cert.cert_path }}/{{ cert.cert_name }}"
+- name: Read key and certificate for "{{ cert.name }}"
+  ansible.builtin.command: >
+    awk 1 "{{ cert.key_path }}/{{ cert.key_name }}" "{{ cert.cert_path }}/{{ cert.cert_name }}"
   register: __bundle
   when: not __cert.stat.exists
 
-- name: create key and cert bundle file for "{{ cert.name }}"
-  copy:
-    dest: "{{ cert.path }}/{{ cert.name }}"
+- name: Create key + certificate bundle for "{{ cert.name }}"
+  ansible.builtin.copy:
+    dest: "{{ cert.bundle_path }}/{{ cert.bundle_name }}"
     content: "{{ __bundle.stdout }}"
-    remote_src: true
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
   when: not __cert.stat.exists

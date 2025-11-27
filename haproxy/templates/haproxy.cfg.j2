@@ -2,7 +2,7 @@
 
 global
 {% if  ansible_facts["distribution"] == "Archlinux" %}
-  log         127.0.0.1 local0
+  log /dev/log local0 info
 {% else %}
   log /dev/log  local0
   log /dev/log  local1 notice
@@ -39,19 +39,21 @@ defaults
 
 {% for front in haproxy_frontends %}
 frontend {{ front.name }}
-    bind {{ front.bind_addr }}:{{ front.bind_port }} {{ front.bind_extra }}
+{% for b in front.binds %}
+    bind {{ b.addr }}:{{ b.port }} {{ b.extra | default('') }}
+{% endfor %}
     mode {{ front.mode }}
-{% for option,params in front.option.items() %}
-    option {{ option }} {{ params }}
+{% for o in front.options %}
+    {{ o.name }} {{ o.value }}
 {% endfor %}
 {% for acl,params in front.acl.items() %}
     acl {{ acl }} {{ params }}
 {% endfor %}
-{% for param,value in front.extra_params.items() %}
-    {{ param }} {{ value }}
-{% endfor %}
 {% for back in front.use_backends %}
     use_backend {{ back }}
+{% endfor %}
+{% for param,value in front.extra_params.items() %}
+    {{ param }} {{ value }}
 {% endfor %}
 {% endfor %}
 

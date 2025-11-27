@@ -1,0 +1,83 @@
+- name: Assert proper distribution
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["distribution"] in ['Archlinux']
+    quiet: true
+
+- name: Load common variable definitions
+  ansible.builtin.include_vars: common.yml
+
+- name: Load specific variable definitions
+  ansible.builtin.include_vars: "{{ ansible_facts.distribution }}.yml"
+
+- name: Include Distribution specific tasks
+  ansible.builtin.include_tasks: "{{ ansible_facts.distribution }}.yml"
+
+- name: Gather installed package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+#- name: Configure UFW frontends
+#  ansible.builtin.include_tasks: ufw_frontend.yml
+#  when: "'ufw' in ansible_facts.packages"
+#  loop: "{{ haproxy_frontends }}"
+#  loop_control:
+#    loop_var: front
+
+- name: Manage TLS certificates
+  ansible.builtin.include_tasks: tls.yml
+  loop: "{{ haproxy_certs }}"
+  loop_control:
+    loop_var: cert
+
+- name: Manage HAProxy chrooted
+  when: haproxy_chroot != ''
+  block:
+    - name: Create HAProxy chroot directory
+      ansible.builtin.file:
+        path: "{{ haproxy_chroot }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+    - name: Create HAProxy conf override directory
+      ansible.builtin.file:
+        path: /etc/systemd/system/haproxy.service.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+    - name: Escape systemd mount unit name for haproxy
+      ansible.builtin.command: >
+        systemd-escape --suffix=mount --path {{ haproxy_chroot }}/dev/log
+      register: __haproxy_escape_cmd
+      changed_when: false
+    - name: Set fact haproxy_unit_mount_name
+      ansible.builtin.set_fact:
+        haproxy_unit_mount_name: "{{ __haproxy_escape_cmd.stdout }}"
+    - name: Deploy HAProxy mount unit
+      ansible.builtin.template:
+        src: unit.mount.j2
+        dest: "/etc/systemd/system/{{ haproxy_unit_mount_name }}"
+        mode: "0644"
+      notify: restart haproxy
+    - name: Deploy HAProxy mount override
+      ansible.builtin.template:
+        src: override.conf.j2
+        dest: /etc/systemd/system/haproxy.service.d/override.conf
+        mode: "0644"
+      notify: Restart haproxy
+
+- name: Deploy HAProxy configuration
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    mode: "0644"
+    #validate: "haproxy -f %s -c -q"
+  notify: Restart haproxy
+
+#- name: Ensure HAProxy is started and enabled
+#  ansible.builtin.service:
+#    name: haproxy
+#    state: started
+#    enabled: true
