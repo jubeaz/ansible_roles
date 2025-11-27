@@ -1,0 +1,167 @@
+- name: Install requierements
+  community.general.pacman:
+    name:
+      - jq
+    state: present
+
+
+- name: Create elk docker directory
+  ansible.builtin.file:
+    path: /opt/elastic-container
+    state: directory
+    mode: "0755"
+
+- name: Clone Elastic Container repository
+  ansible.builtin.git:
+    repo: "https://github.com/peasead/elastic-container.git"
+    dest: "/opt/elastic-container"
+    version: "main"
+    force: true
+
+- name: Set ELASTIC_PASSWORD in .env
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/.env"
+    regexp: '^ELASTIC_PASSWORD='
+    line: "ELASTIC_PASSWORD={{ elkf_elastic_password }}"
+    backrefs: true
+
+- name: Set KIBANA_PASSWORD in .env
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/.env"
+    regexp: '^KIBANA_PASSWORD='
+    line: "KIBANA_PASSWORD={{ elkf_kibana_password }}"
+    backrefs: true
+
+- name: Enable WindowsDR in .env
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/.env"
+    regexp: '^WindowsDR='
+    line: "WindowsDR=1"
+    backrefs: true
+
+
+- name: Set lincence to trial in .env
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/.env"
+    regexp: '^LICENSE='
+    line: "LICENSE=trial"
+    backrefs: true
+
+- name: Set lincence to trial in .env
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/.env"
+    regexp: '^LICENSE='
+    line: "LICENSE=trial"
+    backrefs: true
+
+- name: Change sleep duration
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/elastic-container.sh"
+    regexp: 'sleep 40'
+    line: 'sleep {{ elk_sleep }}'
+
+- name: Update get_host_ip function to use specific interface
+  ansible.builtin.lineinfile:
+    path: "/opt/elastic-container/elastic-container.sh"
+    regexp: '^\s*ipvar=\$\(hostname -I.*\)$'
+    line: '    ipvar=$(ip addr show "{{ elkf_iface_name }}" | awk ''/inet / {print $2}'' | cut -d/ -f1 | head -n1)'
+    backrefs: true
+
+- name: Start and enable docker
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: restarted
+
+- name: Make elastic-container.sh executable
+  ansible.builtin.file:
+    path: /opt/elastic-container/elastic-container.sh
+    mode: '0755'
+- name: Run elastic-container.sh start
+  ansible.builtin.command:
+    cmd: ./elastic-container.sh start
+    chdir: /opt/elastic-container
+  register: elastic_container_output
+
+- name: Show script output
+  ansible.builtin.debug:
+    var: elastic_container_output.stdout_lines
+
+- name: Get agent policies
+  ansible.builtin.uri:
+    url: "https://127.0.0.1:5601/api/fleet/agent_policies"
+    method: GET
+    user: "elastic"
+    password: "{{ elkf_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      content-type: "application/json"
+      kbn-xsrf: xx
+    validate_certs: false
+    return_content: true
+  register: agent_policies
+  failed_when: agent_policies.status != 200
+
+- name: Extract Endpoint policy ID
+  ansible.builtin.set_fact:
+    endpoint_policy_id: >-
+      {{
+        (agent_policies.json['items']
+        | selectattr('name', 'equalto', 'Endpoint Policy')
+        | map(attribute='id')
+        | list
+        ) | first | default('', true)
+      }}
+
+- name: Get enrollment API keys from Kibana
+  ansible.builtin.uri:
+    url: "https://127.0.0.1:5601/api/fleet/enrollment_api_keys"
+    method: GET
+    user: "elastic"
+    password: "{{ elkf_elastic_password }}"
+    force_basic_auth: true
+    headers:
+      content-type: "application/json"
+      kbn-xsrf: "true"
+    validate_certs: false
+    return_content: true
+  register: enrollment_keys_resp
+  failed_when: enrollment_keys_resp.status != 200
+
+- name: Extract enrollment token for Endpoint policy
+  ansible.builtin.set_fact:
+    endpoint_enrollment_token: >-
+      {{
+        (enrollment_keys_resp.json['items']
+        | selectattr('policy_id', 'equalto', endpoint_policy_id)
+        | map(attribute='api_key')
+        | list
+        ) | first | default('', true)
+      }}
+
+- name: Fail if no enrollment token found
+  ansible.builtin.fail:
+    msg: "No enrollment token found for Agent Policy 'Endpoint policy'"
+  when: endpoint_enrollment_token == ''
+
+- name: Show enrollment token for Endpoint policy
+  ansible.builtin.debug:
+    msg: "Enrollment token: {{ endpoint_enrollment_token }}"
+
+- name: Save enrollment token to file
+  ansible.builtin.copy:
+    dest: "/opt/elastic-container/enrollment_token.txt"
+    content: "{{ endpoint_enrollment_token }}"
+    owner: root
+    group: root
+    mode: '0600'
+
+- name: Show token path
+  ansible.builtin.debug:
+    msg: "Enrollment token saved to /opt/elastic-container/enrollment_token.txt"
+
+- name: Fetch enrollment_token.txt from the remote host
+  ansible.builtin.fetch:
+    src: /opt/elastic-container/enrollment_token.txt
+    dest: "../../files/enrollment_token.txt"
+    flat: true
