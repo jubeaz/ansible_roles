@@ -1,0 +1,31 @@
+- name: Set enrollment token
+  ansible.builtin.set_fact:
+    w_cfg_elastic_endpoint_enrollment_token: "{{ lookup('file', '../../files/enrollment_token.txt') }}"
+
+- name: Create a directory for installer download
+  ansible.windows.win_file:
+    path: c:\setup
+    state: directory
+
+- name: Download Elastic Agent ZIP
+  ansible.windows.win_get_url:
+    url: "https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-{{ w_cfg_elastic_endpoint_version }}-windows-x86_64.zip"
+    dest: "C:\\setup\\elastic-agent-{{ w_cfg_elastic_endpoint_version }}-windows-x86_64.zip"
+    force: true
+
+- name: Unzip Elastic Agent
+  community.windows.win_unzip:
+    src: "C:\\setup\\elastic-agent-{{ w_cfg_elastic_endpoint_version }}-windows-x86_64.zip"
+    dest: "C:\\setup"
+    overwrite: true
+
+- name: Elastic Agent debug
+  ansible.builtin.debug:
+    msg: "c:\\setup\\elastic-agent-{{ w_cfg_elastic_endpoint_version }}-windows-x86_64\\elastic-agent.exe install --url=https://{{ w_cfg_elastic_endpoint_server }}:8220 --insecure -f --enrollment-token={{ w_cfg_elastic_endpoint_enrollment_token }} *> 'C:\\setup\\agent-install.log'"
+
+- name: Install Elastic Agent
+  ansible.windows.win_shell: |
+    ./elastic-agent.exe install --url=https://{{ w_cfg_elastic_endpoint_server }}:8220 --insecure -f --enrollment-token={{ w_cfg_elastic_endpoint_enrollment_token }} *> "C:\setup\agent-install.log"
+    exit $LASTEXITCODE
+  args:
+    chdir: "c:\\setup\\elastic-agent-{{ w_cfg_elastic_endpoint_version }}-windows-x86_64"
