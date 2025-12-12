@@ -43,6 +43,9 @@
     append: true
   loop: "{{ libvirt_group_members }}"
 
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
+
 - name: Create storage pools
   ansible.builtin.include_tasks: "storage.yml"
   loop: "{{ libvirt_storage_pools }}"
@@ -54,3 +57,6 @@
   loop: "{{ libvirt_networks }}"
   loop_control:
     loop_var: libvirt_network
+
+- name: Flush handlers
+  ansible.builtin.meta: flush_handlers
