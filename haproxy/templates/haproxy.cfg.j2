@@ -2,7 +2,8 @@
 
 global
 {% if  ansible_facts["distribution"] == "Archlinux" %}
-  log /dev/log local0 info
+  # log /dev/log local0 info
+  log stdout format raw local0 info
 {% else %}
   log /dev/log  local0
   log /dev/log  local1 notice
@@ -24,9 +25,11 @@ global
 defaults
   log global
   option  dontlognull
+  option tcplog
   timeout connect {{ haproxy_connect_timeout }}
   timeout client {{ haproxy_client_timeout }}
   timeout server {{ haproxy_server_timeout }}
+  timeout tunnel {{ haproxy_tunnel_timeout }}
 {% if ansible_facts["distribution"] == 'Ubuntu' %}
   errorfile 400 /etc/haproxy/errors/400.http
   errorfile 403 /etc/haproxy/errors/403.http
@@ -60,8 +63,8 @@ frontend {{ front.name }}
 {% for back in haproxy_backends %}
 backend {{ back.name }}
     mode {{ back.mode }}
-{% for option,params in back.option.items() %}
-    option {{ option }} {{ params }}
+{% for be_o in back.options %}
+    {{ be_o.name }} {{ be_o.value }}
 {% endfor %}
 {% for param,value in back.extra_params.items() %}
     {{ param }} {{ value }}

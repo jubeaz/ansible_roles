@@ -60,7 +60,7 @@
         src: unit.mount.j2
         dest: "/etc/systemd/system/{{ haproxy_unit_mount_name }}"
         mode: "0644"
-      notify: restart haproxy
+      notify: Restart haproxy
     - name: Deploy HAProxy mount override
       ansible.builtin.template:
         src: override.conf.j2

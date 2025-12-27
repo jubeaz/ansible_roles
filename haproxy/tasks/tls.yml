@@ -1,4 +1,3 @@
-
 - name: Create certificate key directory for "{{ cert.name }}"
   ansible.builtin.file:
     path: "{{ cert.key_path }}"
